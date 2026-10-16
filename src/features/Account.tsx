@@ -101,7 +101,9 @@ export function Profile({
   return (
     <>
       <div className="notice">
-        <p>Hai effettuato l’accesso come <strong>{user.email}</strong>.</p>
+        <p>
+          Hai effettuato l’accesso come <strong>{user.email}</strong>.
+        </p>
         <button
           type="button"
           className="secondary"
