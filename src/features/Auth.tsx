@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   savePasswordProof,
   getPasswordProof,
@@ -26,7 +26,14 @@ export default function Auth({
     [phone, setPhone] = useState(""),
     [accepted, setAccepted] = useState(false),
     [legal, setLegal] = useState(false),
-    [busy, setBusy] = useState(false);
+    [busy, setBusy] = useState(false),
+    [registrationCode, setRegistrationCode] = useState(""),
+    [retrySeconds, setRetrySeconds] = useState(0);
+  useEffect(() => {
+    if (!retrySeconds) return;
+    const timer = window.setTimeout(() => setRetrySeconds((n) => Math.max(0, n - 1)), 1000);
+    return () => window.clearTimeout(timer);
+  }, [retrySeconds]);
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
@@ -59,8 +66,10 @@ export default function Auth({
           onDone();
           close();
         } else {
-          notify("Controlla la tua email e conferma la registrazione.");
-          setMode("login");
+          notify("Controlla la tua email: inserisci il codice ricevuto oppure apri il link di conferma.");
+          setRegistrationCode("");
+          setRetrySeconds(60);
+          setMode("verify");
         }
       } else {
         const { data, error } = await supabase.auth.signInWithPassword({
@@ -78,6 +87,50 @@ export default function Auth({
       setBusy(false);
     }
   }
+  if (mode === "verify") return (
+    <Modal title="Completa la registrazione" close={close}>
+      <p>Inserisci il codice ricevuto via email, oppure usa il link di conferma presente nel messaggio.</p>
+      <form onSubmit={async (event) => {
+        event.preventDefault();
+        if (busy) return;
+        setBusy(true);
+        try {
+          const { error } = await supabase.auth.verifyOtp({
+            email: email.trim(), token: registrationCode.trim(), type: "email",
+          });
+          if (error) throw error;
+          notify("Email verificata! Benvenuto su BarberCut.");
+          onDone();
+          close();
+        } catch {
+          notify("Il codice non è valido o è scaduto. Controllalo oppure richiedi una nuova email.");
+        } finally { setBusy(false); }
+      }}>
+        <Field label="Email di registrazione" name="email" type="email" value={email} onChange={setEmail}/>
+        <label>Codice di verifica
+          <input name="registration-code" type="text" inputMode="numeric" autoComplete="one-time-code"
+            pattern="[0-9]+" value={registrationCode}
+            onChange={(event) => setRegistrationCode(event.target.value.replace(/[^0-9]/g, ""))}
+            required disabled={busy}/>
+        </label>
+        <button className="primary" disabled={busy}>{busy ? "Verifica in corso…" : "Completa registrazione"}</button>
+      </form>
+      <button className="text" disabled={busy || retrySeconds > 0 || !email.trim()} onClick={async () => {
+        setBusy(true);
+        try {
+          const { error } = await supabase.auth.resend({
+            type: "signup", email: email.trim(),
+            options: { emailRedirectTo: location.origin + import.meta.env.BASE_URL },
+          });
+          if (error) throw error;
+          setRetrySeconds(60);
+          notify("Se l’account è in attesa di conferma, riceverai una nuova email. Controlla anche la cartella spam.");
+        } catch { notify("Non riesco a inviare una nuova email. Attendi un minuto e riprova."); }
+        finally { setBusy(false); }
+      }}>{retrySeconds ? "Puoi richiedere una nuova email tra " + retrySeconds + " secondi" : "Invia di nuovo l’email"}</button>
+      <button className="text" disabled={busy} onClick={() => setMode("login")}>Torna ad Accedi</button>
+    </Modal>
+  );
   return (
     <>
       <Modal
@@ -170,6 +223,7 @@ export default function Auth({
           </button>
         </form>
         <div className="auth-links">
+          <button className="text" onClick={() => setMode("verify")}>Hai già un codice? Conferma la tua email</button>
           <button
             className="text"
             onClick={() => setMode(mode === "register" ? "login" : "register")}
