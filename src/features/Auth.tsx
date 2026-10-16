@@ -260,14 +260,18 @@ export default function Auth({
                   checked={accepted}
                   onChange={(e) => setAccepted(e.target.checked)}
                 />
-                Accetto i{" "}
-                <button
-                  className="text"
-                  type="button"
-                  onClick={() => setLegal(true)}
-                >
-                  Termini e condizioni
-                </button>
+                <span style={{ flex: "1 1 220px" }}>
+                  Dichiaro di aver letto e accettato i{" "}
+                  <button
+                    className="text"
+                    type="button"
+                    onClick={() => setLegal(true)}
+                  >
+                    termini e condizioni di utilizzo
+                  </button>{" "}
+                  e di aver preso visione dell'informativa sul trattamento dei
+                  dati personali (privacy policy)
+                </span>
               </label>
             </>
           )}
