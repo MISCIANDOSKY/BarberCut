@@ -37,8 +37,35 @@ export default function Auth({
     );
     return () => window.clearTimeout(timer);
   }, [retrySeconds]);
+  async function sendLoginCode() {
+    if (busy || retrySeconds > 0) return;
+    setBusy(true);
+    try {
+      clearPasswordProof();
+      await result(supabase.auth.signInWithOtp({
+        email: email.trim(),
+        options: {
+          shouldCreateUser: false,
+          emailRedirectTo: location.origin + import.meta.env.BASE_URL,
+        },
+      }));
+      setRegistrationCode("");
+      setRetrySeconds(60);
+      setMode("otpVerify");
+      notify("Se l’email è associata a un account, riceverai il codice di accesso. Controlla anche la cartella spam.");
+    } catch (error) {
+      notify((await import("../lib/api")).friendly(error));
+    } finally {
+      setBusy(false);
+    }
+  }
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (busy) return;
+    if (mode === "otp") {
+      await sendLoginCode();
+      return;
+    }
     setBusy(true);
     try {
       const redirect = location.origin + import.meta.env.BASE_URL;
@@ -92,9 +119,10 @@ export default function Auth({
       setBusy(false);
     }
   }
-  if (mode === "verify")
+  const verifyingLogin = mode === "otpVerify";
+  if (mode === "verify" || verifyingLogin)
     return (
-      <Modal title="Completa la registrazione" close={close}>
+      <Modal title={verifyingLogin ? "Accedi con codice di verifica" : "Completa la registrazione"} close={close}>
         <p>
           Inserisci il codice ricevuto via email, oppure usa il link di conferma
           presente nel messaggio.
@@ -111,7 +139,8 @@ export default function Auth({
                 type: "email",
               });
               if (error) throw error;
-              notify("Email verificata! Benvenuto su BarberCut.");
+              if (verifyingLogin) await authorizeStaff();
+              notify(verifyingLogin ? "Accesso effettuato. Bentornato!" : "Email verificata! Benvenuto su BarberCut.");
               onDone();
               close();
             } catch {
@@ -124,7 +153,7 @@ export default function Auth({
           }}
         >
           <Field
-            label="Email di registrazione"
+            label={verifyingLogin ? "Email di accesso" : "Email di registrazione"}
             name="email"
             type="email"
             value={email}
@@ -147,13 +176,17 @@ export default function Auth({
             />
           </label>
           <button className="primary" disabled={busy}>
-            {busy ? "Verifica in corso…" : "Completa registrazione"}
+            {busy ? "Verifica in corso…" : verifyingLogin ? "Accedi" : "Completa registrazione"}
           </button>
         </form>
         <button
           className="text"
           disabled={busy || retrySeconds > 0 || !email.trim()}
           onClick={async () => {
+            if (verifyingLogin) {
+              await sendLoginCode();
+              return;
+            }
             setBusy(true);
             try {
               const { error } = await supabase.auth.resend({
@@ -198,11 +231,13 @@ export default function Auth({
             ? "Crea il tuo account"
             : mode === "reset"
               ? "Recupera password"
-              : "Bentornato"
+              : mode === "otp"
+                ? "Accedi con codice di verifica"
+                : "Bentornato"
         }
         close={close}
       >
-        <p className="muted">Il tuo prossimo appuntamento comincia qui.</p>
+        <p className="muted">{mode === "otp" ? "Inserisci l’email del tuo account: ti invieremo un codice per accedere senza password." : "Il tuo prossimo appuntamento comincia qui."}</p>
         <form onSubmit={submit}>
           {mode === "register" && (
             <div className="two">
@@ -236,7 +271,7 @@ export default function Auth({
               onChange={setPhone}
             />
           )}
-          {mode !== "reset" && (
+          {(mode === "login" || mode === "register") && (
             <label>
               Password
               <input
@@ -275,19 +310,28 @@ export default function Auth({
               </label>
             </>
           )}
-          <button className="primary" disabled={busy}>
-            {busy
+          <button className="primary" disabled={busy || (mode === "otp" && retrySeconds > 0)}>
+            {mode === "otp" && retrySeconds > 0 ? "Riprova tra " + retrySeconds + " secondi" : busy
               ? "Attendi…"
               : mode === "register"
                 ? "Registrati"
                 : mode === "reset"
                   ? "Invia email"
-                  : "Accedi"}
+                  : mode === "otp" ? "Invia codice di accesso" : "Accedi"}
           </button>
         </form>
         <div className="auth-links">
-          <button className="text" onClick={() => setMode("verify")}>
-            Hai già un codice? Conferma la tua email
+          <button
+            className="text"
+            disabled={busy}
+            onClick={() => {
+              if (mode === "otp") setMode("login");
+              else if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) && retrySeconds === 0) void sendLoginCode();
+              else if (email.trim() && retrySeconds > 0) setMode("otpVerify");
+              else setMode("otp");
+            }}
+          >
+            {mode === "otp" ? "Accedi con password" : "Accedi con codice di verifica"}
           </button>
           <button
             className="text"
@@ -411,10 +455,9 @@ export function StaffGate({
 }
 export async function authorizeStaff() {
   const proof = getPasswordProof();
-  if (!proof) return false;
   const { error } = await supabase.functions.invoke(
     "staff-email-verification",
-    { body: { password_token: proof } },
+    { body: proof ? { password_token: proof } : {} },
   );
   if (error) return false;
   clearPasswordProof();

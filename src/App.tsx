@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { getPasswordProof, clearPasswordProof } from "./lib/passwordProof";
+import { clearPasswordProof } from "./lib/passwordProof";
 import type { User } from "@supabase/supabase-js";
 import { Panel, Empty, Modal } from "./components/UI";
 import PWA from "./components/PWA";
@@ -160,7 +160,7 @@ export default function App() {
       }
       if (event === "SIGNED_IN")
         setTimeout(async () => {
-          if (getPasswordProof()) await authorizeStaff();
+          await authorizeStaff();
           refresh();
         }, 0);
     });
