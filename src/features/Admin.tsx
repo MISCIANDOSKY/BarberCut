@@ -400,12 +400,10 @@ export default function Admin({
             const v = new FormData(e.currentTarget);
             run(() =>
               result(
-                supabase
-                  .from("barbers")
-                  .insert({
-                    name: v.get("name"),
-                    user_id: v.get("user") || null,
-                  }),
+                supabase.from("barbers").insert({
+                  name: v.get("name"),
+                  user_id: v.get("user") || null,
+                }),
               ),
             );
           }}
@@ -442,14 +440,12 @@ export default function Admin({
               const v = new FormData(e.currentTarget);
               run(() =>
                 result(
-                  supabase
-                    .from("services")
-                    .insert({
-                      name: v.get("name"),
-                      description: v.get("description"),
-                      duration_minutes: Number(v.get("duration")),
-                      price: Number(v.get("price")),
-                    }),
+                  supabase.from("services").insert({
+                    name: v.get("name"),
+                    description: v.get("description"),
+                    duration_minutes: Number(v.get("duration")),
+                    price: Number(v.get("price")),
+                  }),
                 ),
               );
             }}
@@ -490,12 +486,10 @@ export default function Admin({
               const v = new FormData(e.currentTarget);
               run(() =>
                 result(
-                  supabase
-                    .from("barber_services")
-                    .upsert({
-                      barber_id: v.get("barber"),
-                      service_id: v.get("service"),
-                    }),
+                  supabase.from("barber_services").upsert({
+                    barber_id: v.get("barber"),
+                    service_id: v.get("service"),
+                  }),
                 ),
               );
             }}
