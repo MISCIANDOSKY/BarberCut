@@ -382,12 +382,21 @@ export default function App() {
       )}
       <main>
         {section ? (
-          <div className="workspace" style={{ paddingTop: "24px", minHeight: "60vh" }}>
+          <div
+            className="workspace"
+            style={{ paddingTop: "24px", minHeight: "60vh" }}
+          >
             <Panel key={section} title={section} back={() => setSection("")}>
               {loading ? (
-                <p className="empty" role="status">Caricamento…</p>
+                <p className="empty" role="status">
+                  Caricamento…
+                </p>
               ) : staff && !verified && section !== "Profilo" ? (
-                <StaffGate email={user!.email!} done={refresh} notify={notify} />
+                <StaffGate
+                  email={user!.email!}
+                  done={refresh}
+                  notify={notify}
+                />
               ) : (
                 content()
               )}
@@ -460,10 +469,7 @@ export default function App() {
                 />
               ) : (
                 <>
-                  <nav
-                    className="main-actions"
-                    aria-label="Azioni principali"
-                  >
+                  <nav className="main-actions" aria-label="Azioni principali">
                     {choices.map(([icon, title, sub], i) => (
                       <button
                         key={title}
