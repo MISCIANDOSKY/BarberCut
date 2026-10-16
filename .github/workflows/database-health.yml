@@ -1,0 +1,29 @@
+name: Database availability
+on:
+  schedule:
+    - cron: '17 1,7,13,19 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/database-health.yml'
+      - 'scripts/check-database.mjs'
+      - 'tests/database-health.test.mjs'
+permissions:
+  contents: read
+concurrency:
+  group: barbercut-database-health
+  cancel-in-progress: false
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test availability checker
+        run: node --test tests/database-health.test.mjs
+      - name: Query live BarberCut database
+        run: node scripts/check-database.mjs
