@@ -32,7 +32,13 @@ export default function Admin({
                 : null;
       if (table) {
         const query = supabase.from(table).select("*");
-        setRows(await result(table === "services" || table === "barbers" ? query.is("deleted_at", null) : query) as Row[]);
+        setRows(
+          (await result(
+            table === "services" || table === "barbers"
+              ? query.is("deleted_at", null)
+              : query,
+          )) as Row[],
+        );
       }
       if (section === "Utenti" || section === "Barbieri")
         setUsers(
@@ -40,10 +46,14 @@ export default function Admin({
         );
       if (section === "Servizi") {
         setServices(
-          (await result(supabase.from("services").select("*").is("deleted_at", null))) as Row[],
+          (await result(
+            supabase.from("services").select("*").is("deleted_at", null),
+          )) as Row[],
         );
         setBarbers(
-          (await result(supabase.from("barbers").select("*").is("deleted_at", null))) as Row[],
+          (await result(
+            supabase.from("barbers").select("*").is("deleted_at", null),
+          )) as Row[],
         );
       }
       if (section === "Configurazione")
@@ -377,28 +387,50 @@ export default function Admin({
                 </button>
               ) : (
                 <div>
-                <button
-                  className="text"
-                  disabled={busy}
-                  onClick={() =>
-                    run(() =>
-                      result(
-                        supabase
-                          .from(section === "Servizi" ? "services" : "barbers")
-                          .update({ active: !r.active })
-                          .eq("id", r.id),
-                      ),
-                    )
-                  }
-                >
-                  {r.active ? "Disattiva" : "Riattiva"}
-                </button>
+                  <button
+                    className="text"
+                    disabled={busy}
+                    onClick={() =>
+                      run(() =>
+                        result(
+                          supabase
+                            .from(
+                              section === "Servizi" ? "services" : "barbers",
+                            )
+                            .update({ active: !r.active })
+                            .eq("id", r.id),
+                        ),
+                      )
+                    }
+                  >
+                    {r.active ? "Disattiva" : "Riattiva"}
+                  </button>
 
-                <button className="text danger-text" disabled={busy} onClick={() => {
-                  const kind = section === "Servizi" ? "service" : "barber";
-                  if (!confirm("Eliminare " + r.name + "? La voce verrà rimossa dagli elenchi; i dati degli appuntamenti saranno conservati.")) return;
-                  run(() => result(supabase.rpc("admin_delete_resource", { p_kind: kind, p_id: r.id })));
-                }}>Elimina</button>
+                  <button
+                    className="text danger-text"
+                    disabled={busy}
+                    onClick={() => {
+                      const kind = section === "Servizi" ? "service" : "barber";
+                      if (
+                        !confirm(
+                          "Eliminare " +
+                            r.name +
+                            "? La voce verrà rimossa dagli elenchi; i dati degli appuntamenti saranno conservati.",
+                        )
+                      )
+                        return;
+                      run(() =>
+                        result(
+                          supabase.rpc("admin_delete_resource", {
+                            p_kind: kind,
+                            p_id: r.id,
+                          }),
+                        ),
+                      );
+                    }}
+                  >
+                    Elimina
+                  </button>
                 </div>
               )}
             </article>
@@ -435,7 +467,8 @@ export default function Admin({
             </select>
           </label>
           <p className="muted">
-            Il ruolo Barbiere viene assegnato automaticamente all’account associato.
+            Il ruolo Barbiere viene assegnato automaticamente all’account
+            associato.
           </p>
           <button className="primary" disabled={busy}>
             Aggiungi barbiere

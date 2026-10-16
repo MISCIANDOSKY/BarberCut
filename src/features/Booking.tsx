@@ -43,7 +43,15 @@ export default function Booking({
     [links, setLinks] = useState<Row[]>([]);
   const selection = useRef("");
   const saving = useRef(false);
-  const activeServices = services.filter((s) => s.active && links.some((link) => link.service_id === s.id && barbers.some((item) => item.id === link.barber_id && item.active)));
+  const activeServices = services.filter(
+    (s) =>
+      s.active &&
+      links.some(
+        (link) =>
+          link.service_id === s.id &&
+          barbers.some((item) => item.id === link.barber_id && item.active),
+      ),
+  );
   const eligibleBarbers = barbers.filter(
     (b) =>
       b.active &&
@@ -145,12 +153,17 @@ export default function Booking({
       await result(
         guest
           ? supabase.rpc("book_guest_appointment", {
-              p_barber: chosenBarber, p_service: service, p_start: selected,
-              p_first_name: guest.first_name, p_last_name: guest.last_name,
+              p_barber: chosenBarber,
+              p_service: service,
+              p_start: selected,
+              p_first_name: guest.first_name,
+              p_last_name: guest.last_name,
               p_phone: guest.phone || "",
             })
           : supabase.rpc("book_appointment", {
-              p_barber: chosenBarber, p_service: service, p_start: selected,
+              p_barber: chosenBarber,
+              p_service: service,
+              p_start: selected,
               ...(clientId ? { p_client: clientId } : {}),
             }),
       );

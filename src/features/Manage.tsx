@@ -22,7 +22,9 @@ export default function Manage({
   section,
   isAdmin = false,
 }: Props) {
-  const scopedBarbers = barbers.filter((item) => isAdmin || item.user_id === user.id);
+  const scopedBarbers = barbers.filter(
+    (item) => isAdmin || item.user_id === user.id,
+  );
   const [selectedBarber, setB] = useState(
       barbers.find((x) => x.user_id === user.id)?.id || barbers[0]?.id || "",
     ),
@@ -33,7 +35,9 @@ export default function Manage({
     [hours, setHours] = useState<Row[]>([]),
     [exceptions, setExceptions] = useState<Row[]>([]),
     [busy, setBusy] = useState(false);
-  const b = scopedBarbers.some((item) => item.id === selectedBarber) ? selectedBarber : scopedBarbers[0]?.id || "";
+  const b = scopedBarbers.some((item) => item.id === selectedBarber)
+    ? selectedBarber
+    : scopedBarbers[0]?.id || "";
   async function load() {
     if (!b) return;
     try {
@@ -99,7 +103,11 @@ export default function Manage({
     }
   }
   if (!scopedBarbers.length)
-    return <Empty>Nessuna agenda associata al tuo account. Contatta l’amministratore.</Empty>;
+    return (
+      <Empty>
+        Nessuna agenda associata al tuo account. Contatta l’amministratore.
+      </Empty>
+    );
   return (
     <>
       {scopedBarbers.length > 1 && (
@@ -141,7 +149,9 @@ export default function Manage({
                 <span>
                   {e.kind === "block"
                     ? "Orario bloccato"
-                    : (e.guest_first_name || e.profiles?.first_name || "") + " " + (e.guest_last_name || e.profiles?.last_name || "")}
+                    : (e.guest_first_name || e.profiles?.first_name || "") +
+                      " " +
+                      (e.guest_last_name || e.profiles?.last_name || "")}
                   <small>{e.service_name || e.notes}</small>
                 </span>
                 <span>↗</span>
@@ -156,19 +166,54 @@ export default function Manage({
       {section === "Nuova prenotazione" && (
         <>
           {!client ? (
-            <form onSubmit={(event) => {
-              event.preventDefault();
-              const values = new FormData(event.currentTarget);
-              const first_name = String(values.get("first_name") || "").trim();
-              const last_name = String(values.get("last_name") || "").trim();
-              if (!first_name || !last_name) { notify("Inserisci nome e cognome del cliente."); return; }
-              setClient({ first_name, last_name, phone: String(values.get("phone") || "").trim() });
-            }}>
+            <form
+              onSubmit={(event) => {
+                event.preventDefault();
+                const values = new FormData(event.currentTarget);
+                const first_name = String(
+                  values.get("first_name") || "",
+                ).trim();
+                const last_name = String(values.get("last_name") || "").trim();
+                if (!first_name || !last_name) {
+                  notify("Inserisci nome e cognome del cliente.");
+                  return;
+                }
+                setClient({
+                  first_name,
+                  last_name,
+                  phone: String(values.get("phone") || "").trim(),
+                });
+              }}
+            >
               <div className="two">
-                <label>Nome<input name="first_name" autoComplete="given-name" maxLength={120} required/></label>
-                <label>Cognome<input name="last_name" autoComplete="family-name" maxLength={120} required/></label>
+                <label>
+                  Nome
+                  <input
+                    name="first_name"
+                    autoComplete="given-name"
+                    maxLength={120}
+                    required
+                  />
+                </label>
+                <label>
+                  Cognome
+                  <input
+                    name="last_name"
+                    autoComplete="family-name"
+                    maxLength={120}
+                    required
+                  />
+                </label>
               </div>
-              <label>Telefono (facoltativo)<input name="phone" type="tel" autoComplete="tel" maxLength={40}/></label>
+              <label>
+                Telefono (facoltativo)
+                <input
+                  name="phone"
+                  type="tel"
+                  autoComplete="tel"
+                  maxLength={40}
+                />
+              </label>
               <button className="primary">Scegli servizio e orario</button>
             </form>
           ) : (
@@ -388,7 +433,8 @@ export default function Manage({
           close={() => setDetail(null)}
         >
           <h3>
-            {detail.guest_first_name || detail.profiles?.first_name} {detail.guest_last_name || detail.profiles?.last_name}
+            {detail.guest_first_name || detail.profiles?.first_name}{" "}
+            {detail.guest_last_name || detail.profiles?.last_name}
           </h3>
           <p>
             {detail.service_name || detail.notes}
@@ -396,7 +442,10 @@ export default function Manage({
             {dateLabel(detail.start_at)} · {timeLabel(detail.start_at)}
           </p>
           {(detail.guest_phone || detail.profiles?.phone) && (
-            <a className="primary" href={"tel:" + (detail.guest_phone || detail.profiles.phone)}>
+            <a
+              className="primary"
+              href={"tel:" + (detail.guest_phone || detail.profiles.phone)}
+            >
               Chiama {detail.guest_phone || detail.profiles.phone}
             </a>
           )}

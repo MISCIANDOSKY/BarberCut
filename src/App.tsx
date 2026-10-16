@@ -236,8 +236,18 @@ export default function App() {
         />
       );
     if (section === "Servizi e prezzi" && ready && role === "barber") {
-      const ownBarber = barbers.find((item) => item.user_id === user!.id && item.active);
-      return ownBarber ? <BarberServices barberId={ownBarber.id} notify={notify} refresh={refresh}/> : <Empty>Nessuna agenda associata al tuo account.</Empty>;
+      const ownBarber = barbers.find(
+        (item) => item.user_id === user!.id && item.active,
+      );
+      return ownBarber ? (
+        <BarberServices
+          barberId={ownBarber.id}
+          notify={notify}
+          refresh={refresh}
+        />
+      ) : (
+        <Empty>Nessuna agenda associata al tuo account.</Empty>
+      );
     }
     if (section === "Servizi e prezzi")
       return services.length ? (
