@@ -389,124 +389,132 @@ export default function App() {
           </div>
         ) : (
           <>
-        <div className="hero">
-          <div className="hero-copy">
-            <span className="eyebrow">
-              <i />{" "}
-              {ready
-                ? role === "admin"
-                  ? "IL TUO NEGOZIO, SOTTO CONTROLLO"
-                  : "LA TUA GIORNATA IN AGENDA"
-                : "UN APPUNTAMENTO CON IL TUO STILE"}
-            </span>
-            <h1>
-              {profile?.first_name ? (
-                <>
-                  Ciao, {profile.first_name}
-                  <span className="gold">.</span>
-                </>
+            <div className="hero">
+              <div className="hero-copy">
+                <span className="eyebrow">
+                  <i />{" "}
+                  {ready
+                    ? role === "admin"
+                      ? "IL TUO NEGOZIO, SOTTO CONTROLLO"
+                      : "LA TUA GIORNATA IN AGENDA"
+                    : "UN APPUNTAMENTO CON IL TUO STILE"}
+                </span>
+                <h1>
+                  {profile?.first_name ? (
+                    <>
+                      Ciao, {profile.first_name}
+                      <span className="gold">.</span>
+                    </>
+                  ) : (
+                    <>
+                      Il tuo stile.
+                      <br />
+                      Il tuo <em>momento.</em>
+                    </>
+                  )}
+                </h1>
+                <p>
+                  {ready
+                    ? "Tutto quello che serve, in un unico posto."
+                    : "Un taglio fatto bene comincia dal tempo giusto. Scegli il tuo, al resto pensiamo noi."}
+                </p>
+                <div className="hero-rule">
+                  <span>PRECISIONE</span>
+                  <span>CARATTERE</span>
+                  <span>CURA</span>
+                </div>
+              </div>
+              <div className="barber-art" aria-hidden="true">
+                <div className="art-circle" />
+                <div className="pole">
+                  <div />
+                </div>
+                <span className="art-word">
+                  FATTO
+                  <br />
+                  <em>per te.</em>
+                </span>
+                <span className="art-caption">BARBERCUT / IL TUO STILE</span>
+              </div>
+            </div>
+            <div className="workspace">
+              <div className="section-label">
+                <span>{ready ? "LA TUA AREA" : "A PORTATA DI MANO"}</span>
+                <span>01 — {String(choices.length).padStart(2, "0")}</span>
+              </div>
+              {loading ? (
+                <p className="empty" role="status">
+                  Prepariamo il tuo spazio…
+                </p>
+              ) : staff && !verified ? (
+                <StaffGate
+                  email={user!.email!}
+                  done={refresh}
+                  notify={notify}
+                />
               ) : (
                 <>
-                  Il tuo stile.
-                  <br />
-                  Il tuo <em>momento.</em>
+                  {section && (
+                    <Panel title={section} back={() => setSection("")}>
+                      {content()}
+                    </Panel>
+                  )}
+                  <nav
+                    className={"main-actions " + (section ? "compact" : "")}
+                    aria-label="Azioni principali"
+                  >
+                    {choices.map(([icon, title, sub], i) => (
+                      <button
+                        key={title}
+                        className={
+                          "action " + (title === section ? "active" : "")
+                        }
+                        onClick={() =>
+                          setSection(section === title ? "" : title)
+                        }
+                        aria-expanded={section === title}
+                      >
+                        <span className="action-icon">{icon}</span>
+                        <span className="action-copy">
+                          <strong>{title}</strong>
+                          <small>{sub}</small>
+                        </span>
+                        <span className="action-arrow">↗</span>
+                        <span className="action-number">0{i + 1}</span>
+                      </button>
+                    ))}
+                  </nav>
                 </>
               )}
-            </h1>
-            <p>
-              {ready
-                ? "Tutto quello che serve, in un unico posto."
-                : "Un taglio fatto bene comincia dal tempo giusto. Scegli il tuo, al resto pensiamo noi."}
-            </p>
-            <div className="hero-rule">
-              <span>PRECISIONE</span>
-              <span>CARATTERE</span>
-              <span>CURA</span>
-            </div>
-          </div>
-          <div className="barber-art" aria-hidden="true">
-            <div className="art-circle" />
-            <div className="pole">
-              <div />
-            </div>
-            <span className="art-word">
-              FATTO
-              <br />
-              <em>per te.</em>
-            </span>
-            <span className="art-caption">BARBERCUT / IL TUO STILE</span>
-          </div>
-        </div>
-        <div className="workspace">
-          <div className="section-label">
-            <span>{ready ? "LA TUA AREA" : "A PORTATA DI MANO"}</span>
-            <span>01 — {String(choices.length).padStart(2, "0")}</span>
-          </div>
-          {loading ? (
-            <p className="empty" role="status">
-              Prepariamo il tuo spazio…
-            </p>
-          ) : staff && !verified ? (
-            <StaffGate email={user!.email!} done={refresh} notify={notify} />
-          ) : (
-            <>
-              {section && (
-                <Panel title={section} back={() => setSection("")}>
-                  {content()}
-                </Panel>
-              )}
-              <nav
-                className={"main-actions " + (section ? "compact" : "")}
-                aria-label="Azioni principali"
-              >
-                {choices.map(([icon, title, sub], i) => (
+              {user && terms && !accepted && (
+                <div className="notice">
+                  <p>
+                    Abbiamo aggiornato i{" "}
+                    <button className="text" onClick={() => setLegal(true)}>
+                      Termini e condizioni
+                    </button>
+                    . Leggili prima di prenotare.
+                  </p>
                   <button
-                    key={title}
-                    className={"action " + (title === section ? "active" : "")}
-                    onClick={() => setSection(section === title ? "" : title)}
-                    aria-expanded={section === title}
+                    className="secondary"
+                    onClick={async () => {
+                      try {
+                        await result(
+                          supabase
+                            .from("terms_acceptances")
+                            .insert({ user_id: user.id, terms_id: terms.id }),
+                        );
+                        setAccepted(true);
+                      } catch (e) {
+                        notify(friendly(e));
+                      }
+                    }}
                   >
-                    <span className="action-icon">{icon}</span>
-                    <span className="action-copy">
-                      <strong>{title}</strong>
-                      <small>{sub}</small>
-                    </span>
-                    <span className="action-arrow">↗</span>
-                    <span className="action-number">0{i + 1}</span>
+                    Ho letto e accetto
                   </button>
-                ))}
-              </nav>
-            </>
-          )}
-          {user && terms && !accepted && (
-            <div className="notice">
-              <p>
-                Abbiamo aggiornato i{" "}
-                <button className="text" onClick={() => setLegal(true)}>
-                  Termini e condizioni
-                </button>
-                . Leggili prima di prenotare.
-              </p>
-              <button
-                className="secondary"
-                onClick={async () => {
-                  try {
-                    await result(
-                      supabase
-                        .from("terms_acceptances")
-                        .insert({ user_id: user.id, terms_id: terms.id }),
-                    );
-                    setAccepted(true);
-                  } catch (e) {
-                    notify(friendly(e));
-                  }
-                }}
-              >
-                Ho letto e accetto
-              </button>
+                </div>
+              )}
             </div>
-          )}
-        </div>
           </>
         )}
       </main>
