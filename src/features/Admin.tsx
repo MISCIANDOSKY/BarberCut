@@ -263,9 +263,10 @@ export default function Admin({
                 <>
                   <label>
                     Descrizione
-                    <input
+                    <textarea
                       name="description"
-                      defaultValue={editing.description}
+                      defaultValue={editing.description || ""}
+                      rows={3}
                     />
                   </label>
                   <div className="two">
@@ -355,9 +356,11 @@ export default function Admin({
             <article className="table-row" key={r.id}>
               <span>
                 <strong>{r.name || r.version}</strong>
-                <button className="text" onClick={() => setEditing(r)}>
-                  {section === "Termini" ? "Leggi testo" : "Modifica"}
-                </button>
+                {section === "Termini" && (
+                  <button className="text" onClick={() => setEditing(r)}>
+                    Leggi testo
+                  </button>
+                )}
                 <small>
                   {section === "Servizi"
                     ? r.duration_minutes + " min · " + r.price + " €"
@@ -386,7 +389,16 @@ export default function Admin({
                   {r.published ? "Pubblicato" : "Pubblica"}
                 </button>
               ) : (
-                <div>
+                <div
+                  style={{ display: "flex", flexDirection: "column", alignItems: "stretch", gap: ".25rem" }}
+                >
+                  <button
+                    className="text"
+                    disabled={busy}
+                    onClick={() => setEditing(r)}
+                  >
+                    Modifica
+                  </button>
                   <button
                     className="text"
                     disabled={busy}
