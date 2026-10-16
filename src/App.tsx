@@ -80,6 +80,8 @@ export default function App() {
         (config as Row).accent,
       );
       if (u) {
+        // Keep a server timestamp even when an existing login session is reused.
+        await supabase.rpc("record_activity");
         const [p, r, v, ns, ap] = await Promise.all([
           result(supabase.from("profiles").select("*").eq("id", u.id).single()),
           result(
@@ -178,6 +180,22 @@ export default function App() {
       window.removeEventListener("offline", off);
     };
   }, [refresh]);
+  useEffect(() => {
+    if (!user) return;
+    const record = () => {
+      if (document.visibilityState === "visible") {
+        void supabase.rpc("record_activity").then(() => {});
+      }
+    };
+    const timer = window.setInterval(record, 15 * 60 * 1000);
+    window.addEventListener("focus", record);
+    document.addEventListener("visibilitychange", record);
+    return () => {
+      window.clearInterval(timer);
+      window.removeEventListener("focus", record);
+      document.removeEventListener("visibilitychange", record);
+    };
+  }, [user?.id]);
   useEffect(() => {
     if (!message) return;
     const t = setTimeout(() => setMessage(""), 9000);

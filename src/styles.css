@@ -1081,3 +1081,17 @@ dialog.feature-dialog > header {
 input[aria-invalid="true"] {
   border-color: #ff8585;
 }
+
+.maintenance-rule {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+}
+.maintenance-rule > .check { flex: 1 1 250px; }
+.maintenance-days {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.maintenance-days input { width: 100px; }

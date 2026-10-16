@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Empty, Modal } from "../components/UI";
 import { supabase, result } from "../lib/api";
 import type { Row } from "../lib/api";
+import Maintenance from "./Maintenance";
 export default function Admin({
   section,
   notify,
@@ -162,11 +163,8 @@ export default function Admin({
   if (section === "Manutenzione")
     return (
       <>
-        <h3>Dati e manutenzione</h3>
-        <p>
-          La pulizia automatica degli appuntamenti e degli account è disattivata
-          finché non viene approvata una politica di conservazione.
-        </p>
+        <Maintenance notify={notify} />
+        <h3>Esportazione dati</h3>
         <button
           className="secondary"
           disabled={busy}
