@@ -39,7 +39,7 @@ export default function Auth({
         notify("Se l’email è registrata, riceverai le istruzioni.");
         close();
       } else if (mode === "register") {
-        if (!terms || !accepted) throw new Error("TERMS_REQUIRED");
+        if (terms && !accepted) throw new Error("TERMS_REQUIRED");
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
@@ -50,7 +50,7 @@ export default function Auth({
         });
         if (error) throw error;
         if (data.session) {
-          await result(
+          if (terms) await result(
             supabase
               .from("terms_acceptances")
               .insert({ user_id: data.user!.id, terms_id: terms.id }),
@@ -138,7 +138,7 @@ export default function Auth({
               />
             </label>
           )}
-          {mode === "register" && (
+          {mode === "register" && terms && (
             <>
               <label className="check">
                 <input
@@ -156,16 +156,11 @@ export default function Auth({
                   Termini e condizioni
                 </button>
               </label>
-              {!terms && (
-                <p className="notice">
-                  Le registrazioni apriranno dopo la pubblicazione dei termini.
-                </p>
-              )}
             </>
           )}
           <button
             className="primary"
-            disabled={busy || (mode === "register" && !terms)}
+            disabled={busy}
           >
             {busy
               ? "Attendi…"
