@@ -32,4 +32,4 @@ Non sono attivate cancellazioni automatiche di dati o account. Il flusso elimina
 - supabase/functions: verifica email riservata
 - scripts: icone PNG e service worker generati in CI
 
-Le migrations 0001 e 0002 sono state applicate al progetto Supabase esistente. La vecchia tabella vuota bookings è stata preservata nello schema private senza accesso ai client.
+Le migrations versionate corrispondono alle versioni registrate nel progetto Supabase esistente. La vecchia tabella vuota bookings è stata preservata nello schema private senza accesso ai client.
