@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { clearPasswordProof } from "./lib/passwordProof";
 import type { User } from "@supabase/supabase-js";
-import { Panel, Empty, Modal } from "./components/UI";
+import { Empty, Modal } from "./components/UI";
 import PWA from "./components/PWA";
 import Auth, { StaffGate, authorizeStaff } from "./features/Auth";
 import Booking from "./features/Booking";
@@ -178,9 +178,6 @@ export default function App() {
       window.removeEventListener("offline", off);
     };
   }, [refresh]);
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "instant" });
-  }, [section]);
   useEffect(() => {
     if (!message) return;
     const t = setTimeout(() => setMessage(""), 9000);
@@ -381,29 +378,6 @@ export default function App() {
         </div>
       )}
       <main>
-        {section ? (
-          <div
-            className="workspace"
-            style={{ paddingTop: "24px", minHeight: "60vh" }}
-          >
-            <Panel key={section} title={section} back={() => setSection("")}>
-              {loading ? (
-                <p className="empty" role="status">
-                  Caricamento…
-                </p>
-              ) : staff && !verified && section !== "Profilo" ? (
-                <StaffGate
-                  email={user!.email!}
-                  done={refresh}
-                  notify={notify}
-                />
-              ) : (
-                content()
-              )}
-            </Panel>
-          </div>
-        ) : (
-          <>
             <div className="hero">
               <div className="hero-copy">
                 <span className="eyebrow">
@@ -469,7 +443,10 @@ export default function App() {
                 />
               ) : (
                 <>
-                  <nav className="main-actions" aria-label="Azioni principali">
+                  <nav
+                    className="main-actions"
+                    aria-label="Azioni principali"
+                  >
                     {choices.map(([icon, title, sub], i) => (
                       <button
                         key={title}
@@ -517,8 +494,6 @@ export default function App() {
                 </div>
               )}
             </div>
-          </>
-        )}
       </main>
       <footer>
         <div>
@@ -528,7 +503,24 @@ export default function App() {
         <PWA />
         <span className="footer-note">PRENOTA. ARRIVA. RINNOVA.</span>
       </footer>
-      {message && (
+      {section && (
+        <Modal key={section} title={section} wide close={() => setSection("")}>
+          {loading ? (
+            <p className="empty" role="status">Caricamento…</p>
+          ) : staff && !verified && section !== "Profilo" ? (
+            <StaffGate email={user!.email!} done={refresh} notify={notify} />
+          ) : (
+            content()
+          )}
+          {message && (
+            <div className="toast" role="status">
+              <span>{message}</span>
+              <button onClick={() => setMessage("")} aria-label="Chiudi messaggio">×</button>
+            </div>
+          )}
+        </Modal>
+      )}
+      {message && !section && (
         <div className="toast" role="status">
           <span>{message}</span>
           <button onClick={() => setMessage("")} aria-label="Chiudi messaggio">

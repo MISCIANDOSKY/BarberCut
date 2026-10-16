@@ -1019,3 +1019,17 @@ dialog h2 {
     scroll-behavior: auto !important;
   }
 }
+
+/* Feature windows open like login and keep the home screen in place. */
+dialog.feature-dialog {
+  width: min(900px, calc(100% - 28px));
+  max-height: 90dvh;
+  overscroll-behavior: contain;
+}
+dialog.feature-dialog > .panel {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  max-width: none;
+  animation: none;
+}
