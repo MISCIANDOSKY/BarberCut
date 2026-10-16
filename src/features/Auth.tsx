@@ -50,11 +50,12 @@ export default function Auth({
         });
         if (error) throw error;
         if (data.session) {
-          if (terms) await result(
-            supabase
-              .from("terms_acceptances")
-              .insert({ user_id: data.user!.id, terms_id: terms.id }),
-          );
+          if (terms)
+            await result(
+              supabase
+                .from("terms_acceptances")
+                .insert({ user_id: data.user!.id, terms_id: terms.id }),
+            );
           onDone();
           close();
         } else {
@@ -158,10 +159,7 @@ export default function Auth({
               </label>
             </>
           )}
-          <button
-            className="primary"
-            disabled={busy}
-          >
+          <button className="primary" disabled={busy}>
             {busy
               ? "Attendi…"
               : mode === "register"
