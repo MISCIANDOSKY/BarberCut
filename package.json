@@ -7,7 +7,7 @@
     "dev": "vite --host 0.0.0.0",
     "build": "node scripts/icons.mjs && tsc -b && vite build && node scripts/service-worker.mjs",
     "test": "node --test tests/*.test.mjs",
-    "format": "prettier --write \"src/**/*.{ts,tsx,mjs,mts,css}\" \"scripts/*.mjs\" \"tests/*.mjs\" \"*.json\" \"*.ts\" \"*.html\" README.md \".github/workflows/*.yml\""
+    "format": "prettier --write \"src/**/*.{ts,tsx,mjs,mts,css}\" \"scripts/*.mjs\" \"tests/*.mjs\" \"*.json\" \"*.ts\" \"*.html\" README.md"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.57.4",
