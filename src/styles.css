@@ -1020,16 +1020,47 @@ dialog h2 {
   }
 }
 
-/* Feature windows open like login and keep the home screen in place. */
+/* Each feature fills the viewport and scrolls independently of the home page. */
 dialog.feature-dialog {
-  width: min(900px, calc(100% - 28px));
-  max-height: 90dvh;
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: var(--bg);
   overscroll-behavior: contain;
 }
-dialog.feature-dialog > .panel {
+dialog.feature-dialog > header {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  justify-content: flex-start;
+  margin: 0;
+  padding: calc(16px + env(safe-area-inset-top)) max(20px, calc((100% - 960px) / 2)) 16px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.feature-content {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 28px max(20px, env(safe-area-inset-right)) calc(32px + env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+}
+.feature-content > .panel {
   border: 0;
   padding: 0;
   margin: 0;
   max-width: none;
+  background: transparent;
   animation: none;
+}
+@media (max-width: 600px) {
+  .feature-content {
+    padding-top: 20px;
+  }
 }

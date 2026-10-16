@@ -46,16 +46,23 @@ export function Modal({
       className={wide ? "feature-dialog" : undefined}
       onCancel={close}
       onClick={(e) => {
-        if (e.target === e.currentTarget) close();
+        if (!wide && e.target === e.currentTarget) close();
       }}
     >
       <header>
+        {wide && (
+          <button type="button" className="back" onClick={close} aria-label="Torna indietro">
+            ←
+          </button>
+        )}
         <h2>{title}</h2>
-        <button className="back" onClick={close} aria-label="Chiudi finestra">
-          ×
-        </button>
+        {!wide && (
+          <button type="button" className="back" onClick={close} aria-label="Chiudi finestra">
+            ×
+          </button>
+        )}
       </header>
-      {children}
+      {wide ? <div className="feature-content">{children}</div> : children}
     </dialog>
   );
 }
