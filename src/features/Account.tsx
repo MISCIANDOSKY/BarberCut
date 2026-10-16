@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import type { ReactNode } from "react";
 import { clearPasswordProof } from "../lib/passwordProof";
 import { Empty, Field } from "../components/UI";
 import { supabase, result, dateLabel, timeLabel, euro } from "../lib/api";
@@ -86,12 +87,14 @@ export function Profile({
   notify,
   reload,
   deletionEnabled,
+  addressEditor,
 }: {
   user: Row;
   profile: Row;
   notify: (s: string) => void;
   reload: () => void;
   deletionEnabled: boolean;
+  addressEditor?: ReactNode;
 }) {
   const [first, setFirst] = useState(profile.first_name),
     [last, setLast] = useState(profile.last_name),
@@ -185,6 +188,7 @@ export function Profile({
       >
         Cambia password
       </button>
+      {addressEditor}
       <DeleteAccount
         email={user.email}
         enabled={deletionEnabled}

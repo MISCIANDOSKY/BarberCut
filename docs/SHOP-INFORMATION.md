@@ -1,0 +1,7 @@
+# Informazioni della barberia
+
+La home clienti mantiene l’ordine Prenota, Servizi e prezzi, Le mie prenotazioni e poi Informazioni. Informazioni mostra indirizzo condiviso della barberia, collegamento alla mappa, settimana abituale di ogni barbiere attivo e variazioni dei successivi 30 giorni. Gli orari vengono letti dalle tabelle già modificate in Orari di lavoro; non esiste una copia separata da aggiornare. Le festività italiane restano chiuse secondo le regole di prenotazione.
+
+Il profilo staff contiene l’editor dell’indirizzo. Solo un admin con sessione verificata o un barbiere con sessione verificata e agenda attiva associata può salvare tramite RPC. I clienti non possono modificare l’indirizzo. Primo salvataggio diretto; ogni successiva variazione richiede la conferma “Sei sicuro che vuoi modificare l’indirizzo della barberia?”. Il backend verifica la conferma e una revisione incrementale per evitare modifiche concorrenti. Non è stato inventato alcun indirizzo: finché il titolare non lo inserisce, viene indicato come non configurato.
+
+La RPC pubblica di lettura restituisce solo dati di attività: nome barberia, indirizzo, nome barbieri e intervalli di apertura. Non include account collegati, contatti personali, appuntamenti o note. Barbieri inattivi o eliminati sono esclusi. Test SQL con rollback verificano permessi, primo salvataggio, conferma, revisione concorrente, intervalli separati e visibilità pubblica.

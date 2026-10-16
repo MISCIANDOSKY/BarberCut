@@ -1099,3 +1099,25 @@ input[aria-invalid="true"] {
 .maintenance-days input {
   width: 100px;
 }
+
+.shop-address address {
+  font-style: normal;
+  white-space: pre-wrap;
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+.shop-hours, .shop-address-editor {
+  border-top: 1px solid var(--border);
+  margin-top: 24px;
+  padding-top: 8px;
+}
+.shop-hours-row {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+.shop-hours-row dd { margin: 0; text-align: right; color: var(--muted); }

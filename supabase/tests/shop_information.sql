@@ -1,0 +1,31 @@
+begin;
+do $test$
+declare a uuid:=gen_random_uuid();c uuid:=gen_random_uuid();b uuid;hidden uuid;j jsonb;
+begin
+ insert into auth.users(id,email,raw_user_meta_data) values(a,'address-barber@example.invalid','{}'),(c,'address-client@example.invalid','{}');
+ insert into public.barbers(name,user_id) values('Public test barber',a) returning id into b;
+ insert into public.barbers(name,active) values('Hidden test barber',false) returning id into hidden;
+ insert into public.working_hours(barber_id,weekday,opens,closes) values(b,1,'09:00','13:00'),(b,1,'15:00','19:00'),(hidden,1,'09:00','18:00');
+ perform public.staff_authorize_session(a,'shop-test');
+ update public.app_settings set shop_address='',address_revision=0 where id;
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',a,'role','authenticated','session_id','shop-test')::text,true);
+ set local role authenticated;
+ j:=public.update_shop_address('Via Roma 1, Milano',0,false);
+ if j->>'revision'<>'1' then raise exception 'first save failed';end if;
+ begin perform public.update_shop_address('Via Roma 2, Milano',1,false);raise exception 'confirmation bypassed';exception when raise_exception then if sqlerrm<>'ADDRESS_CONFIRMATION_REQUIRED' then raise;end if;end;
+ j:=public.update_shop_address('Via Roma 2, Milano',1,true);
+ if j->>'revision'<>'2' then raise exception 'confirmed save failed';end if;
+ begin perform public.update_shop_address('Via Roma 3, Milano',1,true);raise exception 'concurrent edit bypassed';exception when raise_exception then if sqlerrm<>'ADDRESS_CHANGED' then raise;end if;end;
+ reset role;
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',c,'role','authenticated')::text,true);
+ set local role authenticated;
+ begin perform public.update_shop_address('Unauthorized address',2,true);raise exception 'client edit allowed';exception when raise_exception then if sqlerrm<>'ACCESS_DENIED' then raise;end if;end;
+ reset role;
+ set local role anon;
+ j:=public.shop_information();
+ if j->>'address'<>'Via Roma 2, Milano' then raise exception 'public address unavailable';end if;
+ if not exists(select 1 from jsonb_array_elements(j->'barbers') v where v->>'id'=b::text and jsonb_array_length(v->'hours')=2) then raise exception 'public split hours missing';end if;
+ if exists(select 1 from jsonb_array_elements(j->'barbers') v where v->>'id'=hidden::text or v?'user_id') then raise exception 'inactive/private staff info leaked';end if;
+ reset role;
+end $test$;
+rollback;

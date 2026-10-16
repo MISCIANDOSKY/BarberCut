@@ -9,6 +9,8 @@ import { Appointments, Profile, Notifications } from "./features/Account";
 import Manage from "./features/Manage";
 import Admin from "./features/Admin";
 import BarberServices from "./features/BarberServices";
+import Information from "./features/Information";
+import BarberAddress from "./features/BarberAddress";
 import { supabase, result, euro, friendly } from "./lib/api";
 import type { Row } from "./lib/api";
 export default function App() {
@@ -255,6 +257,7 @@ export default function App() {
         ["▦", "Prenota", "Trova il tuo prossimo momento"],
         ["✂", "Servizi e prezzi", "Scegli il tuo stile"],
         ["▤", "Le mie prenotazioni", "Tieni tutto sotto controllo"],
+        ["ⓘ", "Informazioni", "Indirizzo e orari della barberia"],
       ];
   const manageSections = [
     "Appuntamenti",
@@ -263,6 +266,7 @@ export default function App() {
     "Orari di lavoro",
   ];
   function content() {
+    if (section === "Informazioni") return <Information />;
     if (section === "Profilo")
       return user && profile ? (
         <Profile
@@ -271,6 +275,9 @@ export default function App() {
           notify={notify}
           reload={refresh}
           deletionEnabled={!!settings.account_deletion_enabled}
+          addressEditor={ready && (
+            <BarberAddress address={settings.shop_address || ""} revision={settings.address_revision || 0} refresh={refresh} />
+          )}
         />
       ) : (
         <Empty>Accedi per visualizzare il tuo profilo.</Empty>
