@@ -8,6 +8,7 @@ import Booking from "./features/Booking";
 import { Appointments, Profile, Notifications } from "./features/Account";
 import Manage from "./features/Manage";
 import Admin from "./features/Admin";
+import BarberServices from "./features/BarberServices";
 import { supabase, result, euro, friendly } from "./lib/api";
 import type { Row } from "./lib/api";
 export default function App() {
@@ -234,6 +235,10 @@ export default function App() {
           userId={user!.id}
         />
       );
+    if (section === "Servizi e prezzi" && ready && role === "barber") {
+      const ownBarber = barbers.find((item) => item.user_id === user!.id && item.active);
+      return ownBarber ? <BarberServices barberId={ownBarber.id} notify={notify} refresh={refresh}/> : <Empty>Nessuna agenda associata al tuo account.</Empty>;
+    }
     if (section === "Servizi e prezzi")
       return services.length ? (
         <div className="service-list">
@@ -293,6 +298,7 @@ export default function App() {
           settings={settings}
           notify={notify}
           section={section}
+          isAdmin={role === "admin"}
         />
       );
     if (ready && section === "Agenda")

@@ -11,6 +11,7 @@ type Props = {
   settings: Row;
   notify: (s: string) => void;
   section: string;
+  isAdmin?: boolean;
 };
 export default function Manage({
   user,
@@ -19,18 +20,20 @@ export default function Manage({
   settings,
   notify,
   section,
+  isAdmin = false,
 }: Props) {
-  const [b, setB] = useState(
+  const scopedBarbers = barbers.filter((item) => isAdmin || item.user_id === user.id);
+  const [selectedBarber, setB] = useState(
       barbers.find((x) => x.user_id === user.id)?.id || barbers[0]?.id || "",
     ),
     [day, setDay] = useState(today()),
     [rows, setRows] = useState<Row[]>([]),
     [detail, setDetail] = useState<Row | null>(null),
     [client, setClient] = useState<Row | null>(null),
-    [email, setEmail] = useState(""),
     [hours, setHours] = useState<Row[]>([]),
     [exceptions, setExceptions] = useState<Row[]>([]),
     [busy, setBusy] = useState(false);
+  const b = scopedBarbers.some((item) => item.id === selectedBarber) ? selectedBarber : scopedBarbers[0]?.id || "";
   async function load() {
     if (!b) return;
     try {
@@ -95,11 +98,11 @@ export default function Manage({
       setBusy(false);
     }
   }
-  if (!barbers.length)
-    return <Empty>Aggiungi almeno un barbiere nell’area Admin.</Empty>;
+  if (!scopedBarbers.length)
+    return <Empty>Nessuna agenda associata al tuo account. Contatta l’amministratore.</Empty>;
   return (
     <>
-      {barbers.length > 1 && (
+      {scopedBarbers.length > 1 && (
         <label>
           Agenda
           <select
@@ -109,7 +112,7 @@ export default function Manage({
               setClient(null);
             }}
           >
-            {barbers.map((x) => (
+            {scopedBarbers.map((x) => (
               <option key={x.id} value={x.id}>
                 {x.name}
               </option>
@@ -138,7 +141,7 @@ export default function Manage({
                 <span>
                   {e.kind === "block"
                     ? "Orario bloccato"
-                    : e.profiles?.first_name + " " + e.profiles?.last_name}
+                    : (e.guest_first_name || e.profiles?.first_name || "") + " " + (e.guest_last_name || e.profiles?.last_name || "")}
                   <small>{e.service_name || e.notes}</small>
                 </span>
                 <span>↗</span>
@@ -153,41 +156,20 @@ export default function Manage({
       {section === "Nuova prenotazione" && (
         <>
           {!client ? (
-            <form
-              onSubmit={async (e) => {
-                e.preventDefault();
-                setBusy(true);
-                try {
-                  const data = (await result(
-                    supabase.rpc("lookup_client", {
-                      p_email: email,
-                      p_barber: b,
-                    }),
-                  )) as Row[];
-                  if (data[0]) setClient(data[0]);
-                  else
-                    notify(
-                      "Account non trovato. Il cliente deve prima registrarsi.",
-                    );
-                } catch {
-                  notify("Ricerca non riuscita.");
-                } finally {
-                  setBusy(false);
-                }
-              }}
-            >
-              <label>
-                Email del cliente registrato
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </label>
-              <button className="primary" disabled={busy}>
-                Trova account
-              </button>
+            <form onSubmit={(event) => {
+              event.preventDefault();
+              const values = new FormData(event.currentTarget);
+              const first_name = String(values.get("first_name") || "").trim();
+              const last_name = String(values.get("last_name") || "").trim();
+              if (!first_name || !last_name) { notify("Inserisci nome e cognome del cliente."); return; }
+              setClient({ first_name, last_name, phone: String(values.get("phone") || "").trim() });
+            }}>
+              <div className="two">
+                <label>Nome<input name="first_name" autoComplete="given-name" maxLength={120} required/></label>
+                <label>Cognome<input name="last_name" autoComplete="family-name" maxLength={120} required/></label>
+              </div>
+              <label>Telefono (facoltativo)<input name="phone" type="tel" autoComplete="tel" maxLength={40}/></label>
+              <button className="primary">Scegli servizio e orario</button>
             </form>
           ) : (
             <>
@@ -203,9 +185,9 @@ export default function Manage({
               <Booking
                 key={b}
                 user={user}
-                clientId={client.id}
+                guest={client}
                 services={services}
-                barbers={barbers.filter((x) => x.id === b)}
+                barbers={scopedBarbers.filter((x) => x.id === b)}
                 settings={settings}
                 notify={notify}
                 login={() => {}}
@@ -406,16 +388,16 @@ export default function Manage({
           close={() => setDetail(null)}
         >
           <h3>
-            {detail.profiles?.first_name} {detail.profiles?.last_name}
+            {detail.guest_first_name || detail.profiles?.first_name} {detail.guest_last_name || detail.profiles?.last_name}
           </h3>
           <p>
             {detail.service_name || detail.notes}
             <br />
             {dateLabel(detail.start_at)} · {timeLabel(detail.start_at)}
           </p>
-          {detail.profiles?.phone && (
-            <a className="primary" href={"tel:" + detail.profiles.phone}>
-              Chiama {detail.profiles.phone}
+          {(detail.guest_phone || detail.profiles?.phone) && (
+            <a className="primary" href={"tel:" + (detail.guest_phone || detail.profiles.phone)}>
+              Chiama {detail.guest_phone || detail.profiles.phone}
             </a>
           )}
           {detail.kind === "appointment" && (

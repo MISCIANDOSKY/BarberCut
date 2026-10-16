@@ -20,6 +20,9 @@ export async function result<T = any>(
 export function friendly(e: unknown) {
   let m = e instanceof Error ? e.message : String(e);
   for (const [k, v] of Object.entries({
+    GUEST_NAME_REQUIRED: "Inserisci nome e cognome del cliente; il telefono è facoltativo.",
+    INVALID_SERVICE: "Controlla nome, durata (multipli di 15 minuti) e prezzo del servizio.",
+    BARBER_HAS_APPOINTMENTS: "Prima di eliminare questo barbiere, cancella o sposta i suoi appuntamenti futuri.",
     SETUP_REQUIRED:
       "Completa servizi, barbieri, orari, termini e regola di cancellazione prima di aprire le prenotazioni.",
     INVALID_DATE:

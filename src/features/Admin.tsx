@@ -30,18 +30,20 @@ export default function Admin({
               : section === "Termini"
                 ? "terms_versions"
                 : null;
-      if (table)
-        setRows((await result(supabase.from(table).select("*"))) as Row[]);
+      if (table) {
+        const query = supabase.from(table).select("*");
+        setRows(await result(table === "services" || table === "barbers" ? query.is("deleted_at", null) : query) as Row[]);
+      }
       if (section === "Utenti" || section === "Barbieri")
         setUsers(
           (await result(supabase.from("profiles").select("*"))) as Row[],
         );
       if (section === "Servizi") {
         setServices(
-          (await result(supabase.from("services").select("*"))) as Row[],
+          (await result(supabase.from("services").select("*").is("deleted_at", null))) as Row[],
         );
         setBarbers(
-          (await result(supabase.from("barbers").select("*"))) as Row[],
+          (await result(supabase.from("barbers").select("*").is("deleted_at", null))) as Row[],
         );
       }
       if (section === "Configurazione")
@@ -374,6 +376,7 @@ export default function Admin({
                   {r.published ? "Pubblicato" : "Pubblica"}
                 </button>
               ) : (
+                <div>
                 <button
                   className="text"
                   disabled={busy}
@@ -390,6 +393,13 @@ export default function Admin({
                 >
                   {r.active ? "Disattiva" : "Riattiva"}
                 </button>
+
+                <button className="text danger-text" disabled={busy} onClick={() => {
+                  const kind = section === "Servizi" ? "service" : "barber";
+                  if (!confirm("Eliminare " + r.name + "? La voce verrà rimossa dagli elenchi; i dati degli appuntamenti saranno conservati.")) return;
+                  run(() => result(supabase.rpc("admin_delete_resource", { p_kind: kind, p_id: r.id })));
+                }}>Elimina</button>
+                </div>
               )}
             </article>
           ))}
@@ -415,8 +425,8 @@ export default function Admin({
           </label>
           <label>
             Account associato
-            <select name="user">
-              <option value="">Da associare</option>
+            <select name="user" required>
+              <option value="">Scegli un account registrato</option>
               {users.map((u) => (
                 <option key={u.id} value={u.id}>
                   {u.first_name} {u.last_name} · {u.id.slice(0, 8)}
@@ -425,7 +435,7 @@ export default function Admin({
             </select>
           </label>
           <p className="muted">
-            Assegna anche il ruolo Barbiere nella sezione Utenti.
+            Il ruolo Barbiere viene assegnato automaticamente all’account associato.
           </p>
           <button className="primary" disabled={busy}>
             Aggiungi barbiere

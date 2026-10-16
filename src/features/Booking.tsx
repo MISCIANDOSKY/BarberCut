@@ -20,6 +20,7 @@ export default function Booking({
   login,
   onBooked,
   clientId,
+  guest,
 }: {
   user: Row | null;
   services: Row[];
@@ -29,6 +30,7 @@ export default function Booking({
   login: () => void;
   onBooked: () => void;
   clientId?: string;
+  guest?: Row;
 }) {
   const [service, setService] = useState(""),
     [barber, setBarber] = useState(""),
@@ -41,7 +43,7 @@ export default function Booking({
     [links, setLinks] = useState<Row[]>([]);
   const selection = useRef("");
   const saving = useRef(false);
-  const activeServices = services.filter((s) => s.active);
+  const activeServices = services.filter((s) => s.active && links.some((link) => link.service_id === s.id && barbers.some((item) => item.id === link.barber_id && item.active)));
   const eligibleBarbers = barbers.filter(
     (b) =>
       b.active &&
@@ -141,12 +143,16 @@ export default function Booking({
     setBusy(true);
     try {
       await result(
-        supabase.rpc("book_appointment", {
-          p_barber: chosenBarber,
-          p_service: service,
-          p_start: selected,
-          ...(clientId ? { p_client: clientId } : {}),
-        }),
+        guest
+          ? supabase.rpc("book_guest_appointment", {
+              p_barber: chosenBarber, p_service: service, p_start: selected,
+              p_first_name: guest.first_name, p_last_name: guest.last_name,
+              p_phone: guest.phone || "",
+            })
+          : supabase.rpc("book_appointment", {
+              p_barber: chosenBarber, p_service: service, p_start: selected,
+              ...(clientId ? { p_client: clientId } : {}),
+            }),
       );
       setConfirmed({
         start_at: selected,
@@ -202,7 +208,7 @@ export default function Booking({
         </button>
       </div>
     );
-  if (!settings.bookings_enabled && !clientId)
+  if (!settings.bookings_enabled && !clientId && !guest)
     return (
       <Empty>
         Stiamo preparando la nuova agenda. Le prenotazioni apriranno a breve.
