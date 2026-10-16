@@ -51,13 +51,23 @@ export function Modal({
     >
       <header>
         {wide && (
-          <button type="button" className="back" onClick={close} aria-label="Torna indietro">
+          <button
+            type="button"
+            className="back"
+            onClick={close}
+            aria-label="Torna indietro"
+          >
             ←
           </button>
         )}
         <h2>{title}</h2>
         {!wide && (
-          <button type="button" className="back" onClick={close} aria-label="Chiudi finestra">
+          <button
+            type="button"
+            className="back"
+            onClick={close}
+            aria-label="Chiudi finestra"
+          >
             ×
           </button>
         )}
