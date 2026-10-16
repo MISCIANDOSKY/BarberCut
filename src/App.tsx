@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { getPasswordProof, clearPasswordProof } from "./lib/passwordProof";
 import type { User } from "@supabase/supabase-js";
 import { Panel, Empty, Modal } from "./components/UI";
@@ -35,12 +35,15 @@ export default function App() {
     [online, setOnline] = useState(navigator.onLine),
     [reset, setReset] = useState(false),
     [password, setPassword] = useState("");
+  const refreshVersion = useRef(0);
   const notify = useCallback((s: string) => setMessage(s), []);
   const refresh = useCallback(async () => {
+    const version = ++refreshVersion.current;
     try {
       const {
         data: { user: u },
       } = await supabase.auth.getUser();
+      if (version !== refreshVersion.current) return;
       setUser(u);
       const [config, svcs, bs, ts] = await Promise.all([
         result(supabase.from("app_settings").select("*").single()),
@@ -54,6 +57,7 @@ export default function App() {
             .maybeSingle(),
         ),
       ]);
+      if (version !== refreshVersion.current) return;
       setSettings(config as Row);
       setServices(svcs as Row[]);
       setBarbers(bs as Row[]);
@@ -92,6 +96,7 @@ export default function App() {
               .order("start_at"),
           ),
         ]);
+        if (version !== refreshVersion.current) return;
         setProfile(p as Row);
         setRole((r as Row).role);
         setVerified(!!v);
@@ -106,7 +111,7 @@ export default function App() {
               .eq("terms_id", (ts as Row).id)
               .maybeSingle(),
           );
-          setAccepted(!!a);
+          if (version === refreshVersion.current) setAccepted(!!a);
         }
       } else {
         setProfile(null);
@@ -116,9 +121,9 @@ export default function App() {
         setAppointments([]);
       }
     } catch (e) {
-      notify(friendly(e));
+      if (version === refreshVersion.current) notify(friendly(e));
     } finally {
-      setLoading(false);
+      if (version === refreshVersion.current) setLoading(false);
     }
   }, [notify]);
   useEffect(() => {
@@ -128,6 +133,15 @@ export default function App() {
     } = supabase.auth.onAuthStateChange((event) => {
       if (event === "PASSWORD_RECOVERY") setReset(true);
       if (event === "SIGNED_OUT") {
+        refreshVersion.current++;
+        setUser(null);
+        setProfile(null);
+        setRole("client");
+        setVerified(false);
+        setNotifications([]);
+        setAppointments([]);
+        setAccepted(true);
+        setLoading(false);
         setSection("");
         clearPasswordProof();
       }
@@ -145,6 +159,7 @@ export default function App() {
     window.addEventListener("online", on);
     window.addEventListener("offline", off);
     return () => {
+      refreshVersion.current++;
       subscription.unsubscribe();
       window.removeEventListener("online", on);
       window.removeEventListener("offline", off);
