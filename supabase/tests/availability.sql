@@ -29,7 +29,9 @@ if not private.is_holiday(date '2027-03-29') then raise exception 'Easter Monday
 insert into public.schedule_exceptions(barber_id,day,opens,closes) values(b,d,'15:00','16:00');
 select count(*) into n from public.get_available_slots(b,s15,d);if n<>4 then raise exception 'special opening incorrect';end if;
 if exists(select 1 from public.get_available_slots(b,s15,(current_date+interval '4 months')::date)) then raise exception 'three month limit incorrect';end if;
-update public.app_settings set bookings_enabled=true;
+insert into public.terms_versions(version,body,published) values('TEST availability','Termini di test non pubblici',true);
+insert into public.terms_acceptances(user_id,terms_id) select u,id from public.terms_versions where version='TEST availability';
+update public.app_settings set bookings_enabled=true,cancellation_hours=0;
 perform set_config('request.jwt.claims',jsonb_build_object('sub',u,'role','authenticated','session_id','test')::text,true);
 t:=(d+time '15:00') at time zone 'Europe/Rome';
 created:=public.book_appointment(b,s15,t);

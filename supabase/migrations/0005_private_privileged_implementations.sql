@@ -1,0 +1,20 @@
+
+alter function public.get_available_slots(uuid,uuid,date) set schema private;
+create function public.get_available_slots(p_barber uuid,p_service uuid,p_day date) returns table(start_at timestamptz) language sql stable security invoker set search_path='' as $$select * from private.get_available_slots(p_barber,p_service,p_day)$$;
+grant usage on schema private to anon;
+grant execute on function private.get_available_slots(uuid,uuid,date) to anon,authenticated;
+revoke all on function public.get_available_slots(uuid,uuid,date) from public;
+grant execute on function public.get_available_slots(uuid,uuid,date) to anon,authenticated;
+alter function public.book_appointment(uuid,uuid,timestamptz,uuid) set schema private;
+create function public.book_appointment(p_barber uuid,p_service uuid,p_start timestamptz,p_client uuid default null) returns uuid language sql security invoker set search_path='' as $$select private.book_appointment(p_barber,p_service,p_start,p_client)$$;
+alter function public.cancel_appointment(uuid) set schema private;
+create function public.cancel_appointment(p_id uuid) returns void language sql security invoker set search_path='' as $$select private.cancel_appointment(p_id)$$;
+alter function public.reschedule_appointment(uuid,timestamptz) set schema private;
+create function public.reschedule_appointment(p_id uuid,p_start timestamptz) returns void language sql security invoker set search_path='' as $$select private.reschedule_appointment(p_id,p_start)$$;
+alter function public.lookup_client(text,uuid) set schema private;
+create function public.lookup_client(p_email text,p_barber uuid) returns table(id uuid,first_name text,last_name text,phone text) language sql stable security invoker set search_path='' as $$select * from private.lookup_client(p_email,p_barber)$$;
+alter function public.publish_terms(uuid) set schema private;
+create function public.publish_terms(p_id uuid) returns void language sql security invoker set search_path='' as $$select private.publish_terms(p_id)$$;
+revoke all on function public.book_appointment(uuid,uuid,timestamptz,uuid),public.cancel_appointment(uuid),public.reschedule_appointment(uuid,timestamptz),public.lookup_client(text,uuid),public.publish_terms(uuid) from public,anon;
+grant execute on function public.book_appointment(uuid,uuid,timestamptz,uuid),public.cancel_appointment(uuid),public.reschedule_appointment(uuid,timestamptz),public.lookup_client(text,uuid),public.publish_terms(uuid) to authenticated;
+revoke all on function private.appointment_reminders() from public,anon,authenticated;

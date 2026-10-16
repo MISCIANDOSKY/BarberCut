@@ -18,17 +18,19 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Create dependency lockfile on first run
+      - name: Update dependency lockfile
+        run: npm install --package-lock-only
+      - run: npm ci
+      - name: Format and retain reproducible sources
         run: |
-          if [ ! -f package-lock.json ]; then
-            npm install --package-lock-only
-            git config user.name 'github-actions[bot]'
-            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-            git add package-lock.json
-            git commit -m "Lock npm dependencies"
+          npm run format
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .
+          if ! git diff --cached --quiet; then
+            git commit -m "Format sources and update dependency lockfile"
             git push
           fi
-      - run: npm ci
       - run: npm run build
       - run: npm test
       - uses: actions/upload-pages-artifact@v3

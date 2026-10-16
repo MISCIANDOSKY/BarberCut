@@ -22,7 +22,7 @@ Il primo admin è stato associato all'account indicato dal titolare. Per il barb
 
 ## Limiti espliciti
 
-Non sono attivate cancellazioni automatiche di dati o account. Eliminazione account, retention, push ed email di promemoria richiedono configurazione e approvazione delle regole. L'export JSON admin è un'esportazione applicativa e non sostituisce un dump PostgreSQL completo con Auth. Non sono stati svolti test fisici su Safari iPhone o Chrome Android.
+Non sono attivate cancellazioni automatiche di dati o account. Eliminazione account, retention, push ed email di promemoria richiedono configurazione e approvazione delle regole. I promemoria interni 24h e 1h sono attivi tramite pg_cron e deduplicati per appuntamento e orario. L'export JSON admin è un'esportazione applicativa e non sostituisce un dump PostgreSQL completo con Auth. Non sono stati svolti test fisici su Safari iPhone o Chrome Android.
 
 ## Sorgenti
 
