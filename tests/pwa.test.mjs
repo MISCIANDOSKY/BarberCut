@@ -1,0 +1,4 @@
+import test from'node:test';import assert from'node:assert/strict';import{readFileSync,existsSync}from'node:fs';
+test('Manifest installabile con scope relativo e icone dedicate',()=>{const m=JSON.parse(readFileSync('public/manifest.webmanifest','utf8'));assert.equal(m.display,'standalone');assert.equal(m.start_url,'./');assert.equal(m.scope,'./');assert(m.icons.some(i=>i.sizes==='192x192'));assert(m.icons.some(i=>i.sizes==='512x512'&&i.purpose==='maskable'))});
+test('Nessuna chiave privilegiata nel frontend',()=>{const text=readFileSync('src/lib/api.ts','utf8');assert(!text.includes('service_role'));assert(text.includes('sb_publishable_'))});
+test('Gli artefatti PWA vengono generati nel build',()=>{assert(existsSync('dist/sw.js'));for(const size of[192,512]){const b=readFileSync('dist/icons/icon-'+size+'.png');assert.equal(b.readUInt32BE(16),size);assert.equal(b.readUInt32BE(20),size)}});
