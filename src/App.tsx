@@ -510,6 +510,7 @@ export default function App() {
         <div>
           <strong>{settings.shop_name}</strong>
           <span>Un piccolo gesto. Un grande stile.</span>
+          <span>Powered by MISCIANDOSKY</span>
         </div>
         <PWA />
         <span className="footer-note">PRENOTA. ARRIVA. RINNOVA.</span>
