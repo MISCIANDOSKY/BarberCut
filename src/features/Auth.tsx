@@ -8,7 +8,8 @@ import { Field, Modal } from "../components/UI";
 import { supabase, result } from "../lib/api";
 import type { Row } from "../lib/api";
 const SEND_ERROR = "Errore nell’invio, riprovare fra qualche minuto.";
-const CODE_ERROR = "Errore: codice non valido o scaduto. Riprova oppure richiedi un nuovo codice.";
+const CODE_ERROR =
+  "Errore: codice non valido o scaduto. Riprova oppure richiedi un nuovo codice.";
 
 export default function Auth({
   close,
@@ -133,7 +134,9 @@ export default function Auth({
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
       setErrorMessage(
-        mode === "reset" || (mode === "register" && /email.*(send|rate)|smtp|sending|rate.*email/i.test(message))
+        mode === "reset" ||
+          (mode === "register" &&
+            /email.*(send|rate)|smtp|sending|rate.*email/i.test(message))
           ? SEND_ERROR
           : (await import("../lib/api")).friendly(e),
       );
@@ -156,7 +159,11 @@ export default function Auth({
           Inserisci il codice ricevuto via email, oppure usa il link di conferma
           presente nel messaggio.
         </p>
-        {errorMessage && <p className="form-error" role="alert">{errorMessage}</p>}
+        {errorMessage && (
+          <p className="form-error" role="alert">
+            {errorMessage}
+          </p>
+        )}
         <form
           onSubmit={async (event) => {
             event.preventDefault();
@@ -214,7 +221,11 @@ export default function Auth({
               disabled={busy}
             />
           </label>
-          {codeError && <p id={codeErrorId} className="form-error" role="alert">{codeError}</p>}
+          {codeError && (
+            <p id={codeErrorId} className="form-error" role="alert">
+              {codeError}
+            </p>
+          )}
           <button className="primary" disabled={busy}>
             {busy
               ? "Verifica in corso…"
@@ -286,7 +297,11 @@ export default function Auth({
             ? "Inserisci l’email del tuo account: ti invieremo un codice per accedere senza password."
             : "Il tuo prossimo appuntamento comincia qui."}
         </p>
-        {errorMessage && <p className="form-error" role="alert">{errorMessage}</p>}
+        {errorMessage && (
+          <p className="form-error" role="alert">
+            {errorMessage}
+          </p>
+        )}
         <form onSubmit={submit}>
           {mode === "register" && (
             <div className="two">
@@ -486,7 +501,11 @@ export function StaffGate({
       <button className="primary" onClick={send} disabled={busy}>
         {busy ? "Attendi…" : sent ? "Invia di nuovo" : "Invia verifica email"}
       </button>
-      {sendError && <p className="form-error" role="alert">{sendError}</p>}
+      {sendError && (
+        <p className="form-error" role="alert">
+          {sendError}
+        </p>
+      )}
       {sent && (
         <form onSubmit={verify}>
           <label>
@@ -504,7 +523,11 @@ export function StaffGate({
               required
             />
           </label>
-          {codeError && <p id={codeErrorId} className="form-error" role="alert">{codeError}</p>}
+          {codeError && (
+            <p id={codeErrorId} className="form-error" role="alert">
+              {codeError}
+            </p>
+          )}
           <button className="secondary" disabled={busy}>
             Verifica codice
           </button>
