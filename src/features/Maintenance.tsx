@@ -110,6 +110,7 @@ export default function Maintenance({
           Admin, barbieri e clienti con appuntamenti futuri sono esclusi. I dati
           degli account disattivati restano conservati.
         </p>
+        <p className="muted">Prima della disattivazione vengono inviati avvisi email a 30, 15 e 7 giorni. Basta completare un accesso o fare una prenotazione per far ripartire il conteggio. La disattivazione attende almeno sette giorni dall’ultimo avviso inviato.</p>
         <div className="maintenance-rule">
           <label className="check">
             <input

@@ -30,13 +30,14 @@ export default function App() {
     [appointments, setAppointments] = useState<Row[]>([]),
     [notifications, setNotifications] = useState<Row[]>([]),
     [section, setSection] = useState(""),
-    [auth, setAuth] = useState(false),
+    [auth, setAuth] = useState(() => new URLSearchParams(location.search).get("keep-active") === "1"),
     [message, setMessage] = useState(""),
     [loading, setLoading] = useState(true),
     [online, setOnline] = useState(navigator.onLine),
     [reset, setReset] = useState(false),
     [password, setPassword] = useState("");
   const refreshVersion = useRef(0);
+  const keepActiveRequested = useRef(new URLSearchParams(location.search).get("keep-active") === "1");
   const notify = useCallback((s: string) => setMessage(s), []);
   const refresh = useCallback(async () => {
     const version = ++refreshVersion.current;
@@ -81,7 +82,15 @@ export default function App() {
       );
       if (u) {
         // Keep a server timestamp even when an existing login session is reused.
-        await supabase.rpc("record_activity");
+        const { error: activityError } = await supabase.rpc("record_activity");
+        if (!activityError && keepActiveRequested.current) {
+          keepActiveRequested.current = false;
+          setAuth(false);
+          const address = new URL(location.href);
+          address.searchParams.delete("keep-active");
+          history.replaceState(history.state, "", address.pathname + address.search + address.hash);
+          notify("Il tuo account è attivo. Il conteggio dell’inattività è ripartito da oggi.");
+        }
         const [p, r, v, ns, ap] = await Promise.all([
           result(supabase.from("profiles").select("*").eq("id", u.id).single()),
           result(

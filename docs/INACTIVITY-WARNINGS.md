@@ -1,0 +1,13 @@
+# Avvisi di inattività
+
+I clienti ricevono un avviso a 30, 15 e 7 giorni dalla disattivazione. Admin e barbieri sono esclusi; anche account collegati a un’agenda o con appuntamenti confermati futuri non sono candidati. Il calcolo usa l’attività server già registrata, inclusi accessi con sessioni esistenti. La prenotazione effettuata dal cliente aggiorna l’attività tramite trigger.
+
+Il pulsante email “Mantieni attivo il mio account” apre la PWA con ?keep-active=1. Senza sessione si apre l’accesso; con una sessione valida viene registrata l’attività. La mera apertura dell’email non conta. Nessun token permanente o identificativo utente è incorporato nel collegamento. È disponibile anche un codice OTP a breve scadenza; dopo la sua scadenza si può richiederne un altro dall’app.
+
+La consegna riutilizza Supabase Auth SMTP e Brevo già configurati. La Edge Function richiede un’email OTP senza creare account e senza effettuare accessi. Il modello Magic link/OTP ha un ramo italiano di preavviso e mantiene il normale ramo di accesso. Il contesto di presentazione viene inserito atomicamente in raw_user_meta_data, usato solo dal template e rimosso al termine dell’invio, alla ripresa dell’attività o dopo un timeout. Questi metadati non autorizzano alcuna operazione. L’invio non aggiorna l’inattività.
+
+La coda privata viene controllata ogni 15 minuti, con un massimo di 20 invii per ciclo e sei tentativi distanziati di 30 minuti. Ogni richiesta alla funzione usa un token casuale monouso di 256 bit, conservato soltanto come SHA-256 con scadenza. La Edge Function usa verify_jwt=false perché autentica questo token tramite RPC disponibili esclusivamente a service_role. I chiamanti non possono scegliere destinatario o testo. Nessuna credenziale SMTP o service role entra nel repository o nel browser.
+
+Un avviso non è duplicato nello stesso periodo di inattività. Nuovi accessi o ruoli modificati annullano i messaggi non più pertinenti. Ogni ciclo garantisce inizialmente 30 giorni di preavviso, anche se una soglia viene accorciata su utenti già inattivi. La disattivazione giornaliera richiede il completamento dell’ultimo avviso e almeno sette giorni di attesa dalla consegna al trasporto SMTP. Un errore di invio rinvia la disattivazione. Nessun account viene eliminato da questa procedura.
+
+Test SQL in supabase/tests/inactivity_warnings.sql verificano le tre soglie, duplicati, ruoli, annullamento dopo login, contesto email e sua pulizia, privilegi, token monouso, mancato reset dell’inattività durante l’invio e attesa prima della disattivazione. Nessuna email reale è stata inviata per questi test; le fixture vengono annullate.

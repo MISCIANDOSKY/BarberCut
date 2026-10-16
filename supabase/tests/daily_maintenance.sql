@@ -18,6 +18,8 @@ begin
  insert into public.calendar_entries(barber_id,service_id,kind,client_id,start_at,end_at,service_name,price) values(ba,sv,'appointment',active_user,now()-interval '2 hours',now()-interval '1 hour','Recent',10) returning id into recent_ap;
  insert into public.calendar_entries(barber_id,service_id,kind,client_id,start_at,end_at,service_name,price) values(ba,sv,'appointment',future_user,now()+interval '2 days',now()+interval '2 days 30 minutes','Future',10) returning id into future_ap;
  insert into public.calendar_entries(barber_id,kind,start_at,end_at) values(ba,'block',cutoff-interval '4 hours',cutoff-interval '3 hours') returning id into block_id;
+ insert into private.inactivity_cycles(user_id,activity_at,inactive_days,disable_after) values(old_user,now()-interval '121 days',120,now()-interval '1 day');
+ insert into private.inactivity_notices(cycle_id,lead_days,status,sent_at) select id,7,'sent',now()-interval '8 days' from private.inactivity_cycles where user_id=old_user;
  output:=private.run_daily_maintenance();
  if (select banned_until is null or banned_until<=now() from auth.users where id=old_user) then raise exception 'inactive user not disabled';end if;
  if exists(select 1 from auth.users where id in(active_user,staff_user,admin_user,future_user) and banned_until>now()) then raise exception 'protected/recent/future user disabled';end if;
