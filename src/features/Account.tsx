@@ -100,34 +100,6 @@ export function Profile({
     [loggingOut, setLoggingOut] = useState(false);
   return (
     <>
-      <div className="notice">
-        <p>
-          Hai effettuato l’accesso come <strong>{user.email}</strong>.
-        </p>
-        <button
-          type="button"
-          className="secondary"
-          disabled={busy || loggingOut}
-          style={{ width: "100%" }}
-          onClick={async () => {
-            if (loggingOut) return;
-            setLoggingOut(true);
-            try {
-              const { error } = await supabase.auth.signOut({ scope: "local" });
-              if (error) throw error;
-              clearPasswordProof();
-              notify("Hai effettuato l’uscita dal tuo account.");
-              reload();
-            } catch {
-              notify("Non riesco a uscire dall’account. Riprova.");
-            } finally {
-              setLoggingOut(false);
-            }
-          }}
-        >
-          {loggingOut ? "Uscita in corso…" : "Esci dal tuo account"}
-        </button>
-      </div>
       <form
         onSubmit={async (e) => {
           e.preventDefault();
@@ -177,6 +149,31 @@ export function Profile({
           {busy ? "Salvataggio…" : "Salva profilo"}
         </button>
       </form>
+      <div style={{ marginTop: ".75rem", marginBottom: ".75rem" }}>
+        <button
+          type="button"
+          className="secondary"
+          disabled={busy || loggingOut}
+          style={{ width: "100%" }}
+          onClick={async () => {
+            if (loggingOut) return;
+            setLoggingOut(true);
+            try {
+              const { error } = await supabase.auth.signOut({ scope: "local" });
+              if (error) throw error;
+              clearPasswordProof();
+              notify("Hai effettuato l’uscita dal tuo account.");
+              reload();
+            } catch {
+              notify("Non riesco a uscire dall’account. Riprova.");
+            } finally {
+              setLoggingOut(false);
+            }
+          }}
+        >
+          {loggingOut ? "Uscita in corso…" : "Esci dal tuo account"}
+        </button>
+      </div>
       <button
         className="text"
         onClick={async () => {

@@ -179,6 +179,9 @@ export default function App() {
     };
   }, [refresh]);
   useEffect(() => {
+    if (section === "Profilo") window.scrollTo({ top: 0, behavior: "instant" });
+  }, [section]);
+  useEffect(() => {
     if (!message) return;
     const t = setTimeout(() => setMessage(""), 9000);
     return () => clearTimeout(t);
@@ -378,6 +381,14 @@ export default function App() {
         </div>
       )}
       <main>
+        {section === "Profilo" && user ? (
+          <div className="workspace">
+            <Panel title="Profilo" back={() => setSection("")}>
+              {content()}
+            </Panel>
+          </div>
+        ) : (
+          <>
         <div className="hero">
           <div className="hero-copy">
             <span className="eyebrow">
@@ -496,6 +507,8 @@ export default function App() {
             </div>
           )}
         </div>
+          </>
+        )}
       </main>
       <footer>
         <div>
