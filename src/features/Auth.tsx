@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import {
   savePasswordProof,
   getPasswordProof,
@@ -7,6 +7,9 @@ import {
 import { Field, Modal } from "../components/UI";
 import { supabase, result } from "../lib/api";
 import type { Row } from "../lib/api";
+const SEND_ERROR = "Errore nell’invio, riprovare fra qualche minuto.";
+const CODE_ERROR = "Errore: codice non valido o scaduto. Riprova oppure richiedi un nuovo codice.";
+
 export default function Auth({
   close,
   notify,
@@ -28,7 +31,14 @@ export default function Auth({
     [legal, setLegal] = useState(false),
     [busy, setBusy] = useState(false),
     [registrationCode, setRegistrationCode] = useState(""),
-    [retrySeconds, setRetrySeconds] = useState(0);
+    [retrySeconds, setRetrySeconds] = useState(0),
+    [errorMessage, setErrorMessage] = useState(""),
+    [codeError, setCodeError] = useState("");
+  const codeErrorId = useId();
+  useEffect(() => {
+    setErrorMessage("");
+    setCodeError("");
+  }, [mode, email]);
   useEffect(() => {
     if (!retrySeconds) return;
     const timer = window.setTimeout(
@@ -40,6 +50,8 @@ export default function Auth({
   async function sendLoginCode() {
     if (busy || retrySeconds > 0) return;
     setBusy(true);
+    setErrorMessage("");
+    setCodeError("");
     try {
       clearPasswordProof();
       await result(
@@ -57,8 +69,8 @@ export default function Auth({
       notify(
         "Se l’email è associata a un account, riceverai il codice di accesso. Controlla anche la cartella spam.",
       );
-    } catch (error) {
-      notify((await import("../lib/api")).friendly(error));
+    } catch {
+      setErrorMessage(SEND_ERROR);
     } finally {
       setBusy(false);
     }
@@ -71,6 +83,7 @@ export default function Auth({
       return;
     }
     setBusy(true);
+    setErrorMessage("");
     try {
       const redirect = location.origin + import.meta.env.BASE_URL;
       if (mode === "reset") {
@@ -118,7 +131,12 @@ export default function Auth({
         close();
       }
     } catch (e) {
-      notify((await import("../lib/api")).friendly(e));
+      const message = e instanceof Error ? e.message : String(e);
+      setErrorMessage(
+        mode === "reset" || (mode === "register" && /email.*(send|rate)|smtp|sending|rate.*email/i.test(message))
+          ? SEND_ERROR
+          : (await import("../lib/api")).friendly(e),
+      );
     } finally {
       setBusy(false);
     }
@@ -138,11 +156,14 @@ export default function Auth({
           Inserisci il codice ricevuto via email, oppure usa il link di conferma
           presente nel messaggio.
         </p>
+        {errorMessage && <p className="form-error" role="alert">{errorMessage}</p>}
         <form
           onSubmit={async (event) => {
             event.preventDefault();
             if (busy) return;
             setBusy(true);
+            setCodeError("");
+            setErrorMessage("");
             try {
               const { error } = await supabase.auth.verifyOtp({
                 email: email.trim(),
@@ -159,9 +180,7 @@ export default function Auth({
               onDone();
               close();
             } catch {
-              notify(
-                "Il codice non è valido o è scaduto. Controllalo oppure richiedi una nuova email.",
-              );
+              setCodeError(CODE_ERROR);
             } finally {
               setBusy(false);
             }
@@ -185,13 +204,17 @@ export default function Auth({
               autoComplete="one-time-code"
               pattern="[0-9]+"
               value={registrationCode}
-              onChange={(event) =>
-                setRegistrationCode(event.target.value.replace(/[^0-9]/g, ""))
-              }
+              aria-invalid={!!codeError}
+              aria-describedby={codeError ? codeErrorId : undefined}
+              onChange={(event) => {
+                setRegistrationCode(event.target.value.replace(/[^0-9]/g, ""));
+                setCodeError("");
+              }}
               required
               disabled={busy}
             />
           </label>
+          {codeError && <p id={codeErrorId} className="form-error" role="alert">{codeError}</p>}
           <button className="primary" disabled={busy}>
             {busy
               ? "Verifica in corso…"
@@ -209,6 +232,8 @@ export default function Auth({
               return;
             }
             setBusy(true);
+            setErrorMessage("");
+            setCodeError("");
             try {
               const { error } = await supabase.auth.resend({
                 type: "signup",
@@ -223,9 +248,7 @@ export default function Auth({
                 "Se l’account è in attesa di conferma, riceverai una nuova email. Controlla anche la cartella spam.",
               );
             } catch {
-              notify(
-                "Non riesco a inviare una nuova email. Attendi un minuto e riprova.",
-              );
+              setErrorMessage(SEND_ERROR);
             } finally {
               setBusy(false);
             }
@@ -263,6 +286,7 @@ export default function Auth({
             ? "Inserisci l’email del tuo account: ti invieremo un codice per accedere senza password."
             : "Il tuo prossimo appuntamento comincia qui."}
         </p>
+        {errorMessage && <p className="form-error" role="alert">{errorMessage}</p>}
         <form onSubmit={submit}>
           {mode === "register" && (
             <div className="two">
@@ -408,9 +432,15 @@ export function StaffGate({
 }) {
   const [code, setCode] = useState(""),
     [busy, setBusy] = useState(false),
-    [sent, setSent] = useState(false);
+    [sent, setSent] = useState(false),
+    [sendError, setSendError] = useState(""),
+    [codeError, setCodeError] = useState("");
+  const codeErrorId = useId();
   async function send() {
+    if (busy) return;
     setBusy(true);
+    setSendError("");
+    setCodeError("");
     try {
       await result(
         supabase.auth.signInWithOtp({
@@ -426,25 +456,24 @@ export function StaffGate({
         "Email inviata. Inserisci il codice oppure apri il link nello stesso browser.",
       );
     } catch {
-      notify(
-        "Invio non riuscito. Controlla la configurazione email di Supabase e riprova.",
-      );
+      setSendError(SEND_ERROR);
     } finally {
       setBusy(false);
     }
   }
   async function verify(e: React.FormEvent) {
     e.preventDefault();
+    if (busy) return;
     setBusy(true);
+    setCodeError("");
+    setSendError("");
     try {
       await result(
-        supabase.auth.verifyOtp({ email, token: code, type: "email" }),
+        supabase.auth.verifyOtp({ email, token: code.trim(), type: "email" }),
       );
       done();
     } catch {
-      notify(
-        "Codice non valido o scaduto. Accedi nuovamente con la password e riprova.",
-      );
+      setCodeError(CODE_ERROR);
     } finally {
       setBusy(false);
     }
@@ -457,6 +486,7 @@ export function StaffGate({
       <button className="primary" onClick={send} disabled={busy}>
         {busy ? "Attendi…" : sent ? "Invia di nuovo" : "Invia verifica email"}
       </button>
+      {sendError && <p className="form-error" role="alert">{sendError}</p>}
       {sent && (
         <form onSubmit={verify}>
           <label>
@@ -465,16 +495,22 @@ export function StaffGate({
               inputMode="numeric"
               autoComplete="one-time-code"
               value={code}
-              onChange={(e) => setCode(e.target.value)}
+              aria-invalid={!!codeError}
+              aria-describedby={codeError ? codeErrorId : undefined}
+              onChange={(e) => {
+                setCode(e.target.value.replace(/[^0-9]/g, ""));
+                setCodeError("");
+              }}
               required
             />
           </label>
+          {codeError && <p id={codeErrorId} className="form-error" role="alert">{codeError}</p>}
           <button className="secondary" disabled={busy}>
             Verifica codice
           </button>
           <p className="muted">
-            Se l’email contiene un link, aprilo nello stesso browser. Il codice
-            richiede il modello email OTP configurato in Supabase.
+            Inserisci il codice scritto nell’email. Se preferisci usare il link,
+            aprilo nello stesso browser.
           </p>
         </form>
       )}

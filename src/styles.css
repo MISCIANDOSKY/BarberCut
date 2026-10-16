@@ -1067,3 +1067,17 @@ dialog.feature-dialog > header {
     padding-top: 20px;
   }
 }
+
+.form-error {
+  color: #ffb4b4;
+  background: #421e1e;
+  border: 1px solid #b85b5b;
+  border-radius: 4px;
+  padding: 12px 14px;
+  margin: 8px 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+input[aria-invalid="true"] {
+  border-color: #ff8585;
+}

@@ -319,7 +319,7 @@ function DeleteAccount({
                   "Controlla l’email. Inserisci il codice o apri il link, poi torna qui per confermare.",
                 );
               } catch {
-                notify("Invio email non riuscito. Riprova.");
+                notify("Errore nell’invio, riprovare fra qualche minuto.");
               } finally {
                 setBusy(false);
               }
