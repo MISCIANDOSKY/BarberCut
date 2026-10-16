@@ -179,7 +179,7 @@ export default function App() {
     };
   }, [refresh]);
   useEffect(() => {
-    if (section === "Profilo") window.scrollTo({ top: 0, behavior: "instant" });
+    window.scrollTo({ top: 0, behavior: "instant" });
   }, [section]);
   useEffect(() => {
     if (!message) return;
@@ -381,10 +381,16 @@ export default function App() {
         </div>
       )}
       <main>
-        {section === "Profilo" && user ? (
-          <div className="workspace">
-            <Panel title="Profilo" back={() => setSection("")}>
-              {content()}
+        {section ? (
+          <div className="workspace" style={{ paddingTop: "24px", minHeight: "60vh" }}>
+            <Panel key={section} title={section} back={() => setSection("")}>
+              {loading ? (
+                <p className="empty" role="status">Caricamento…</p>
+              ) : staff && !verified && section !== "Profilo" ? (
+                <StaffGate email={user!.email!} done={refresh} notify={notify} />
+              ) : (
+                content()
+              )}
             </Panel>
           </div>
         ) : (
@@ -454,25 +460,15 @@ export default function App() {
                 />
               ) : (
                 <>
-                  {section && (
-                    <Panel title={section} back={() => setSection("")}>
-                      {content()}
-                    </Panel>
-                  )}
                   <nav
-                    className={"main-actions " + (section ? "compact" : "")}
+                    className="main-actions"
                     aria-label="Azioni principali"
                   >
                     {choices.map(([icon, title, sub], i) => (
                       <button
                         key={title}
-                        className={
-                          "action " + (title === section ? "active" : "")
-                        }
-                        onClick={() =>
-                          setSection(section === title ? "" : title)
-                        }
-                        aria-expanded={section === title}
+                        className="action"
+                        onClick={() => setSection(title)}
                       >
                         <span className="action-icon">{icon}</span>
                         <span className="action-copy">
