@@ -275,9 +275,15 @@ export default function App() {
           notify={notify}
           reload={refresh}
           deletionEnabled={!!settings.account_deletion_enabled}
-          addressEditor={ready && (
-            <BarberAddress address={settings.shop_address || ""} revision={settings.address_revision || 0} refresh={refresh} />
-          )}
+          addressEditor={
+            ready && (
+              <BarberAddress
+                address={settings.shop_address || ""}
+                revision={settings.address_revision || 0}
+                refresh={refresh}
+              />
+            )
+          }
         />
       ) : (
         <Empty>Accedi per visualizzare il tuo profilo.</Empty>

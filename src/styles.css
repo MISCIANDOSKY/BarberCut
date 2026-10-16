@@ -1106,7 +1106,8 @@ input[aria-invalid="true"] {
   line-height: 1.7;
   margin-bottom: 16px;
 }
-.shop-hours, .shop-address-editor {
+.shop-hours,
+.shop-address-editor {
   border-top: 1px solid var(--border);
   margin-top: 24px;
   padding-top: 8px;
@@ -1120,4 +1121,8 @@ input[aria-invalid="true"] {
   border-bottom: 1px solid var(--border);
   font-size: 14px;
 }
-.shop-hours-row dd { margin: 0; text-align: right; color: var(--muted); }
+.shop-hours-row dd {
+  margin: 0;
+  text-align: right;
+  color: var(--muted);
+}
