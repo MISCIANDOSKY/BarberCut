@@ -42,13 +42,21 @@ export default function Booking({
   const selection = useRef("");
   const saving = useRef(false);
   const activeServices = services.filter((s) => s.active);
-  const eligibleBarbers = barbers.filter((b) =>
-    b.active && links.some((link) => link.barber_id === b.id && link.service_id === service),
+  const eligibleBarbers = barbers.filter(
+    (b) =>
+      b.active &&
+      links.some(
+        (link) => link.barber_id === b.id && link.service_id === service,
+      ),
   );
   const chosenBarber = eligibleBarbers.some((b) => b.id === barber)
     ? barber
-    : eligibleBarbers.length === 1 ? eligibleBarbers[0].id : "";
-  useEffect(() => { selection.current = selected; }, [selected]);
+    : eligibleBarbers.length === 1
+      ? eligibleBarbers[0].id
+      : "";
+  useEffect(() => {
+    selection.current = selected;
+  }, [selected]);
   const svc = services.find((s) => s.id === service);
   const maxDate = maxBookingDate();
   useEffect(() => {
@@ -65,18 +73,28 @@ export default function Booking({
     let failed = false;
     setLoading(true);
     const request = createLatestRequest<Row[]>({
-      load: () => result(supabase.rpc("get_available_slots", {
-        p_barber: chosenBarber, p_service: service, p_day: day,
-      })),
+      load: () =>
+        result(
+          supabase.rpc("get_available_slots", {
+            p_barber: chosenBarber,
+            p_service: service,
+            p_day: day,
+          }),
+        ),
       onData: (next) => {
         if (saving.current) return;
         failed = false;
         setSlots(next);
         setLoading(false);
-        if (selection.current && !next.some((s) => s.start_at === selection.current)) {
+        if (
+          selection.current &&
+          !next.some((s) => s.start_at === selection.current)
+        ) {
           selection.current = "";
           setSelected("");
-          notify("L’orario selezionato non è più disponibile. Scegline un altro.");
+          notify(
+            "L’orario selezionato non è più disponibile. Scegline un altro.",
+          );
         }
       },
       onError: () => {
@@ -85,12 +103,16 @@ export default function Booking({
         selection.current = "";
         setSelected("");
         setLoading(false);
-        if (!failed) notify("Non riesco ad aggiornare gli orari. Riprova quando sei online.");
+        if (!failed)
+          notify(
+            "Non riesco ad aggiornare gli orari. Riprova quando sei online.",
+          );
         failed = true;
       },
     });
     const update = () => {
-      if (!saving.current && !document.hidden && navigator.onLine) void request.refresh();
+      if (!saving.current && !document.hidden && navigator.onLine)
+        void request.refresh();
     };
     void request.refresh();
     const timer = window.setInterval(update, 30000);
@@ -107,7 +129,10 @@ export default function Booking({
   }, [service, chosenBarber, day, confirmed, notify]);
   async function book() {
     if (saving.current || !selected || !svc) return;
-    if (!navigator.onLine) { notify("Collegati a internet per confermare la prenotazione."); return; }
+    if (!navigator.onLine) {
+      notify("Collegati a internet per confermare la prenotazione.");
+      return;
+    }
     if (!user) {
       login();
       return;
@@ -228,10 +253,10 @@ export default function Booking({
               >
                 <option value="">Scegli il barbiere</option>
                 {eligibleBarbers.map((b) => (
-                    <option key={b.id} value={b.id}>
-                      {b.name}
-                    </option>
-                  ))}
+                  <option key={b.id} value={b.id}>
+                    {b.name}
+                  </option>
+                ))}
               </select>
             </label>
           )}
