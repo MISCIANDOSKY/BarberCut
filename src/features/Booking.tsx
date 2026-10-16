@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createLatestRequest } from "../lib/latestRequest.mjs";
 import { maxBookingDate } from "../lib/dates.mjs";
 import { Empty } from "../components/UI";
 import {
@@ -38,7 +39,16 @@ export default function Booking({
     [loading, setLoading] = useState(false),
     [confirmed, setConfirmed] = useState<Row | null>(null),
     [links, setLinks] = useState<Row[]>([]);
-  const chosenBarber = barber || (barbers.length === 1 ? barbers[0].id : "");
+  const selection = useRef("");
+  const saving = useRef(false);
+  const activeServices = services.filter((s) => s.active);
+  const eligibleBarbers = barbers.filter((b) =>
+    b.active && links.some((link) => link.barber_id === b.id && link.service_id === service),
+  );
+  const chosenBarber = eligibleBarbers.some((b) => b.id === barber)
+    ? barber
+    : eligibleBarbers.length === 1 ? eligibleBarbers[0].id : "";
+  useEffect(() => { selection.current = selected; }, [selected]);
   const svc = services.find((s) => s.id === service);
   const maxDate = maxBookingDate();
   useEffect(() => {
@@ -47,35 +57,62 @@ export default function Booking({
       .catch(() => notify("Impossibile caricare i servizi."));
   }, []);
   useEffect(() => {
-    let active = true;
+    selection.current = "";
     setSelected("");
     setSlots([]);
-    if (service && chosenBarber && day) {
-      setLoading(true);
-      result(
-        supabase.rpc("get_available_slots", {
-          p_barber: chosenBarber,
-          p_service: service,
-          p_day: day,
-        }),
-      )
-        .then((d) => {
-          if (active) setSlots(d as Row[]);
-        })
-        .catch(() => notify("Non riesco ad aggiornare gli orari. Riprova."))
-        .finally(() => {
-          if (active) setLoading(false);
-        });
-    }
-    return () => {
-      active = false;
+    setLoading(false);
+    if (!service || !chosenBarber || !day || confirmed) return;
+    let failed = false;
+    setLoading(true);
+    const request = createLatestRequest<Row[]>({
+      load: () => result(supabase.rpc("get_available_slots", {
+        p_barber: chosenBarber, p_service: service, p_day: day,
+      })),
+      onData: (next) => {
+        if (saving.current) return;
+        failed = false;
+        setSlots(next);
+        setLoading(false);
+        if (selection.current && !next.some((s) => s.start_at === selection.current)) {
+          selection.current = "";
+          setSelected("");
+          notify("L’orario selezionato non è più disponibile. Scegline un altro.");
+        }
+      },
+      onError: () => {
+        if (saving.current) return;
+        setSlots([]);
+        selection.current = "";
+        setSelected("");
+        setLoading(false);
+        if (!failed) notify("Non riesco ad aggiornare gli orari. Riprova quando sei online.");
+        failed = true;
+      },
+    });
+    const update = () => {
+      if (!saving.current && !document.hidden && navigator.onLine) void request.refresh();
     };
-  }, [service, chosenBarber, day]);
+    void request.refresh();
+    const timer = window.setInterval(update, 30000);
+    window.addEventListener("focus", update);
+    window.addEventListener("online", update);
+    document.addEventListener("visibilitychange", update);
+    return () => {
+      request.stop();
+      window.clearInterval(timer);
+      window.removeEventListener("focus", update);
+      window.removeEventListener("online", update);
+      document.removeEventListener("visibilitychange", update);
+    };
+  }, [service, chosenBarber, day, confirmed, notify]);
   async function book() {
+    if (saving.current || !selected || !svc) return;
+    if (!navigator.onLine) { notify("Collegati a internet per confermare la prenotazione."); return; }
     if (!user) {
       login();
       return;
     }
+    saving.current = true;
     setBusy(true);
     try {
       await result(
@@ -111,6 +148,7 @@ export default function Booking({
         setSlots([]);
       }
     } finally {
+      saving.current = false;
       setBusy(false);
     }
   }
@@ -158,9 +196,10 @@ export default function Booking({
       )}
       <span className="step-label">01 / SCEGLI IL SERVIZIO</span>
       <div className="service-list">
-        {services.map((s) => (
+        {activeServices.map((s) => (
           <button
             key={s.id}
+            disabled={busy}
             className={"service " + (service === s.id ? "selected" : "")}
             onClick={() => {
               setService(s.id);
@@ -175,25 +214,20 @@ export default function Booking({
           </button>
         ))}
       </div>
-      {!services.length && <Empty>Nessun servizio disponibile.</Empty>}
+      {!activeServices.length && <Empty>Nessun servizio disponibile.</Empty>}
       {service && (
         <>
           <span className="step-label">02 / SCEGLI IL GIORNO</span>
-          {barbers.length > 1 && (
+          {eligibleBarbers.length > 1 && (
             <label>
               Barbiere
               <select
-                value={barber}
+                value={chosenBarber}
+                disabled={busy}
                 onChange={(e) => setBarber(e.target.value)}
               >
                 <option value="">Scegli il barbiere</option>
-                {barbers
-                  .filter((b) =>
-                    links.some(
-                      (l) => l.barber_id === b.id && l.service_id === service,
-                    ),
-                  )
-                  .map((b) => (
+                {eligibleBarbers.map((b) => (
                     <option key={b.id} value={b.id}>
                       {b.name}
                     </option>
@@ -205,6 +239,7 @@ export default function Booking({
             Giorno
             <input
               type="date"
+              disabled={busy}
               min={today()}
               max={maxDate}
               value={day}
@@ -221,6 +256,7 @@ export default function Booking({
                   <button
                     className={selected === s.start_at ? "selected" : ""}
                     key={s.start_at}
+                    disabled={busy}
                     onClick={() => setSelected(s.start_at)}
                   >
                     {timeLabel(s.start_at)}
