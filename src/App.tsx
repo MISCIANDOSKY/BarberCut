@@ -48,8 +48,8 @@ export default function App() {
       setUser(u);
       const [config, svcs, bs, ts] = await Promise.all([
         result(supabase.from("app_settings").select("*").single()),
-        result(supabase.from("services").select("*").order("price")),
-        result(supabase.from("barbers").select("*").order("name")),
+        result(supabase.from("services").select("*").is("deleted_at", null).order("price")),
+        result(supabase.from("barbers").select("*").is("deleted_at", null).order("name")),
         result(
           supabase
             .from("terms_versions")
