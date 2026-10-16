@@ -390,7 +390,12 @@ export default function Admin({
                 </button>
               ) : (
                 <div
-                  style={{ display: "flex", flexDirection: "column", alignItems: "stretch", gap: ".25rem" }}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "stretch",
+                    gap: ".25rem",
+                  }}
                 >
                   <button
                     className="text"
