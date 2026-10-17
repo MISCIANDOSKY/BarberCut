@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createLatestRequest } from "../lib/latestRequest.mjs";
 import { maxBookingDate } from "../lib/dates.mjs";
-import { Empty } from "../components/UI";
+import { Empty, Modal } from "../components/UI";
 import {
   supabase,
   result,
@@ -34,6 +34,8 @@ export default function Booking({
 }) {
   const [service, setService] = useState(""),
     [barber, setBarber] = useState(""),
+    [choosingTime, setChoosingTime] = useState(false),
+    [bookingError, setBookingError] = useState(""),
     [day, setDay] = useState(today()),
     [slots, setSlots] = useState<Row[]>([]),
     [selected, setSelected] = useState(""),
@@ -79,7 +81,8 @@ export default function Booking({
     setSelected("");
     setSlots([]);
     setLoading(false);
-    if (!service || !chosenBarber || !day || confirmed) return;
+    setBookingError("");
+    if (!choosingTime || !service || !chosenBarber || !day || confirmed) return;
     let failed = false;
     setLoading(true);
     const request = createLatestRequest<Row[]>({
@@ -93,6 +96,7 @@ export default function Booking({
         ),
       onData: (next) => {
         if (saving.current) return;
+        if (failed) setBookingError("");
         failed = false;
         setSlots(next);
         setLoading(false);
@@ -102,6 +106,7 @@ export default function Booking({
         ) {
           selection.current = "";
           setSelected("");
+          setBookingError("L’orario selezionato non è più disponibile. Scegline un altro.");
           notify(
             "L’orario selezionato non è più disponibile. Scegline un altro.",
           );
@@ -113,6 +118,7 @@ export default function Booking({
         selection.current = "";
         setSelected("");
         setLoading(false);
+        setBookingError("Non riesco ad aggiornare gli orari. Riprova quando sei online.");
         if (!failed)
           notify(
             "Non riesco ad aggiornare gli orari. Riprova quando sei online.",
@@ -136,7 +142,7 @@ export default function Booking({
       window.removeEventListener("online", update);
       document.removeEventListener("visibilitychange", update);
     };
-  }, [service, chosenBarber, day, confirmed, notify]);
+  }, [service, chosenBarber, day, confirmed, choosingTime, notify]);
   async function book() {
     if (saving.current || !selected || !svc) return;
     if (!navigator.onLine) {
@@ -149,6 +155,7 @@ export default function Booking({
     }
     saving.current = true;
     setBusy(true);
+    setBookingError("");
     try {
       await result(
         guest
@@ -177,7 +184,9 @@ export default function Booking({
       setConfirmed(savedBooking);
       onBooked(savedBooking);
     } catch (e) {
-      notify((await import("../lib/api")).friendly(e));
+      const errorMessage = (await import("../lib/api")).friendly(e);
+      setBookingError(errorMessage);
+      notify(errorMessage);
       setSelected("");
       try {
         setSlots(
@@ -249,6 +258,10 @@ export default function Booking({
             onClick={() => {
               setService(s.id);
               setBarber("");
+              setSelected("");
+              setSlots([]);
+              setBookingError("");
+              setChoosingTime(true);
             }}
           >
             <span>
@@ -260,8 +273,13 @@ export default function Booking({
         ))}
       </div>
       {!activeServices.length && <Empty>Nessun servizio disponibile.</Empty>}
-      {service && (
-        <>
+      {service && choosingTime && (
+        <Modal title="Giorno e orario" wide close={() => setChoosingTime(false)}>
+          <div className="booking-schedule">
+            <p className="notice">
+              <strong>{svc?.name}</strong><br />
+              {svc?.duration_minutes} minuti · {svc && euro(svc.price)}
+            </p>
           <span className="step-label">02 / SCEGLI IL GIORNO</span>
           {eligibleBarbers.length > 1 && (
             <label>
@@ -302,7 +320,7 @@ export default function Booking({
                     className={selected === s.start_at ? "selected" : ""}
                     key={s.start_at}
                     disabled={busy}
-                    onClick={() => setSelected(s.start_at)}
+                    onClick={() => { setSelected(s.start_at); setBookingError(""); }}
                   >
                     {timeLabel(s.start_at)}
                   </button>
@@ -316,25 +334,22 @@ export default function Booking({
               )}
             </>
           )}
-          {selected && (
-            <div className="confirmation">
+          {bookingError && <p className="form-error" role="alert">{bookingError}</p>}
+          <div className="booking-footer">
+            {selected ? (
               <p>
-                <strong>{svc?.name}</strong>
-                <br />
-                {dateLabel(selected)} alle {timeLabel(selected)}
-                <br />
-                {svc && euro(svc.price)}
+                <strong>{svc?.name}</strong><br />
+                {dateLabel(selected)} alle {timeLabel(selected)} · {svc && euro(svc.price)}
               </p>
-              <button
-                className="primary"
-                disabled={busy || !navigator.onLine}
-                onClick={book}
-              >
-                {busy ? "Conferma in corso…" : "Conferma prenotazione →"}
-              </button>
-            </div>
-          )}
-        </>
+            ) : <p className="muted">Seleziona giorno e orario per confermare.</p>}
+            <button className="primary"
+              disabled={busy || !selected || !navigator.onLine}
+              onClick={book}>
+              {busy ? "Conferma in corso…" : "Conferma prenotazione"}
+            </button>
+          </div>
+          </div>
+        </Modal>
       )}
     </>
   );

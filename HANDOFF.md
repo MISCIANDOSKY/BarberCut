@@ -75,6 +75,7 @@ Le prenotazioni disabilitate sono un'impostazione corrente: non riaprirle automa
 
 - Disponibilità calcolata dal server, fuso Europe/Rome, scatti di 15 minuti; verifica dell'intera durata del servizio.
 - Limiti: massimo 5 appuntamenti futuri per cliente e prenotazione entro 3 mesi.
+- Prenotazione in due schermate: scelta servizio, poi schermata completa Giorno e orario con riepilogo, disponibilità e Conferma prenotazione in fondo. Freccia indietro ai servizi; conferma disabilitata senza orario, offline o durante salvataggio. Errori mostrati anche nella schermata attiva.
 - Dopo una prenotazione personale riuscita, apertura automatica di Le mie prenotazioni e aggiornamento elenco, anche per l’admin dall’area Cliente. I salvataggi manuali staff continuano invece a tornare all’agenda.
 - Orari settimanali, turni, eccezioni per data, festività nazionali e Pasquetta; le chiusure prevalgono sulle aperture.
 - Orari di lavoro: riepilogo di tutti i sette giorni con stato Chiuso esplicito. Nel giorno selezionato, checkbox Chiuso subito sopra il pulsante Aggiungi intervallo (o Salva giorno di chiusura) disabilita i campi orario; Salva giorno di chiusura rimuove gli intervalli settimanali del solo giorno/agenda selezionato. Per aprire, togliere la spunta e aggiungere almeno un intervallo. Eccezioni per data gestite separatamente.
@@ -205,3 +206,7 @@ Rimossa la descrizione dalla riga della durata nel catalogo cliente. Aggiunta ic
 ### 17 ottobre 2026 — Dopo prenotazione cliente apri Le mie prenotazioni
 
 Il callback di successo del flusso Prenota ora apre direttamente Le mie prenotazioni, conferma il salvataggio e aggiorna l’elenco. Vale anche per prenotazioni personali dell’admin; prenotazioni manuali staff e percorsi di errore invariati. Nessuna modifica al database e nessuna prenotazione reale creata per il test. Controllata la chiamata solo dopo salvataggio riuscito; TypeScript, build, test e pubblicazione riusciti nella [CI 39031573996](https://github.com/MISCIANDOSKY/BarberCut/actions/runs/39031573996). Nessuna prova con prenotazione reale su dispositivo fisico.
+
+### 17 ottobre 2026 — Giorno e orario in schermata separata
+
+La scelta del servizio apre una schermata completa Giorno e orario con riepilogo, barbiere se necessario, data e disponibilità. Pulsante Conferma prenotazione in fondo, con riepilogo e stato disabilitato prima della scelta orario. Freccia indietro ai servizi e reset della selezione per impedire conferme di orari precedenti; polling limitato alla schermata orari aperta, invariati controlli server e protezione doppio invio. Errori di disponibilità/salvataggio leggibili nella schermata attiva. Stesso componente per clienti, admin come cliente e prenotazioni manuali staff; destinazioni dopo successo invariate. Nessuna modifica al database o prenotazione reale di prova. CI e verifica navigazione pubblica da completare.
