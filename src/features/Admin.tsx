@@ -60,11 +60,15 @@ export default function Admin({
         );
       }
       function availableUsers(exceptBarberId?: string) {
-    return users.filter((account) =>
-      !barbers.some((barber) => barber.user_id === account.id && barber.id !== exceptBarberId)
-    );
-  }
-  if (section === "Configurazione")
+        return users.filter(
+          (account) =>
+            !barbers.some(
+              (barber) =>
+                barber.user_id === account.id && barber.id !== exceptBarberId,
+            ),
+        );
+      }
+      if (section === "Configurazione")
         setSettings(
           (await result(
             supabase.from("app_settings").select("*").single(),
@@ -496,9 +500,15 @@ export default function Admin({
             essere nuovamente associato.
           </p>
           {!availableUsers().length && (
-            <p className="muted">Non ci sono account disponibili. Registra un nuovo account oppure modifica o elimina l’associazione di un barbiere esistente.</p>
+            <p className="muted">
+              Non ci sono account disponibili. Registra un nuovo account oppure
+              modifica o elimina l’associazione di un barbiere esistente.
+            </p>
           )}
-          <button className="primary" disabled={busy || !availableUsers().length}>
+          <button
+            className="primary"
+            disabled={busy || !availableUsers().length}
+          >
             Aggiungi barbiere
           </button>
         </form>
