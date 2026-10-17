@@ -1189,3 +1189,8 @@ input[aria-invalid="true"] {
 .booking-footer .primary {
   width: 100%;
 }
+
+.shop-hours-interval {
+  display: block;
+  line-height: 1.6;
+}

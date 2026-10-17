@@ -92,12 +92,11 @@ export default function Information() {
                       <dt>{weekdays[day]}</dt>
                       <dd>
                         {intervals.length
-                          ? intervals
-                              .map(
-                                (item: Row) =>
-                                  time(item.opens) + "–" + time(item.closes),
-                              )
-                              .join(" · ")
+                          ? intervals.map((item: Row) => (
+                              <span className="shop-hours-interval" key={item.id || item.opens + "-" + item.closes}>
+                                {time(item.opens)}–{time(item.closes)}
+                              </span>
+                            ))
                           : "Chiuso"}
                       </dd>
                     </div>
@@ -130,12 +129,11 @@ export default function Information() {
                         <dd>
                           {changes.some((item: Row) => item.closed)
                             ? "Chiuso"
-                            : changes
-                                .map(
-                                  (item: Row) =>
-                                    time(item.opens) + "–" + time(item.closes),
-                                )
-                                .join(" · ")}
+                            : changes.map((item: Row) => (
+                                <span className="shop-hours-interval" key={item.id || item.opens + "-" + item.closes}>
+                                  {time(item.opens)}–{time(item.closes)}
+                                </span>
+                              ))}
                         </dd>
                       </div>
                     );
