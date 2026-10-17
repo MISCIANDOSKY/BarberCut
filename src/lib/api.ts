@@ -34,6 +34,8 @@ export function friendly(e: unknown) {
       "Questo numero è associato a più account. Verifica il telefono del cliente o lascia il campo vuoto per una prenotazione ospite.",
     PHONE_MATCH_CHANGED:
       "Il telefono del cliente è stato modificato. Controllalo e riprova.",
+    CLOSED_DAY_CONFIRM_REQUIRED:
+      "Questo giorno non devi lavorare. Conferma per inserire l’appuntamento.",
     GUEST_NAME_REQUIRED:
       "Inserisci nome e cognome del cliente; il telefono è facoltativo.",
     INVALID_SERVICE:
