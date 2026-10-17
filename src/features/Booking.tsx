@@ -106,7 +106,9 @@ export default function Booking({
         ) {
           selection.current = "";
           setSelected("");
-          setBookingError("L’orario selezionato non è più disponibile. Scegline un altro.");
+          setBookingError(
+            "L’orario selezionato non è più disponibile. Scegline un altro.",
+          );
           notify(
             "L’orario selezionato non è più disponibile. Scegline un altro.",
           );
@@ -118,7 +120,9 @@ export default function Booking({
         selection.current = "";
         setSelected("");
         setLoading(false);
-        setBookingError("Non riesco ad aggiornare gli orari. Riprova quando sei online.");
+        setBookingError(
+          "Non riesco ad aggiornare gli orari. Riprova quando sei online.",
+        );
         if (!failed)
           notify(
             "Non riesco ad aggiornare gli orari. Riprova quando sei online.",
@@ -274,80 +278,100 @@ export default function Booking({
       </div>
       {!activeServices.length && <Empty>Nessun servizio disponibile.</Empty>}
       {service && choosingTime && (
-        <Modal title="Giorno e orario" wide close={() => setChoosingTime(false)}>
+        <Modal
+          title="Giorno e orario"
+          wide
+          close={() => setChoosingTime(false)}
+        >
           <div className="booking-schedule">
             <p className="notice">
-              <strong>{svc?.name}</strong><br />
+              <strong>{svc?.name}</strong>
+              <br />
               {svc?.duration_minutes} minuti · {svc && euro(svc.price)}
             </p>
-          <span className="step-label">02 / SCEGLI IL GIORNO</span>
-          {eligibleBarbers.length > 1 && (
+            <span className="step-label">02 / SCEGLI IL GIORNO</span>
+            {eligibleBarbers.length > 1 && (
+              <label>
+                Barbiere
+                <select
+                  value={chosenBarber}
+                  disabled={busy}
+                  onChange={(e) => setBarber(e.target.value)}
+                >
+                  <option value="">Scegli il barbiere</option>
+                  {eligibleBarbers.map((b) => (
+                    <option key={b.id} value={b.id}>
+                      {b.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
             <label>
-              Barbiere
-              <select
-                value={chosenBarber}
+              Giorno
+              <input
+                type="date"
                 disabled={busy}
-                onChange={(e) => setBarber(e.target.value)}
-              >
-                <option value="">Scegli il barbiere</option>
-                {eligibleBarbers.map((b) => (
-                  <option key={b.id} value={b.id}>
-                    {b.name}
-                  </option>
-                ))}
-              </select>
+                min={today()}
+                max={maxDate}
+                value={day}
+                onChange={(e) => setDay(e.target.value)}
+              />
             </label>
-          )}
-          <label>
-            Giorno
-            <input
-              type="date"
-              disabled={busy}
-              min={today()}
-              max={maxDate}
-              value={day}
-              onChange={(e) => setDay(e.target.value)}
-            />
-          </label>
-          <span className="step-label">03 / TROVA IL TUO ORARIO</span>
-          {loading ? (
-            <p role="status">Aggiornamento disponibilità…</p>
-          ) : (
-            <>
-              <div className="slots">
-                {slots.map((s) => (
-                  <button
-                    className={selected === s.start_at ? "selected" : ""}
-                    key={s.start_at}
-                    disabled={busy}
-                    onClick={() => { setSelected(s.start_at); setBookingError(""); }}
-                  >
-                    {timeLabel(s.start_at)}
-                  </button>
-                ))}
-              </div>
-              {chosenBarber && !slots.length && (
-                <Empty>
-                  Nessun orario disponibile per questo giorno. Prova un’altra
-                  data.
-                </Empty>
-              )}
-            </>
-          )}
-          {bookingError && <p className="form-error" role="alert">{bookingError}</p>}
-          <div className="booking-footer">
-            {selected ? (
-              <p>
-                <strong>{svc?.name}</strong><br />
-                {dateLabel(selected)} alle {timeLabel(selected)} · {svc && euro(svc.price)}
+            <span className="step-label">03 / TROVA IL TUO ORARIO</span>
+            {loading ? (
+              <p role="status">Aggiornamento disponibilità…</p>
+            ) : (
+              <>
+                <div className="slots">
+                  {slots.map((s) => (
+                    <button
+                      className={selected === s.start_at ? "selected" : ""}
+                      key={s.start_at}
+                      disabled={busy}
+                      onClick={() => {
+                        setSelected(s.start_at);
+                        setBookingError("");
+                      }}
+                    >
+                      {timeLabel(s.start_at)}
+                    </button>
+                  ))}
+                </div>
+                {chosenBarber && !slots.length && (
+                  <Empty>
+                    Nessun orario disponibile per questo giorno. Prova un’altra
+                    data.
+                  </Empty>
+                )}
+              </>
+            )}
+            {bookingError && (
+              <p className="form-error" role="alert">
+                {bookingError}
               </p>
-            ) : <p className="muted">Seleziona giorno e orario per confermare.</p>}
-            <button className="primary"
-              disabled={busy || !selected || !navigator.onLine}
-              onClick={book}>
-              {busy ? "Conferma in corso…" : "Conferma prenotazione"}
-            </button>
-          </div>
+            )}
+            <div className="booking-footer">
+              {selected ? (
+                <p>
+                  <strong>{svc?.name}</strong>
+                  <br />
+                  {dateLabel(selected)} alle {timeLabel(selected)} ·{" "}
+                  {svc && euro(svc.price)}
+                </p>
+              ) : (
+                <p className="muted">
+                  Seleziona giorno e orario per confermare.
+                </p>
+              )}
+              <button
+                className="primary"
+                disabled={busy || !selected || !navigator.onLine}
+                onClick={book}
+              >
+                {busy ? "Conferma in corso…" : "Conferma prenotazione"}
+              </button>
+            </div>
           </div>
         </Modal>
       )}
