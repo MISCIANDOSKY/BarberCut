@@ -204,4 +204,4 @@ Rimossa la descrizione dalla riga della durata nel catalogo cliente. Aggiunta ic
 
 ### 17 ottobre 2026 — Dopo prenotazione cliente apri Le mie prenotazioni
 
-Il callback di successo del flusso Prenota ora apre direttamente Le mie prenotazioni, conferma il salvataggio e aggiorna l’elenco. Vale anche per prenotazioni personali dell’admin; prenotazioni manuali staff e percorsi di errore invariati. Nessuna modifica al database e nessuna prenotazione reale creata per il test. Controllata la chiamata solo dopo salvataggio riuscito; build, test e pubblicazione da confermare in CI.
+Il callback di successo del flusso Prenota ora apre direttamente Le mie prenotazioni, conferma il salvataggio e aggiorna l’elenco. Vale anche per prenotazioni personali dell’admin; prenotazioni manuali staff e percorsi di errore invariati. Nessuna modifica al database e nessuna prenotazione reale creata per il test. Controllata la chiamata solo dopo salvataggio riuscito; TypeScript, build, test e pubblicazione riusciti nella [CI 39031573996](https://github.com/MISCIANDOSKY/BarberCut/actions/runs/39031573996). Nessuna prova con prenotazione reale su dispositivo fisico.
