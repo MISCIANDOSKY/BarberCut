@@ -348,7 +348,8 @@ export default function App() {
           reload={refresh}
           deletionEnabled={!!settings.account_deletion_enabled}
           registrationEditor={
-            canReview && role === "barber" && (
+            canReview &&
+            role === "barber" && (
               <RegistrationPolicy
                 required={settings.require_user_approval !== false}
                 refresh={refresh}

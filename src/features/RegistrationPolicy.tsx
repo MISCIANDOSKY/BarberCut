@@ -42,11 +42,15 @@ export default function RegistrationPolicy({
           }
         }}
       >
-        <RegistrationChoice required={value} disabled={busy} onChange={(next) => {
-          setValue(next);
-          setMessage("");
-          setError("");
-        }} />
+        <RegistrationChoice
+          required={value}
+          disabled={busy}
+          onChange={(next) => {
+            setValue(next);
+            setMessage("");
+            setError("");
+          }}
+        />
         {error && (
           <p className="form-error" role="alert">
             {error}
@@ -66,7 +70,9 @@ export default function RegistrationPolicy({
 }
 
 export function RegistrationChoice({
-  required, disabled, onChange,
+  required,
+  disabled,
+  onChange,
 }: {
   required: boolean;
   disabled?: boolean;
@@ -75,14 +81,19 @@ export function RegistrationChoice({
   return (
     <>
       <label className="check">
-        <input type="checkbox" checked={!required} disabled={disabled}
-          onChange={(event) => onChange(!event.target.checked)} />
+        <input
+          type="checkbox"
+          checked={!required}
+          disabled={disabled}
+          onChange={(event) => onChange(!event.target.checked)}
+        />
         Accetta i nuovi clienti senza approvazione
       </label>
       <p className="muted">
-        Spunta attiva: i nuovi clienti sono accettati automaticamente dopo la verifica email.
-        Spunta disattiva: devono essere approvati da Gestisci utenti.
-        La scelta vale per tutta la barberia; gli utenti già in attesa mantengono il proprio stato.
+        Spunta attiva: i nuovi clienti sono accettati automaticamente dopo la
+        verifica email. Spunta disattiva: devono essere approvati da Gestisci
+        utenti. La scelta vale per tutta la barberia; gli utenti già in attesa
+        mantengono il proprio stato.
       </p>
     </>
   );

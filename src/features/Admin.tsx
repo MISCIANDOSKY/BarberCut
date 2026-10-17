@@ -62,7 +62,9 @@ export default function Admin({
         );
       }
       if (section === "Configurazione") {
-        const config = await result<Row>(supabase.from("app_settings").select("*").single());
+        const config = await result<Row>(
+          supabase.from("app_settings").select("*").single(),
+        );
         setSettings(config);
         setRequireApproval(config.require_user_approval !== false);
       }
@@ -141,7 +143,11 @@ export default function Admin({
           Lascia vuoto finché la regola non è decisa. Zero permette di
           cancellare fino all’inizio.
         </p>
-        <RegistrationChoice required={requireApproval} disabled={busy} onChange={setRequireApproval} />
+        <RegistrationChoice
+          required={requireApproval}
+          disabled={busy}
+          onChange={setRequireApproval}
+        />
         <label className="check">
           <input
             type="checkbox"
