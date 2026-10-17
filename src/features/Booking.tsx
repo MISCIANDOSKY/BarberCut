@@ -280,16 +280,17 @@ export default function Booking({
       {service && choosingTime && (
         <Modal
           title="Giorno e orario"
+          className="booking-dialog"
           wide
           close={() => setChoosingTime(false)}
         >
           <div className="booking-schedule">
-            <p className="notice">
+            <div className="booking-controls">
+            <p className="booking-service-summary">
               <strong>{svc?.name}</strong>
               <br />
               {svc?.duration_minutes} minuti · {svc && euro(svc.price)}
             </p>
-            <span className="step-label">02 / SCEGLI IL GIORNO</span>
             {eligibleBarbers.length > 1 && (
               <label>
                 Barbiere
@@ -318,7 +319,9 @@ export default function Booking({
                 onChange={(e) => setDay(e.target.value)}
               />
             </label>
-            <span className="step-label">03 / TROVA IL TUO ORARIO</span>
+            </div>
+            <section className="booking-times" aria-label="Orari disponibili" tabIndex={0}>
+            <span className="step-label">SCEGLI L’ORARIO</span>
             {loading ? (
               <p role="status">Aggiornamento disponibilità…</p>
             ) : (
@@ -346,12 +349,13 @@ export default function Booking({
                 )}
               </>
             )}
+            </section>
+            <div className="booking-footer">
             {bookingError && (
               <p className="form-error" role="alert">
                 {bookingError}
               </p>
             )}
-            <div className="booking-footer">
               {selected ? (
                 <p>
                   <strong>{svc?.name}</strong>

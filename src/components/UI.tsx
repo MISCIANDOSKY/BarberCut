@@ -28,11 +28,13 @@ export function Modal({
   children,
   close,
   wide = false,
+  className = "",
 }: {
   title: string;
   children: ReactNode;
   close: () => void;
   wide?: boolean;
+  className?: string;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
@@ -43,7 +45,7 @@ export function Modal({
   return (
     <dialog
       ref={ref}
-      className={wide ? "feature-dialog" : undefined}
+      className={[wide ? "feature-dialog" : "", className].filter(Boolean).join(" ") || undefined}
       onCancel={close}
       onClick={(e) => {
         if (!wide && e.target === e.currentTarget) close();
