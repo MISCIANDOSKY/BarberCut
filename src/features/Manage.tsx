@@ -406,23 +406,6 @@ export default function Manage({
                 ))}
               </select>
             </label>
-            <label className="check">
-              <input
-                type="checkbox"
-                name="closed"
-                checked={closed}
-                disabled={busy || hoursBarber !== b}
-                onChange={(e) => setClosed(e.target.checked)}
-              />
-              Chiuso
-            </label>
-            {closed && (
-              <p className="muted">
-                Salvando, il giorno sarà chiuso ogni settimana. Eventuali
-                intervalli di questo giorno verranno rimossi. Le eccezioni per
-                singole date restano separate.
-              </p>
-            )}
             <div className="two">
               <label>
                 Apertura
@@ -445,6 +428,23 @@ export default function Manage({
                 />
               </label>
             </div>
+            {closed && (
+              <p className="muted">
+                Salvando, il giorno sarà chiuso ogni settimana. Eventuali
+                intervalli di questo giorno verranno rimossi. Le eccezioni per
+                singole date restano separate.
+              </p>
+            )}
+            <label className="check">
+              <input
+                type="checkbox"
+                name="closed"
+                checked={closed}
+                disabled={busy || hoursBarber !== b}
+                onChange={(e) => setClosed(e.target.checked)}
+              />
+              Chiuso
+            </label>
             <button className="secondary" disabled={busy || hoursBarber !== b}>
               {closed ? "Salva giorno di chiusura" : "Aggiungi intervallo"}
             </button>
