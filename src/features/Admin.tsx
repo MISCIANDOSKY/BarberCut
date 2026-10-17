@@ -139,10 +139,6 @@ export default function Admin({
             defaultValue={settings.cancellation_hours ?? ""}
           />
         </label>
-        <p className="muted">
-          Lascia vuoto finché la regola non è decisa. Zero permette di
-          cancellare fino all’inizio.
-        </p>
         <RegistrationChoice
           required={requireApproval}
           disabled={busy}

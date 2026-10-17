@@ -186,3 +186,7 @@ Aggiornata RPC book_guest_appointment: telefono facoltativo confrontato sul serv
 ### 17 ottobre 2026 — Una sola spunta per accettazione clienti
 
 Sostituiti i due radio del profilo barbiere con una sola checkbox Accetta i nuovi clienti senza approvazione, con indicazione attiva=automatica/disattiva=approvazione. Componente condiviso tra profilo barbiere e Configurazione admin, posizionato prima di Apri le prenotazioni online. Rimossa l’impostazione da Manutenzione e dal profilo admin; Salva manutenzione ora usa la RPC delle sole soglie, evitando di sovrascrivere una politica aggiornata altrove. Configurazione salva il flag insieme agli altri campi del form in un unico aggiornamento; profilo barbiere mantiene la RPC con permessi limitati. Nessun cambio schema o valore live durante l’intervento. Verificati nel sorgente checkbox unica, inversione corretta del flag, ordine nel form admin e assenza del campo in Manutenzione. TypeScript, build, test e pubblicazione GitHub Pages riusciti nella [CI 39030058198](https://github.com/MISCIANDOSKY/BarberCut/actions/runs/39030058198). Nessuna verifica autenticata su dispositivo fisico.
+
+### 17 ottobre 2026 — Rimosso testo sotto il limite cancellazione
+
+Rimosso da Configurazione il paragrafo “Lascia vuoto finché la regola non è decisa. Zero permette di cancellare fino all’inizio.” su richiesta del titolare. Modifica del solo testo: campo e regola di cancellazione invariati. Controllata la rimozione nel sorgente; pubblicazione da confermare in CI.
