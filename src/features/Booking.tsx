@@ -72,7 +72,11 @@ export default function Booking({
   }, [selected]);
   const svc = services.find((s) => s.id === service);
   const manualBooking = !!guest;
-  const needsClosedConfirmation = manualBooking && slots.some((slot) => slot.start_at === selected && slot.requires_confirmation);
+  const needsClosedConfirmation =
+    manualBooking &&
+    slots.some(
+      (slot) => slot.start_at === selected && slot.requires_confirmation,
+    );
   const maxDate = maxBookingDate();
   useEffect(() => {
     result(supabase.from("barber_services").select("*"))
@@ -92,11 +96,14 @@ export default function Booking({
     const request = createLatestRequest<Row[]>({
       load: () =>
         result(
-          supabase.rpc(manualBooking ? "get_manual_booking_slots" : "get_available_slots", {
-            p_barber: chosenBarber,
-            p_service: service,
-            p_day: day,
-          }),
+          supabase.rpc(
+            manualBooking ? "get_manual_booking_slots" : "get_available_slots",
+            {
+              p_barber: chosenBarber,
+              p_service: service,
+              p_day: day,
+            },
+          ),
         ),
       onData: (next) => {
         if (saving.current) return;
@@ -150,7 +157,15 @@ export default function Booking({
       window.removeEventListener("online", update);
       document.removeEventListener("visibilitychange", update);
     };
-  }, [service, chosenBarber, day, confirmed, choosingTime, manualBooking, notify]);
+  }, [
+    service,
+    chosenBarber,
+    day,
+    confirmed,
+    choosingTime,
+    manualBooking,
+    notify,
+  ]);
   async function book(confirmClosed = false) {
     if (saving.current || !selected || !svc) return;
     if (!navigator.onLine) {
@@ -193,7 +208,11 @@ export default function Booking({
       setConfirmed(savedBooking);
       onBooked(savedBooking);
     } catch (e) {
-      if (manualBooking && e instanceof Error && e.message.includes("CLOSED_DAY_CONFIRM_REQUIRED")) {
+      if (
+        manualBooking &&
+        e instanceof Error &&
+        e.message.includes("CLOSED_DAY_CONFIRM_REQUIRED")
+      ) {
         setClosedConfirmation(true);
         return;
       }
@@ -204,11 +223,16 @@ export default function Booking({
       try {
         setSlots(
           (await result(
-            supabase.rpc(manualBooking ? "get_manual_booking_slots" : "get_available_slots", {
-              p_barber: chosenBarber,
-              p_service: service,
-              p_day: day,
-            }),
+            supabase.rpc(
+              manualBooking
+                ? "get_manual_booking_slots"
+                : "get_available_slots",
+              {
+                p_barber: chosenBarber,
+                p_service: service,
+                p_day: day,
+              },
+            ),
           )) as Row[],
         );
       } catch {
@@ -396,14 +420,33 @@ export default function Booking({
             </div>
           </div>
           {closedConfirmation && (
-            <Modal title="Conferma appuntamento" close={() => setClosedConfirmation(false)}>
-              <p>Questo giorno non devi lavorare. Sei sicuro di inserire un appuntamento?</p>
+            <Modal
+              title="Conferma appuntamento"
+              close={() => setClosedConfirmation(false)}
+            >
+              <p>
+                Questo giorno non devi lavorare. Sei sicuro di inserire un
+                appuntamento?
+              </p>
               <div className="two">
-                <button type="button" className="secondary" onClick={() => setClosedConfirmation(false)}>No</button>
-                <button type="button" className="primary" disabled={busy} onClick={() => {
-                  setClosedConfirmation(false);
-                  void book(true);
-                }}>Sì</button>
+                <button
+                  type="button"
+                  className="secondary"
+                  onClick={() => setClosedConfirmation(false)}
+                >
+                  No
+                </button>
+                <button
+                  type="button"
+                  className="primary"
+                  disabled={busy}
+                  onClick={() => {
+                    setClosedConfirmation(false);
+                    void book(true);
+                  }}
+                >
+                  Sì
+                </button>
               </div>
             </Modal>
           )}
