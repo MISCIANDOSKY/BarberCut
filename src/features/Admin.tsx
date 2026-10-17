@@ -86,8 +86,12 @@ export default function Admin({
     }
   }
   function availableUsers(exceptBarberId?: string) {
-    return users.filter((account) =>
-      !barbers.some((barber) => barber.user_id === account.id && barber.id !== exceptBarberId)
+    return users.filter(
+      (account) =>
+        !barbers.some(
+          (barber) =>
+            barber.user_id === account.id && barber.id !== exceptBarberId,
+        ),
     );
   }
   if (section === "Configurazione")
