@@ -312,7 +312,10 @@ export default function App() {
           deletionEnabled={!!settings.account_deletion_enabled}
           registrationEditor={
             canReview && (
-              <RegistrationPolicy required={settings.require_user_approval !== false} refresh={refresh} />
+              <RegistrationPolicy
+                required={settings.require_user_approval !== false}
+                refresh={refresh}
+              />
             )
           }
           addressEditor={
