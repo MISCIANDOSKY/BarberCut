@@ -73,6 +73,7 @@ Le prenotazioni disabilitate sono un'impostazione corrente: non riaprirle automa
 - Disponibilità calcolata dal server, fuso Europe/Rome, scatti di 15 minuti; verifica dell'intera durata del servizio.
 - Limiti: massimo 5 appuntamenti futuri per cliente e prenotazione entro 3 mesi.
 - Orari settimanali, turni, eccezioni per data, festività nazionali e Pasquetta; le chiusure prevalgono sulle aperture.
+- Orari di lavoro: riepilogo di tutti i sette giorni con stato Chiuso esplicito. Nel giorno selezionato, checkbox Chiuso disabilita i campi orario; Salva giorno di chiusura rimuove gli intervalli settimanali del solo giorno/agenda selezionato. Per aprire, togliere la spunta e aggiungere almeno un intervallo. Eccezioni per data gestite separatamente.
 - Vincolo database contro sovrapposizioni tra appuntamenti e blocchi dello stesso barbiere, con lock per richieste concorrenti.
 - Nome e prezzo del servizio prenotato rimangono nello storico anche dopo modifiche al catalogo.
 - Nuova prenotazione manuale staff: nome e cognome obbligatori, telefono facoltativo, nessuna email obbligatoria. Possibili clienti ospiti senza account.
@@ -162,3 +163,7 @@ Creati HANDOFF.md e AGENTS.md su richiesta del titolare, con obbligo di aggiorna
 ### 17 ottobre 2026 — Diagnosi apertura prenotazioni
 
 Verifica in sola lettura: prenotazioni disabilitate, termini pubblicati e preavviso cancellazione di 12 ore presenti. Il barbiere attivo ha un servizio associato ma nessun turno in working_hours: il controllo configurazione impedisce l'apertura perché non esiste un'agenda attiva con servizio e orari. Le 6 righe orario complessive appartengono ad altre agende e non soddisfano il requisito per quella attuale. Occorre impostare gli orari reali del barbiere in Orari di lavoro, poi salvare Apri le prenotazioni online in Configurazione admin. Nessun orario inventato e nessuna impostazione operativa modificata.
+
+### 17 ottobre 2026 — Spunta Chiuso negli orari
+
+Aggiunta checkbox Chiuso nella settimana abituale, con selezione giorno, campi orario disabilitati quando chiuso e salvataggio esplicito. Riepilogo visibile da lunedì a domenica, compresi i giorni senza intervalli indicati come Chiuso. Salvare una chiusura rimuove solo gli intervalli del giorno e del barbiere selezionati, tramite gli stessi permessi RLS esistenti; nessuna modifica allo schema o agli orari reali durante lo sviluppo. Migliorata gestione errori rimozione intervalli. Anche le eccezioni con Chiuso disabilitano gli orari, richiesti solo per aperture. Verifica build/TypeScript/test/pubblicazione demandata alla CI GitHub del commit; esito da registrare dopo completamento.

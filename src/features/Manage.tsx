@@ -4,6 +4,7 @@ import { Empty, Modal } from "../components/UI";
 import { supabase, result, dateLabel, timeLabel, today } from "../lib/api";
 import type { Row } from "../lib/api";
 import Booking from "./Booking";
+const weekdays = ["Domenica", "Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato"];
 type Props = {
   user: Row;
   barbers: Row[];
@@ -33,6 +34,10 @@ export default function Manage({
     [detail, setDetail] = useState<Row | null>(null),
     [client, setClient] = useState<Row | null>(null),
     [hours, setHours] = useState<Row[]>([]),
+    [hoursBarber, setHoursBarber] = useState(""),
+    [weekday, setWeekday] = useState(1),
+    [closed, setClosed] = useState(false),
+    [exceptionClosed, setExceptionClosed] = useState(false),
     [exceptions, setExceptions] = useState<Row[]>([]),
     [busy, setBusy] = useState(false);
   const b = scopedBarbers.some((item) => item.id === selectedBarber)
@@ -63,6 +68,7 @@ export default function Manage({
         );
       }
       if (section === "Orari di lavoro") {
+        setHoursBarber("");
         setHours(
           (await result(
             supabase
@@ -72,6 +78,7 @@ export default function Manage({
               .order("weekday"),
           )) as Row[],
         );
+        setHoursBarber(b);
         setExceptions(
           (await result(
             supabase
@@ -90,6 +97,9 @@ export default function Manage({
   useEffect(() => {
     load();
   }, [b, day, section]);
+  useEffect(() => {
+    setClosed(!hours.some((h) => h.weekday === weekday));
+  }, [b, weekday, hours]);
   async function save(table: string, obj: Row) {
     setBusy(true);
     try {
@@ -282,80 +292,102 @@ export default function Manage({
         <>
           <h3>Settimana abituale</h3>
           <p className="muted">
-            Aggiungi più intervalli per separare mattina e pomeriggio. I giorni
-            senza intervalli sono chiusi.
+            Scegli un giorno e spunta Chiuso oppure aggiungi gli orari.
+            Puoi aggiungere più intervalli per separare mattina e pomeriggio.
           </p>
-          {hours.map((h) => (
-            <div className="table-row" key={h.id}>
-              <span>
-                {
-                  [
-                    "Domenica",
-                    "Lunedì",
-                    "Martedì",
-                    "Mercoledì",
-                    "Giovedì",
-                    "Venerdì",
-                    "Sabato",
-                  ][h.weekday]
-                }{" "}
-                · {h.opens.slice(0, 5)}–{h.closes.slice(0, 5)}
-              </span>
-              <button
-                className="text"
-                onClick={async () => {
-                  await result(
-                    supabase.from("working_hours").delete().eq("id", h.id),
-                  );
-                  load();
-                }}
-              >
-                Rimuovi
-              </button>
-            </div>
-          ))}
+          {hoursBarber !== b ? <Empty>Caricamento orari…</Empty> :
+            [1, 2, 3, 4, 5, 6, 0].map((dayIndex) => {
+              const intervals = hours.filter((h) => h.weekday === dayIndex);
+              return (
+                <div key={dayIndex}>
+                  <h4>{weekdays[dayIndex]}</h4>
+                  {!intervals.length && <p className="muted">Chiuso</p>}
+                  {intervals.map((h) => (
+                    <div className="table-row" key={h.id}>
+                      <span>{h.opens.slice(0, 5)}–{h.closes.slice(0, 5)}</span>
+                      <button
+                        className="text"
+                        disabled={busy}
+                        onClick={async () => {
+                          setBusy(true);
+                          try {
+                            await result(supabase.from("working_hours").delete().eq("id", h.id).eq("barber_id", b));
+                            await load();
+                          } catch (error) {
+                            notify((await import("../lib/api")).friendly(error));
+                          } finally {
+                            setBusy(false);
+                          }
+                        }}
+                      >Rimuovi</button>
+                    </div>
+                  ))}
+                </div>
+              );
+            })}
           <form
-            onSubmit={(e) => {
+            onSubmit={async (e) => {
               e.preventDefault();
-              const v = new FormData(e.currentTarget);
-              save("working_hours", {
-                barber_id: b,
-                weekday: Number(v.get("weekday")),
-                opens: v.get("opens"),
-                closes: v.get("closes"),
-              });
+              const form = e.currentTarget;
+              const values = new FormData(form);
+              setBusy(true);
+              try {
+                if (closed) {
+                  await result(
+                    supabase.from("working_hours").delete().eq("barber_id", b).eq("weekday", weekday),
+                  );
+                  notify(weekdays[weekday] + ": chiuso.");
+                } else {
+                  const opens = String(values.get("opens") || "");
+                  const closes = String(values.get("closes") || "");
+                  if (!opens || !closes || opens >= closes) {
+                    notify("Inserisci un orario di chiusura successivo all’apertura.");
+                    return;
+                  }
+                  await result(supabase.from("working_hours").insert({
+                    barber_id: b, weekday, opens, closes,
+                  }));
+                  notify("Intervallo salvato.");
+                }
+                await load();
+              } catch (error) {
+                notify((await import("../lib/api")).friendly(error));
+              } finally {
+                setBusy(false);
+              }
             }}
           >
             <label>
               Giorno
-              <select name="weekday">
-                {[
-                  "Domenica",
-                  "Lunedì",
-                  "Martedì",
-                  "Mercoledì",
-                  "Giovedì",
-                  "Venerdì",
-                  "Sabato",
-                ].map((d, i) => (
-                  <option value={i} key={d}>
-                    {d}
-                  </option>
+              <select name="weekday" value={weekday} disabled={busy || hoursBarber !== b}
+                onChange={(e) => setWeekday(Number(e.target.value))}>
+                {[1, 2, 3, 4, 5, 6, 0].map((i) => (
+                  <option value={i} key={i}>{weekdays[i]}</option>
                 ))}
               </select>
             </label>
+            <label className="check">
+              <input type="checkbox" name="closed" checked={closed}
+                disabled={busy || hoursBarber !== b}
+                onChange={(e) => setClosed(e.target.checked)} />
+              Chiuso
+            </label>
+            {closed && <p className="muted">
+              Salvando, il giorno sarà chiuso ogni settimana. Eventuali intervalli di questo giorno verranno rimossi.
+              Le eccezioni per singole date restano separate.
+            </p>}
             <div className="two">
               <label>
                 Apertura
-                <input type="time" name="opens" required step="900" />
+                <input type="time" name="opens" required={!closed} disabled={closed || busy || hoursBarber !== b} step="900" />
               </label>
               <label>
                 Chiusura
-                <input type="time" name="closes" required step="900" />
+                <input type="time" name="closes" required={!closed} disabled={closed || busy || hoursBarber !== b} step="900" />
               </label>
             </div>
-            <button className="secondary" disabled={busy}>
-              Aggiungi intervallo
+            <button className="secondary" disabled={busy || hoursBarber !== b}>
+              {closed ? "Salva giorno di chiusura" : "Aggiungi intervallo"}
             </button>
           </form>
           <h3>Eccezioni e ferie</h3>
@@ -404,17 +436,18 @@ export default function Manage({
               <input type="date" name="day" required />
             </label>
             <label className="check">
-              <input type="checkbox" name="closed" />
+              <input type="checkbox" name="closed" checked={exceptionClosed}
+                onChange={(e) => setExceptionClosed(e.target.checked)} />
               Chiuso tutto il giorno
             </label>
             <div className="two">
               <label>
                 Apertura
-                <input type="time" name="opens" />
+                <input type="time" name="opens" disabled={exceptionClosed} required={!exceptionClosed} step="900" />
               </label>
               <label>
                 Chiusura
-                <input type="time" name="closes" />
+                <input type="time" name="closes" disabled={exceptionClosed} required={!exceptionClosed} step="900" />
               </label>
             </div>
             <button className="secondary" disabled={busy}>
