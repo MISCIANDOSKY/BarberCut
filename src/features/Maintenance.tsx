@@ -83,10 +83,21 @@ export default function Maintenance({
       <form onSubmit={save}>
         <h3>Iscrizione dei nuovi utenti</h3>
         <label className="check">
-          <input type="checkbox" checked={requireApproval} disabled={busy || !status} onChange={(event) => setRequireApproval(event.target.checked)} />
+          <input
+            type="checkbox"
+            checked={requireApproval}
+            disabled={busy || !status}
+            onChange={(event) => setRequireApproval(event.target.checked)}
+          />
           Richiedi approvazione per i nuovi utenti
         </label>
-        <p className="muted">Se selezionata, i nuovi iscritti devono verificare l’email e poi essere approvati dall’admin o da un barbiere associato prima di prenotare. Se non selezionata, i nuovi account sono abilitati direttamente dopo la verifica email. Gli utenti già registrati mantengono il proprio stato.</p>
+        <p className="muted">
+          Se selezionata, i nuovi iscritti devono verificare l’email e poi
+          essere approvati dall’admin o da un barbiere associato prima di
+          prenotare. Se non selezionata, i nuovi account sono abilitati
+          direttamente dopo la verifica email. Gli utenti già registrati
+          mantengono il proprio stato.
+        </p>
         <div className="maintenance-rule">
           <label className="check">
             <input

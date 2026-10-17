@@ -1127,5 +1127,15 @@ input[aria-invalid="true"] {
   color: var(--muted);
 }
 
-.registration-tabs { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 20px 0; }
-.registration-actions { display: flex; flex-direction: column; gap: 10px; }
+.registration-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 0;
+}
+.registration-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}

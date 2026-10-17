@@ -304,7 +304,13 @@ export default function Auth({
             {errorMessage}
           </p>
         )}
-        {mode === "register" && requiresApproval && <p className="notice">Dopo aver verificato l’email, la tua iscrizione dovrà essere approvata dall’admin o da un barbiere. Riceverai un’email quando potrai prenotare.</p>}
+        {mode === "register" && requiresApproval && (
+          <p className="notice">
+            Dopo aver verificato l’email, la tua iscrizione dovrà essere
+            approvata dall’admin o da un barbiere. Riceverai un’email quando
+            potrai prenotare.
+          </p>
+        )}
         <form onSubmit={submit}>
           {mode === "register" && (
             <div className="two">

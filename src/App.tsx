@@ -33,7 +33,9 @@ export default function App() {
     [legal, setLegal] = useState(false),
     [appointments, setAppointments] = useState<Row[]>([]),
     [notifications, setNotifications] = useState<Row[]>([]),
-    [section, setSection] = useState(() => new URLSearchParams(location.search).get("book") === "1" ? "Prenota" : ""),
+    [section, setSection] = useState(() =>
+      new URLSearchParams(location.search).get("book") === "1" ? "Prenota" : "",
+    ),
     [auth, setAuth] = useState(
       () => new URLSearchParams(location.search).get("keep-active") === "1",
     ),
@@ -232,7 +234,10 @@ export default function App() {
     };
     const timer = window.setInterval(check, 60000);
     window.addEventListener("focus", check);
-    return () => { window.clearInterval(timer); window.removeEventListener("focus", check); };
+    return () => {
+      window.clearInterval(timer);
+      window.removeEventListener("focus", check);
+    };
   }, [user?.id, role, membership]);
   useEffect(() => {
     if (!message) return;
@@ -250,7 +255,13 @@ export default function App() {
   }, [notifications]);
   const staff = user && role !== "client",
     ready = staff && verified,
-    canReview = ready && (role === "admin" || barbers.some((barber) => barber.user_id === user!.id && barber.active && !barber.deleted_at));
+    canReview =
+      ready &&
+      (role === "admin" ||
+        barbers.some(
+          (barber) =>
+            barber.user_id === user!.id && barber.active && !barber.deleted_at,
+        ));
   const choices = ready
     ? role === "admin"
       ? [
@@ -269,7 +280,9 @@ export default function App() {
           ["⊘", "Blocca orario", "Una pausa, una giornata"],
           ["◷", "Orari di lavoro", "La tua settimana"],
           ["✂", "Servizi e prezzi", "Il catalogo"],
-          ...(canReview ? [["✓", "Gestisci utenti", "Approva le nuove iscrizioni"]] : []),
+          ...(canReview
+            ? [["✓", "Gestisci utenti", "Approva le nuove iscrizioni"]]
+            : []),
           ["♧", "Notifiche", "Tutte le novità"],
           ["◉", "Profilo", "Il tuo account"],
         ]
@@ -354,8 +367,24 @@ export default function App() {
           prezzi.
         </Empty>
       );
-    if (section === "Prenota" && user && role === "client" && membership !== "approved") {
-      return <div className="notice" role="status"><p>{membership === "rejected" ? "La tua richiesta di iscrizione non è stata approvata. Contatta la barberia per informazioni." : "Il tuo account è in attesa di approvazione. Potrai prenotare quando l’admin o un barbiere avranno approvato la tua iscrizione. Riceverai una conferma via email."}</p><button className="secondary" onClick={refresh}>Aggiorna stato</button></div>;
+    if (
+      section === "Prenota" &&
+      user &&
+      role === "client" &&
+      membership !== "approved"
+    ) {
+      return (
+        <div className="notice" role="status">
+          <p>
+            {membership === "rejected"
+              ? "La tua richiesta di iscrizione non è stata approvata. Contatta la barberia per informazioni."
+              : "Il tuo account è in attesa di approvazione. Potrai prenotare quando l’admin o un barbiere avranno approvato la tua iscrizione. Riceverai una conferma via email."}
+          </p>
+          <button className="secondary" onClick={refresh}>
+            Aggiorna stato
+          </button>
+        </div>
+      );
     }
     if (section === "Prenota")
       return (
@@ -505,7 +534,15 @@ export default function App() {
             <span>{ready ? "LA TUA AREA" : "A PORTATA DI MANO"}</span>
             <span>01 — {String(choices.length).padStart(2, "0")}</span>
           </div>
-          {user && role === "client" && membership !== "approved" && <div className="notice" role="status"><p>{membership === "rejected" ? "La richiesta di iscrizione non è stata approvata. Contatta la barberia per informazioni." : "Iscrizione in attesa di approvazione. Ti avviseremo via email quando potrai prenotare."}</p></div>}
+          {user && role === "client" && membership !== "approved" && (
+            <div className="notice" role="status">
+              <p>
+                {membership === "rejected"
+                  ? "La richiesta di iscrizione non è stata approvata. Contatta la barberia per informazioni."
+                  : "Iscrizione in attesa di approvazione. Ti avviseremo via email quando potrai prenotare."}
+              </p>
+            </div>
+          )}
           {loading ? (
             <p className="empty" role="status">
               Prepariamo il tuo spazio…

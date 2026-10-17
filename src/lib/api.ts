@@ -22,10 +22,14 @@ export function friendly(e: unknown) {
   for (const [k, v] of Object.entries({
     barbers_live_user_id_key:
       "Questo account è già associato a un barbiere. Scegli un altro account o modifica l’agenda esistente.",
-    USER_APPROVAL_REQUIRED: "Il cliente deve essere approvato dalla barberia prima di poter prenotare.",
-    EMAIL_NOT_VERIFIED: "L’utente deve prima verificare il proprio indirizzo email.",
-    REGISTRATION_ALREADY_REVIEWED: "Questa richiesta è già stata gestita. Aggiorna l’elenco.",
-    CLIENT_REQUIRED: "La richiesta non appartiene a un account cliente disponibile.",
+    USER_APPROVAL_REQUIRED:
+      "Il cliente deve essere approvato dalla barberia prima di poter prenotare.",
+    EMAIL_NOT_VERIFIED:
+      "L’utente deve prima verificare il proprio indirizzo email.",
+    REGISTRATION_ALREADY_REVIEWED:
+      "Questa richiesta è già stata gestita. Aggiorna l’elenco.",
+    CLIENT_REQUIRED:
+      "La richiesta non appartiene a un account cliente disponibile.",
     GUEST_NAME_REQUIRED:
       "Inserisci nome e cognome del cliente; il telefono è facoltativo.",
     INVALID_SERVICE:
