@@ -36,6 +36,7 @@ Le prenotazioni disabilitate sono un'impostazione corrente: non riaprirle automa
 
 - Interfaccia italiana, responsive, tema scuro con accenti oro.
 - Home cliente: Prenota, Servizi e prezzi, Le mie prenotazioni, Informazioni.
+- Catalogo cliente: nome e durata senza descrizione inline; icona informativa color accento giallo accanto al prezzo apre la descrizione a schermata completa, con freccia indietro al catalogo. Disponibile anche nell’area Cliente dell’admin.
 - In fondo alla home admin: tasto Cliente che apre gli stessi quattro comandi cliente, senza cambio ruolo o account. La freccia dalle funzioni personali riporta al menu Cliente; dal menu Cliente torna alla home admin. Le prenotazioni personali usano il client_id dell’admin e rispettano il normale flusso personale.
 - Le funzioni si aprono come schermate complete, mostrando solo la funzione selezionata, con freccia indietro. Non devono tornare a essere riquadri in fondo alla pagina o finestre centrali con la home visibile dietro.
 - Profilo a schermata completa; pulsante Esci sotto Salva profilo.
@@ -195,3 +196,7 @@ Rimosso da Configurazione il paragrafo “Lascia vuoto finché la regola non è 
 ### 17 ottobre 2026 — Area Cliente per l’admin
 
 Aggiunto in fondo ai comandi admin il tasto Cliente, con schermata dedicata Prenota, Servizi e prezzi, Le mie prenotazioni e Informazioni. Riutilizzati i flussi cliente esistenti con lo stesso account; nessuna modifica a ruoli, schema o impostazioni operative. Navigazione indietro dalle funzioni personali al menu Cliente. Test SQL admin_customer_booking.sql superato con rollback: prenotazione personale dell’admin correttamente associata al suo account e visibile nella query delle proprie prenotazioni, ruolo Admin preservato. Nessun appuntamento reale creato per il test. TypeScript, build, test e pubblicazione GitHub Pages riusciti nella [CI 39031007103](https://github.com/MISCIANDOSKY/BarberCut/actions/runs/39031007103). Nessuna prova autenticata del nuovo menu su dispositivo fisico.
+
+### 17 ottobre 2026 — Descrizione servizi tramite icona informativa
+
+Rimossa la descrizione dalla riga della durata nel catalogo cliente. Aggiunta icona ⓘ accanto al prezzo, dello stesso colore accento giallo dell’app, con area tocco 44px e nome accessibile del servizio. Apre una schermata dedicata alla descrizione e permette di tornare al catalogo; testo multilinea preservato e fallback per descrizione vuota. Catalogo condiviso anche dall’area Cliente admin. Nessuna modifica ai dati del catalogo o alle prenotazioni. Controlli build e pubblicazione da confermare in CI.

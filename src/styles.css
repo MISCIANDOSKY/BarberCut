@@ -1139,3 +1139,31 @@ input[aria-invalid="true"] {
   flex-direction: column;
   gap: 10px;
 }
+
+.service-summary {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.service-price-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.service-info {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  min-height: 44px;
+  padding: 0;
+  color: var(--accent);
+  background: transparent;
+  border: 0;
+  font-size: 28px;
+}
+.service-description {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

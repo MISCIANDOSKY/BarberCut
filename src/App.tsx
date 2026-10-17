@@ -10,11 +10,12 @@ import { Appointments, Profile, Notifications } from "./features/Account";
 import Manage from "./features/Manage";
 import Admin from "./features/Admin";
 import BarberServices from "./features/BarberServices";
+import ServiceCatalog from "./features/ServiceCatalog";
 import Information from "./features/Information";
 import ManageUsers from "./features/ManageUsers";
 import BarberAddress from "./features/BarberAddress";
 import RegistrationPolicy from "./features/RegistrationPolicy";
-import { supabase, result, euro, friendly } from "./lib/api";
+import { supabase, result, friendly } from "./lib/api";
 import type { Row } from "./lib/api";
 export default function App() {
   const [user, setUser] = useState<User | null>(null),
@@ -409,27 +410,7 @@ export default function App() {
       );
     }
     if (section === "Servizi e prezzi")
-      return services.length ? (
-        <div className="service-list">
-          {services.map((s) => (
-            <article className="service" key={s.id}>
-              <span>
-                <strong>{s.name}</strong>
-                <small>
-                  {s.duration_minutes} minuti
-                  {s.description ? " · " + s.description : ""}
-                </small>
-              </span>
-              <strong>{euro(s.price)}</strong>
-            </article>
-          ))}
-        </div>
-      ) : (
-        <Empty>
-          Il catalogo è in preparazione. Torna presto per scoprire servizi e
-          prezzi.
-        </Empty>
-      );
+      return <ServiceCatalog services={services} />;
     if (
       section === "Prenota" &&
       user &&
