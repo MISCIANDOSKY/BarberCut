@@ -189,4 +189,4 @@ Sostituiti i due radio del profilo barbiere con una sola checkbox Accetta i nuov
 
 ### 17 ottobre 2026 — Rimosso testo sotto il limite cancellazione
 
-Rimosso da Configurazione il paragrafo “Lascia vuoto finché la regola non è decisa. Zero permette di cancellare fino all’inizio.” su richiesta del titolare. Modifica del solo testo: campo e regola di cancellazione invariati. Controllata la rimozione nel sorgente; pubblicazione da confermare in CI.
+Rimosso da Configurazione il paragrafo “Lascia vuoto finché la regola non è decisa. Zero permette di cancellare fino all’inizio.” su richiesta del titolare. Modifica del solo testo: campo e regola di cancellazione invariati. Controllata la rimozione nel sorgente; build, test e pubblicazione riusciti nella [CI 39030278941](https://github.com/MISCIANDOSKY/BarberCut/actions/runs/39030278941).
