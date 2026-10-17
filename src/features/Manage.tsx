@@ -41,7 +41,10 @@ export default function Manage({
     (item) => isAdmin || item.user_id === user.id,
   );
   const [selectedBarber, setB] = useState(
-      initialBarber || barbers.find((x) => x.user_id === user.id)?.id || barbers[0]?.id || "",
+      initialBarber ||
+        barbers.find((x) => x.user_id === user.id)?.id ||
+        barbers[0]?.id ||
+        "",
     ),
     [day, setDay] = useState(initialDay || today()),
     [rows, setRows] = useState<Row[]>([]),
@@ -238,7 +241,10 @@ export default function Manage({
                   maxLength={40}
                 />
               </label>
-              <p className="muted">Se il telefono corrisponde a un unico account registrato, l’appuntamento comparirà anche nelle sue prenotazioni.</p>
+              <p className="muted">
+                Se il telefono corrisponde a un unico account registrato,
+                l’appuntamento comparirà anche nelle sue prenotazioni.
+              </p>
               <button className="primary">Scegli servizio e orario</button>
             </form>
           ) : (
