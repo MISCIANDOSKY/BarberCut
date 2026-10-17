@@ -1229,7 +1229,8 @@ dialog.booking-dialog > .feature-content {
   grid-template-columns: minmax(0, 1fr);
   min-width: 0;
   gap: 10px;
-  padding: 14px max(20px, env(safe-area-inset-right)) 14px max(20px, env(safe-area-inset-left));
+  padding: 14px max(20px, env(safe-area-inset-right)) 14px
+    max(20px, env(safe-area-inset-left));
   border-bottom: 1px solid var(--border);
 }
 .booking-service-summary {
@@ -1244,13 +1245,16 @@ dialog.booking-dialog > .feature-content {
   overflow-x: hidden;
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
-  padding: 0 max(20px, env(safe-area-inset-right)) 16px max(20px, env(safe-area-inset-left));
+  padding: 0 max(20px, env(safe-area-inset-right)) 16px
+    max(20px, env(safe-area-inset-left));
 }
 .booking-times .step-label {
   margin-top: 16px;
 }
 .booking-footer {
-  padding: 12px max(20px, env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+  padding: 12px max(20px, env(safe-area-inset-right))
+    calc(12px + env(safe-area-inset-bottom))
+    max(20px, env(safe-area-inset-left));
   background: var(--bg);
   border-top: 1px solid var(--border);
 }
