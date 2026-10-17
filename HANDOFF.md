@@ -75,6 +75,7 @@ Le prenotazioni disabilitate sono un'impostazione corrente: non riaprirle automa
 
 - Disponibilità calcolata dal server, fuso Europe/Rome, scatti di 15 minuti; verifica dell'intera durata del servizio.
 - Limiti: massimo 5 appuntamenti futuri per cliente e prenotazione entro 3 mesi.
+- Dopo una prenotazione personale riuscita, apertura automatica di Le mie prenotazioni e aggiornamento elenco, anche per l’admin dall’area Cliente. I salvataggi manuali staff continuano invece a tornare all’agenda.
 - Orari settimanali, turni, eccezioni per data, festività nazionali e Pasquetta; le chiusure prevalgono sulle aperture.
 - Orari di lavoro: riepilogo di tutti i sette giorni con stato Chiuso esplicito. Nel giorno selezionato, checkbox Chiuso subito sopra il pulsante Aggiungi intervallo (o Salva giorno di chiusura) disabilita i campi orario; Salva giorno di chiusura rimuove gli intervalli settimanali del solo giorno/agenda selezionato. Per aprire, togliere la spunta e aggiungere almeno un intervallo. Eccezioni per data gestite separatamente.
 - Vincolo database contro sovrapposizioni tra appuntamenti e blocchi dello stesso barbiere, con lock per richieste concorrenti.
@@ -199,4 +200,8 @@ Aggiunto in fondo ai comandi admin il tasto Cliente, con schermata dedicata Pren
 
 ### 17 ottobre 2026 — Descrizione servizi tramite icona informativa
 
-Rimossa la descrizione dalla riga della durata nel catalogo cliente. Aggiunta icona ⓘ accanto al prezzo, dello stesso colore accento giallo dell’app, con area tocco 44px e nome accessibile del servizio. Apre una schermata dedicata alla descrizione e permette di tornare al catalogo; testo multilinea preservato e fallback per descrizione vuota. Catalogo condiviso anche dall’area Cliente admin. Nessuna modifica ai dati del catalogo o alle prenotazioni. Controlli build e pubblicazione da confermare in CI.
+Rimossa la descrizione dalla riga della durata nel catalogo cliente. Aggiunta icona ⓘ accanto al prezzo, dello stesso colore accento giallo dell’app, con area tocco 44px e nome accessibile del servizio. Apre una schermata dedicata alla descrizione e permette di tornare al catalogo; testo multilinea preservato e fallback per descrizione vuota. Catalogo condiviso anche dall’area Cliente admin. Nessuna modifica ai dati del catalogo o alle prenotazioni. TypeScript, build, test e pubblicazione riusciti nella [CI 39031458281](https://github.com/MISCIANDOSKY/BarberCut/actions/runs/39031458281). Verificati nel browser pubblico catalogo con durata senza descrizione inline, icona gialla accanto al prezzo, apertura descrizione e ritorno al catalogo.
+
+### 17 ottobre 2026 — Dopo prenotazione cliente apri Le mie prenotazioni
+
+Il callback di successo del flusso Prenota ora apre direttamente Le mie prenotazioni, conferma il salvataggio e aggiorna l’elenco. Vale anche per prenotazioni personali dell’admin; prenotazioni manuali staff e percorsi di errore invariati. Nessuna modifica al database e nessuna prenotazione reale creata per il test. Controllata la chiamata solo dopo salvataggio riuscito; build, test e pubblicazione da confermare in CI.

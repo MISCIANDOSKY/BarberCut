@@ -439,7 +439,11 @@ export default function App() {
           barbers={barbers}
           notify={notify}
           login={() => setAuth(true)}
-          onBooked={refresh}
+          onBooked={() => {
+            setSection("Le mie prenotazioni");
+            notify("Prenotazione confermata. La trovi nelle tue prenotazioni.");
+            void refresh();
+          }}
         />
       );
     if (section === "Le mie prenotazioni")
