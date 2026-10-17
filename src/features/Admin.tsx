@@ -59,15 +59,6 @@ export default function Admin({
           )) as Row[],
         );
       }
-      function availableUsers(exceptBarberId?: string) {
-        return users.filter(
-          (account) =>
-            !barbers.some(
-              (barber) =>
-                barber.user_id === account.id && barber.id !== exceptBarberId,
-            ),
-        );
-      }
       if (section === "Configurazione")
         setSettings(
           (await result(
@@ -93,6 +84,11 @@ export default function Admin({
     } finally {
       setBusy(false);
     }
+  }
+  function availableUsers(exceptBarberId?: string) {
+    return users.filter((account) =>
+      !barbers.some((barber) => barber.user_id === account.id && barber.id !== exceptBarberId)
+    );
   }
   if (section === "Configurazione")
     return settings ? (
