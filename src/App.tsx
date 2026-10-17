@@ -343,7 +343,11 @@ export default function App() {
       return (
         <nav className="mini-grid" aria-label="Funzioni cliente">
           {clientChoices.map(([icon, title]) => (
-            <button className="secondary" key={title} onClick={() => setSection(title)}>
+            <button
+              className="secondary"
+              key={title}
+              onClick={() => setSection(title)}
+            >
               {icon} {title}
             </button>
           ))}
@@ -683,11 +687,20 @@ export default function App() {
         <span className="footer-note">PRENOTA. ARRIVA. RINNOVA.</span>
       </footer>
       {section && (
-        <Modal key={section} title={section} wide close={() => {
-          if (ready && role === "admin" && clientChoices.some(([, title]) => title === section))
-            setSection("Cliente");
-          else setSection("");
-        }}>
+        <Modal
+          key={section}
+          title={section}
+          wide
+          close={() => {
+            if (
+              ready &&
+              role === "admin" &&
+              clientChoices.some(([, title]) => title === section)
+            )
+              setSection("Cliente");
+            else setSection("");
+          }}
+        >
           {loading ? (
             <p className="empty" role="status">
               Caricamento…
