@@ -36,6 +36,7 @@ Le prenotazioni disabilitate sono un'impostazione corrente: non riaprirle automa
 
 - Interfaccia italiana, responsive, tema scuro con accenti oro.
 - Home cliente: Prenota, Servizi e prezzi, Le mie prenotazioni, Informazioni.
+- In fondo alla home admin: tasto Cliente che apre gli stessi quattro comandi cliente, senza cambio ruolo o account. La freccia dalle funzioni personali riporta al menu Cliente; dal menu Cliente torna alla home admin. Le prenotazioni personali usano il client_id dell’admin e rispettano il normale flusso personale.
 - Le funzioni si aprono come schermate complete, mostrando solo la funzione selezionata, con freccia indietro. Non devono tornare a essere riquadri in fondo alla pagina o finestre centrali con la home visibile dietro.
 - Profilo a schermata completa; pulsante Esci sotto Salva profilo.
 - Footer: “Un piccolo gesto. Un grande stile.” e “Powered by MISCIANDOSKY”.
@@ -190,3 +191,7 @@ Sostituiti i due radio del profilo barbiere con una sola checkbox Accetta i nuov
 ### 17 ottobre 2026 — Rimosso testo sotto il limite cancellazione
 
 Rimosso da Configurazione il paragrafo “Lascia vuoto finché la regola non è decisa. Zero permette di cancellare fino all’inizio.” su richiesta del titolare. Modifica del solo testo: campo e regola di cancellazione invariati. Controllata la rimozione nel sorgente; build, test e pubblicazione riusciti nella [CI 39030278941](https://github.com/MISCIANDOSKY/BarberCut/actions/runs/39030278941).
+
+### 17 ottobre 2026 — Area Cliente per l’admin
+
+Aggiunto in fondo ai comandi admin il tasto Cliente, con schermata dedicata Prenota, Servizi e prezzi, Le mie prenotazioni e Informazioni. Riutilizzati i flussi cliente esistenti con lo stesso account; nessuna modifica a ruoli, schema o impostazioni operative. Navigazione indietro dalle funzioni personali al menu Cliente. Test SQL admin_customer_booking.sql superato con rollback: prenotazione personale dell’admin correttamente associata al suo account e visibile nella query delle proprie prenotazioni, ruolo Admin preservato. Nessun appuntamento reale creato per il test. Verifica frontend e pubblicazione da confermare in CI.

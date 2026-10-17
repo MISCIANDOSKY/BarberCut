@@ -300,6 +300,12 @@ export default function App() {
           (barber) =>
             barber.user_id === user!.id && barber.active && !barber.deleted_at,
         ));
+  const clientChoices = [
+    ["▦", "Prenota", "Trova il tuo prossimo momento"],
+    ["✂", "Servizi e prezzi", "Scegli il tuo stile"],
+    ["▤", "Le mie prenotazioni", "Tieni tutto sotto controllo"],
+    ["ⓘ", "Informazioni", "Indirizzo e orari della barberia"],
+  ];
   const choices = ready
     ? role === "admin"
       ? [
@@ -311,6 +317,7 @@ export default function App() {
           ["▤", "Termini", "Versioni e pubblicazione"],
           ["⌘", "Manutenzione", "Dati e conservazione"],
           ["↗", "Agenda", "Apri strumenti barbiere"],
+          ["◉", "Cliente", "Prenota un appuntamento per te"],
         ]
       : [
           ["▦", "Appuntamenti", "La tua agenda"],
@@ -324,12 +331,7 @@ export default function App() {
           ["♧", "Notifiche", "Tutte le novità"],
           ["◉", "Profilo", "Il tuo account"],
         ]
-    : [
-        ["▦", "Prenota", "Trova il tuo prossimo momento"],
-        ["✂", "Servizi e prezzi", "Scegli il tuo stile"],
-        ["▤", "Le mie prenotazioni", "Tieni tutto sotto controllo"],
-        ["ⓘ", "Informazioni", "Indirizzo e orari della barberia"],
-      ];
+    : clientChoices;
   const manageSections = [
     "Appuntamenti",
     "Nuova prenotazione",
@@ -337,6 +339,16 @@ export default function App() {
     "Orari di lavoro",
   ];
   function content() {
+    if (section === "Cliente" && ready && role === "admin")
+      return (
+        <nav className="mini-grid" aria-label="Funzioni cliente">
+          {clientChoices.map(([icon, title]) => (
+            <button className="secondary" key={title} onClick={() => setSection(title)}>
+              {icon} {title}
+            </button>
+          ))}
+        </nav>
+      );
     if (section === "Gestisci utenti" && canReview) return <ManageUsers />;
     if (section === "Informazioni") return <Information />;
     if (section === "Profilo")
@@ -671,7 +683,11 @@ export default function App() {
         <span className="footer-note">PRENOTA. ARRIVA. RINNOVA.</span>
       </footer>
       {section && (
-        <Modal key={section} title={section} wide close={() => setSection("")}>
+        <Modal key={section} title={section} wide close={() => {
+          if (ready && role === "admin" && clientChoices.some(([, title]) => title === section))
+            setSection("Cliente");
+          else setSection("");
+        }}>
           {loading ? (
             <p className="empty" role="status">
               Caricamento…
