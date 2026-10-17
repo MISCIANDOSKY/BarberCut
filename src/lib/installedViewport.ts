@@ -12,8 +12,16 @@ displayMode.addEventListener("change", syncMode);
 const preventInstalledZoom = (event: Event) => {
   if (isInstalled() && event.cancelable) event.preventDefault();
 };
-document.addEventListener("gesturestart", preventInstalledZoom, { passive: false });
-document.addEventListener("gesturechange", preventInstalledZoom, { passive: false });
-document.addEventListener("touchmove", (event: TouchEvent) => {
-  if (event.touches.length > 1) preventInstalledZoom(event);
-}, { passive: false });
+document.addEventListener("gesturestart", preventInstalledZoom, {
+  passive: false,
+});
+document.addEventListener("gesturechange", preventInstalledZoom, {
+  passive: false,
+});
+document.addEventListener(
+  "touchmove",
+  (event: TouchEvent) => {
+    if (event.touches.length > 1) preventInstalledZoom(event);
+  },
+  { passive: false },
+);
