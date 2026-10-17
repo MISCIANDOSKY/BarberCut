@@ -1217,6 +1217,8 @@ dialog.booking-dialog > .feature-content {
 }
 .booking-schedule {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
   grid-template-rows: auto minmax(0, 1fr) auto;
   width: 100%;
   height: 100%;
@@ -1224,8 +1226,10 @@ dialog.booking-dialog > .feature-content {
 }
 .booking-controls {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
   gap: 10px;
-  padding: 14px 20px;
+  padding: 14px max(20px, env(safe-area-inset-right)) 14px max(20px, env(safe-area-inset-left));
   border-bottom: 1px solid var(--border);
 }
 .booking-service-summary {
@@ -1240,13 +1244,13 @@ dialog.booking-dialog > .feature-content {
   overflow-x: hidden;
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
-  padding: 0 20px 16px;
+  padding: 0 max(20px, env(safe-area-inset-right)) 16px max(20px, env(safe-area-inset-left));
 }
 .booking-times .step-label {
   margin-top: 16px;
 }
 .booking-footer {
-  padding: 12px 20px calc(12px + env(safe-area-inset-bottom));
+  padding: 12px max(20px, env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
   background: var(--bg);
   border-top: 1px solid var(--border);
 }
@@ -1327,4 +1331,45 @@ textarea {
     gap: 8px;
     padding: 16px 0;
   }
+}
+
+/* Bound the native iOS date widget to a border owned by the responsive layout. */
+.booking-controls > label,
+.booking-date-field,
+.booking-date-control {
+  min-width: 0;
+  max-width: 100%;
+}
+.booking-date-control {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: var(--bg);
+}
+.booking-date-control:focus-within {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+.booking-date-control input[type="date"] {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  outline: 0;
+  margin: 0;
+  font-size: 16px;
+}
+.booking-date-control input[type="date"]::-webkit-date-and-time-value {
+  min-width: 0;
+  text-align: left;
+}
+.booking-date-control input[type="date"]::-webkit-datetime-edit {
+  min-width: 0;
+  padding: 0;
 }

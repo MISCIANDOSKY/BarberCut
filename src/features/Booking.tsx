@@ -308,16 +308,18 @@ export default function Booking({
                   </select>
                 </label>
               )}
-              <label>
+              <label className="booking-date-field">
                 Giorno
-                <input
-                  type="date"
-                  disabled={busy}
-                  min={today()}
-                  max={maxDate}
-                  value={day}
-                  onChange={(e) => setDay(e.target.value)}
-                />
+                <span className="booking-date-control">
+                  <input
+                    type="date"
+                    disabled={busy}
+                    min={today()}
+                    max={maxDate}
+                    value={day}
+                    onChange={(e) => setDay(e.target.value)}
+                  />
+                </span>
               </label>
             </div>
             <section
