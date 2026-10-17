@@ -4,7 +4,15 @@ import { Empty, Modal } from "../components/UI";
 import { supabase, result, dateLabel, timeLabel, today } from "../lib/api";
 import type { Row } from "../lib/api";
 import Booking from "./Booking";
-const weekdays = ["Domenica", "Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato"];
+const weekdays = [
+  "Domenica",
+  "Lunedì",
+  "Martedì",
+  "Mercoledì",
+  "Giovedì",
+  "Venerdì",
+  "Sabato",
+];
 type Props = {
   user: Row;
   barbers: Row[];
@@ -292,10 +300,12 @@ export default function Manage({
         <>
           <h3>Settimana abituale</h3>
           <p className="muted">
-            Scegli un giorno e spunta Chiuso oppure aggiungi gli orari.
-            Puoi aggiungere più intervalli per separare mattina e pomeriggio.
+            Scegli un giorno e spunta Chiuso oppure aggiungi gli orari. Puoi
+            aggiungere più intervalli per separare mattina e pomeriggio.
           </p>
-          {hoursBarber !== b ? <Empty>Caricamento orari…</Empty> :
+          {hoursBarber !== b ? (
+            <Empty>Caricamento orari…</Empty>
+          ) : (
             [1, 2, 3, 4, 5, 6, 0].map((dayIndex) => {
               const intervals = hours.filter((h) => h.weekday === dayIndex);
               return (
@@ -304,27 +314,40 @@ export default function Manage({
                   {!intervals.length && <p className="muted">Chiuso</p>}
                   {intervals.map((h) => (
                     <div className="table-row" key={h.id}>
-                      <span>{h.opens.slice(0, 5)}–{h.closes.slice(0, 5)}</span>
+                      <span>
+                        {h.opens.slice(0, 5)}–{h.closes.slice(0, 5)}
+                      </span>
                       <button
                         className="text"
                         disabled={busy}
                         onClick={async () => {
                           setBusy(true);
                           try {
-                            await result(supabase.from("working_hours").delete().eq("id", h.id).eq("barber_id", b));
+                            await result(
+                              supabase
+                                .from("working_hours")
+                                .delete()
+                                .eq("id", h.id)
+                                .eq("barber_id", b),
+                            );
                             await load();
                           } catch (error) {
-                            notify((await import("../lib/api")).friendly(error));
+                            notify(
+                              (await import("../lib/api")).friendly(error),
+                            );
                           } finally {
                             setBusy(false);
                           }
                         }}
-                      >Rimuovi</button>
+                      >
+                        Rimuovi
+                      </button>
                     </div>
                   ))}
                 </div>
               );
-            })}
+            })
+          )}
           <form
             onSubmit={async (e) => {
               e.preventDefault();
@@ -334,19 +357,30 @@ export default function Manage({
               try {
                 if (closed) {
                   await result(
-                    supabase.from("working_hours").delete().eq("barber_id", b).eq("weekday", weekday),
+                    supabase
+                      .from("working_hours")
+                      .delete()
+                      .eq("barber_id", b)
+                      .eq("weekday", weekday),
                   );
                   notify(weekdays[weekday] + ": chiuso.");
                 } else {
                   const opens = String(values.get("opens") || "");
                   const closes = String(values.get("closes") || "");
                   if (!opens || !closes || opens >= closes) {
-                    notify("Inserisci un orario di chiusura successivo all’apertura.");
+                    notify(
+                      "Inserisci un orario di chiusura successivo all’apertura.",
+                    );
                     return;
                   }
-                  await result(supabase.from("working_hours").insert({
-                    barber_id: b, weekday, opens, closes,
-                  }));
+                  await result(
+                    supabase.from("working_hours").insert({
+                      barber_id: b,
+                      weekday,
+                      opens,
+                      closes,
+                    }),
+                  );
                   notify("Intervallo salvato.");
                 }
                 await load();
@@ -359,31 +393,56 @@ export default function Manage({
           >
             <label>
               Giorno
-              <select name="weekday" value={weekday} disabled={busy || hoursBarber !== b}
-                onChange={(e) => setWeekday(Number(e.target.value))}>
+              <select
+                name="weekday"
+                value={weekday}
+                disabled={busy || hoursBarber !== b}
+                onChange={(e) => setWeekday(Number(e.target.value))}
+              >
                 {[1, 2, 3, 4, 5, 6, 0].map((i) => (
-                  <option value={i} key={i}>{weekdays[i]}</option>
+                  <option value={i} key={i}>
+                    {weekdays[i]}
+                  </option>
                 ))}
               </select>
             </label>
             <label className="check">
-              <input type="checkbox" name="closed" checked={closed}
+              <input
+                type="checkbox"
+                name="closed"
+                checked={closed}
                 disabled={busy || hoursBarber !== b}
-                onChange={(e) => setClosed(e.target.checked)} />
+                onChange={(e) => setClosed(e.target.checked)}
+              />
               Chiuso
             </label>
-            {closed && <p className="muted">
-              Salvando, il giorno sarà chiuso ogni settimana. Eventuali intervalli di questo giorno verranno rimossi.
-              Le eccezioni per singole date restano separate.
-            </p>}
+            {closed && (
+              <p className="muted">
+                Salvando, il giorno sarà chiuso ogni settimana. Eventuali
+                intervalli di questo giorno verranno rimossi. Le eccezioni per
+                singole date restano separate.
+              </p>
+            )}
             <div className="two">
               <label>
                 Apertura
-                <input type="time" name="opens" required={!closed} disabled={closed || busy || hoursBarber !== b} step="900" />
+                <input
+                  type="time"
+                  name="opens"
+                  required={!closed}
+                  disabled={closed || busy || hoursBarber !== b}
+                  step="900"
+                />
               </label>
               <label>
                 Chiusura
-                <input type="time" name="closes" required={!closed} disabled={closed || busy || hoursBarber !== b} step="900" />
+                <input
+                  type="time"
+                  name="closes"
+                  required={!closed}
+                  disabled={closed || busy || hoursBarber !== b}
+                  step="900"
+                />
               </label>
             </div>
             <button className="secondary" disabled={busy || hoursBarber !== b}>
@@ -436,18 +495,34 @@ export default function Manage({
               <input type="date" name="day" required />
             </label>
             <label className="check">
-              <input type="checkbox" name="closed" checked={exceptionClosed}
-                onChange={(e) => setExceptionClosed(e.target.checked)} />
+              <input
+                type="checkbox"
+                name="closed"
+                checked={exceptionClosed}
+                onChange={(e) => setExceptionClosed(e.target.checked)}
+              />
               Chiuso tutto il giorno
             </label>
             <div className="two">
               <label>
                 Apertura
-                <input type="time" name="opens" disabled={exceptionClosed} required={!exceptionClosed} step="900" />
+                <input
+                  type="time"
+                  name="opens"
+                  disabled={exceptionClosed}
+                  required={!exceptionClosed}
+                  step="900"
+                />
               </label>
               <label>
                 Chiusura
-                <input type="time" name="closes" disabled={exceptionClosed} required={!exceptionClosed} step="900" />
+                <input
+                  type="time"
+                  name="closes"
+                  disabled={exceptionClosed}
+                  required={!exceptionClosed}
+                  step="900"
+                />
               </label>
             </div>
             <button className="secondary" disabled={busy}>
