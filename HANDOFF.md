@@ -158,3 +158,7 @@ Creata e pubblicata PWA con Supabase; aggiunti autenticazione OTP, template ital
 ### 17 ottobre 2026 — Handoff permanente
 
 Creati HANDOFF.md e AGENTS.md su richiesta del titolare, con obbligo di aggiornare il riepilogo a ogni intervento. Aggiornato README per allinearlo alle funzioni correnti. Nessuna modifica a dati o impostazioni operative in questo intervento. Verificati repository, configurazione e ultimi esiti cron; sola documentazione.
+
+### 17 ottobre 2026 — Diagnosi apertura prenotazioni
+
+Verifica in sola lettura: prenotazioni disabilitate, termini pubblicati e preavviso cancellazione di 12 ore presenti. Il barbiere attivo ha un servizio associato ma nessun turno in working_hours: il controllo configurazione impedisce l'apertura perché non esiste un'agenda attiva con servizio e orari. Le 6 righe orario complessive appartengono ad altre agende e non soddisfano il requisito per quella attuale. Occorre impostare gli orari reali del barbiere in Orari di lavoro, poi salvare Apri le prenotazioni online in Configurazione admin. Nessun orario inventato e nessuna impostazione operativa modificata.
