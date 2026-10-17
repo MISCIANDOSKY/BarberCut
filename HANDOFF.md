@@ -58,9 +58,9 @@ Le prenotazioni disabilitate sono un'impostazione corrente: non riaprirle automa
 
 ## Clienti e approvazione iscrizioni
 
-- In Manutenzione: checkbox “Richiedi approvazione per i nuovi utenti”, selezionata di default.
-- Anche nel Profilo di admin e barbiere verificato con agenda attiva associata: Iscrizione nuovi clienti, scelta tra accettazione automatica e approvazione, con salvataggio dedicato. La politica è unica per tutta la barberia; al barbiere è consentito modificare solo questo flag, non le altre impostazioni di manutenzione.
-- Se attiva, le nuove iscrizioni hanno stato In attesa; se disattivata, quelle successive sono approvate automaticamente. Il cambio non converte gli utenti già in attesa o rifiutati.
+- Admin > Configurazione: unica checkbox “Accetta i nuovi clienti senza approvazione”, subito prima di Apri le prenotazioni online. Rimossa da Manutenzione.
+- Nel Profilo del barbiere verificato con agenda attiva associata: Iscrizione nuovi clienti, stessa unica checkbox e salvataggio dedicato. La politica è unica per tutta la barberia; al barbiere è consentito modificare solo questo flag, non le altre impostazioni di manutenzione.
+- Spunta attiva = accettazione automatica dopo verifica email (require_user_approval=false); spunta disattiva = richiesta approvazione (require_user_approval=true). Il cambio non converte gli utenti già in attesa o rifiutati.
 - I clienti esistenti sono stati conservati come approvati.
 - Admin e barbiere verificato con associazione attiva hanno il pulsante Gestisci utenti: In attesa, Approvati, Rifiutati.
 - Approva/Rifiuta consentiti per iscrizioni pendenti con email verificata. Il cliente non può approvarsi modificando il profilo o i metadati.
@@ -104,7 +104,7 @@ Le prenotazioni disabilitate sono un'impostazione corrente: non riaprirle automa
 
 ## Manutenzione, inattività e automazioni
 
-- Manutenzione giornaliera alle 03:15 UTC; soglie numeriche modificabili, impostazioni salvate atomicamente insieme alla politica iscrizioni.
+- Manutenzione giornaliera alle 03:15 UTC; soglie numeriche modificabili e salvate tramite save_maintenance_settings, senza modificare la politica iscrizioni ora gestita in Configurazione.
 - Disattiva solo clienti inattivi: admin e barbieri sono esclusi, come gli account associati ad agende e quelli con appuntamenti futuri confermati.
 - Login/sessione attiva e prenotazioni del cliente aggiornano l'attività. Disattivazione con ban Auth e revoca sessioni; non elimina il profilo. Admin può riattivare.
 - Avvisi email 30, 15 e 7 giorni prima: invito a prenotare oppure accedere dal link per mantenere attivo il profilo. Leggere l'email da solo non rinnova l'attività.
@@ -182,3 +182,7 @@ Aggiunta sezione Iscrizione nuovi clienti nel profilo staff autorizzato, con Acc
 ### 17 ottobre 2026 — Prenotazioni manuali collegate e ritorno all’agenda
 
 Aggiornata RPC book_guest_appointment: telefono facoltativo confrontato sul server con i profili non in eliminazione e account non bloccati; corrispondenza univoca collega client_id, numero vuoto/sconosciuto mantiene ospite, duplicati respinti senza scelta arbitraria. Normalizzazione completa (spazi, punteggiatura, +39/0039; numero locale senza prefisso considerato italiano); nessun confronto sui soli suffissi. Lock cliente prima del barbiere, limite 5 e trigger approvazione conservati. Migrazione 20261017113822. Nessun collegamento retroattivo di appuntamenti già salvati. Dopo inserimento riuscito, nuova schermata Appuntamenti con barbiere e data appena prenotati; aggiornamento periodico della lista del cliente. Test SQL manual_booking_phone.sql e barber_workflows.sql superati in transazioni con rollback: collegamento/RLS proprietario, isolamento da altri clienti, ospiti vuoti/sconosciuti, duplicati, autorizzazione staff, approvazione e limite cinque; nessun dato reale di test conservato. Advisor senza nuovi rilievi rispetto al controllo precedente. TypeScript, build, test frontend e pubblicazione GitHub Pages completati con successo nella [CI 39029578128](https://github.com/MISCIANDOSKY/BarberCut/actions/runs/39029578128). Nessuna prova del flusso autenticato su dispositivo fisico.
+
+### 17 ottobre 2026 — Una sola spunta per accettazione clienti
+
+Sostituiti i due radio del profilo barbiere con una sola checkbox Accetta i nuovi clienti senza approvazione, con indicazione attiva=automatica/disattiva=approvazione. Componente condiviso tra profilo barbiere e Configurazione admin, posizionato prima di Apri le prenotazioni online. Rimossa l’impostazione da Manutenzione e dal profilo admin; Salva manutenzione ora usa la RPC delle sole soglie, evitando di sovrascrivere una politica aggiornata altrove. Configurazione salva il flag insieme agli altri campi del form in un unico aggiornamento; profilo barbiere mantiene la RPC con permessi limitati. Nessun cambio schema o valore live durante l’intervento. Verificati nel sorgente checkbox unica, inversione corretta del flag, ordine nel form admin e assenza del campo in Manutenzione. CI e pubblicazione da confermare.

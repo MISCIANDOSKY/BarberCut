@@ -42,40 +42,11 @@ export default function RegistrationPolicy({
           }
         }}
       >
-        <label className="check">
-          <input
-            type="radio"
-            name="registration-policy"
-            checked={!value}
-            disabled={busy}
-            onChange={() => {
-              setValue(false);
-              setMessage("");
-              setError("");
-            }}
-          />
-          Accetta automaticamente i nuovi utenti
-        </label>
-        <label className="check">
-          <input
-            type="radio"
-            name="registration-policy"
-            checked={value}
-            disabled={busy}
-            onChange={() => {
-              setValue(true);
-              setMessage("");
-              setError("");
-            }}
-          />
-          Richiedi approvazione
-        </label>
-        <p className="muted">
-          La verifica dell’email resta necessaria in entrambi i casi. Con
-          approvazione, abilita i clienti da Gestisci utenti prima che possano
-          prenotare. La scelta riguarda le nuove iscrizioni: chi è già in attesa
-          deve ancora essere approvato.
-        </p>
+        <RegistrationChoice required={value} disabled={busy} onChange={(next) => {
+          setValue(next);
+          setMessage("");
+          setError("");
+        }} />
         {error && (
           <p className="form-error" role="alert">
             {error}
@@ -91,5 +62,28 @@ export default function RegistrationPolicy({
         </p>
       )}
     </section>
+  );
+}
+
+export function RegistrationChoice({
+  required, disabled, onChange,
+}: {
+  required: boolean;
+  disabled?: boolean;
+  onChange: (required: boolean) => void;
+}) {
+  return (
+    <>
+      <label className="check">
+        <input type="checkbox" checked={!required} disabled={disabled}
+          onChange={(event) => onChange(!event.target.checked)} />
+        Accetta i nuovi clienti senza approvazione
+      </label>
+      <p className="muted">
+        Spunta attiva: i nuovi clienti sono accettati automaticamente dopo la verifica email.
+        Spunta disattiva: devono essere approvati da Gestisci utenti.
+        La scelta vale per tutta la barberia; gli utenti già in attesa mantengono il proprio stato.
+      </p>
+    </>
   );
 }

@@ -3,6 +3,7 @@ import { Empty, Modal } from "../components/UI";
 import { supabase, result } from "../lib/api";
 import type { Row } from "../lib/api";
 import Maintenance from "./Maintenance";
+import { RegistrationChoice } from "./RegistrationPolicy";
 export default function Admin({
   section,
   notify,
@@ -13,6 +14,7 @@ export default function Admin({
   refresh: () => void;
 }) {
   const [editing, setEditing] = useState<Row | null>(null);
+  const [requireApproval, setRequireApproval] = useState(true);
   const [rows, setRows] = useState<Row[]>([]),
     [users, setUsers] = useState<Row[]>([]),
     [services, setServices] = useState<Row[]>([]),
@@ -59,12 +61,11 @@ export default function Admin({
           )) as Row[],
         );
       }
-      if (section === "Configurazione")
-        setSettings(
-          (await result(
-            supabase.from("app_settings").select("*").single(),
-          )) as Row,
-        );
+      if (section === "Configurazione") {
+        const config = await result<Row>(supabase.from("app_settings").select("*").single());
+        setSettings(config);
+        setRequireApproval(config.require_user_approval !== false);
+      }
     } catch {
       notify("Non riesco a caricare i dati amministrativi.");
     }
@@ -109,6 +110,7 @@ export default function Admin({
                   accent: v.get("accent"),
                   cancellation_hours:
                     v.get("hours") === "" ? null : Number(v.get("hours")),
+                  require_user_approval: requireApproval,
                   bookings_enabled: v.get("enabled") === "on",
                   account_deletion_enabled: v.get("deletion") === "on",
                 })
@@ -139,6 +141,7 @@ export default function Admin({
           Lascia vuoto finché la regola non è decisa. Zero permette di
           cancellare fino all’inizio.
         </p>
+        <RegistrationChoice required={requireApproval} disabled={busy} onChange={setRequireApproval} />
         <label className="check">
           <input
             type="checkbox"

@@ -12,7 +12,6 @@ export default function Maintenance({
   const [appointmentDays, setAppointmentDays] = useState("40");
   const [disableInactive, setDisableInactive] = useState(true);
   const [deleteOld, setDeleteOld] = useState(true);
-  const [requireApproval, setRequireApproval] = useState(true);
   const [busy, setBusy] = useState(false);
   const [feedback, setFeedback] = useState("");
   const [error, setError] = useState("");
@@ -24,7 +23,6 @@ export default function Maintenance({
       setAppointmentDays(String(data.settings.appointment_days));
       setDisableInactive(data.settings.disable_inactive);
       setDeleteOld(data.settings.delete_old_appointments);
-      setRequireApproval(data.settings.require_user_approval);
     } catch (e) {
       setError(friendly(e));
     }
@@ -49,12 +47,11 @@ export default function Maintenance({
     setFeedback("");
     try {
       await result(
-        supabase.rpc("save_maintenance_with_registrations", {
+        supabase.rpc("save_maintenance_settings", {
           p_inactive_days: days[0],
           p_appointment_days: days[1],
           p_disable_inactive: disableInactive,
           p_delete_old: deleteOld,
-          p_require_approval: requireApproval,
         }),
       );
       await load();
@@ -81,23 +78,6 @@ export default function Maintenance({
         </p>
       )}
       <form onSubmit={save}>
-        <h3>Iscrizione dei nuovi utenti</h3>
-        <label className="check">
-          <input
-            type="checkbox"
-            checked={requireApproval}
-            disabled={busy || !status}
-            onChange={(event) => setRequireApproval(event.target.checked)}
-          />
-          Richiedi approvazione per i nuovi utenti
-        </label>
-        <p className="muted">
-          Se selezionata, i nuovi iscritti devono verificare l’email e poi
-          essere approvati dall’admin o da un barbiere associato prima di
-          prenotare. Se non selezionata, i nuovi account sono abilitati
-          direttamente dopo la verifica email. Gli utenti già registrati
-          mantengono il proprio stato.
-        </p>
         <div className="maintenance-rule">
           <label className="check">
             <input
