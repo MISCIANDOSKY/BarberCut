@@ -1,35 +1,39 @@
 # BarberCut
 
-PWA React + TypeScript pubblicata con GitHub Pages, con Supabase come backend centrale. Nessun database locale sul dispositivo; la cache contiene esclusivamente la shell dell'app.
+PWA per una barberia con più barbieri, realizzata con React, TypeScript e Supabase e pubblicata su GitHub Pages.
 
-## Operatività
+**[Apri BarberCut](https://misciandosky.github.io/BarberCut/)** · **[Handoff e stato del progetto](HANDOFF.md)**
 
-La CI esegue installazione con lockfile, controllo TypeScript, build, test PWA e pubblicazione. Il sito è raggiungibile dall'URL restituito dal deployment GitHub Pages. Il percorso previsto è /BarberCut/.
+## Prima di intervenire
 
-Le prenotazioni inizialmente sono chiuse: il titolare configura servizi, barbieri, associazioni, orari, termini approvati e regola di cancellazione prima di aprirle.
+Leggere [HANDOFF.md](HANDOFF.md) e [AGENTS.md](AGENTS.md). Per richiesta del titolare, aggiornare l'handoff a ogni modifica, anche di configurazioni remote. Lavorare su GitHub e Supabase senza sviluppo locale.
 
-## Sicurezza
+## Funzioni
 
-RLS su tutte le tabelle pubbliche. Ruoli in tabella non modificabile dal cliente. Password + verifica email per barbiere/admin: una Edge Function verifica entrambi i token Supabase e abilita esclusivamente la sessione verificata per 8 ore. La service_role rimane solo nell'ambiente Supabase. Nessuna OTP applicativa in chiaro.
+- Registrazione, accesso con password o codice email, recupero password, profilo, logout ed eliminazione account.
+- Email italiane con OTP e link alternativo; SMTP Brevo configurato.
+- Approvazione dei nuovi iscritti gestita da admin e barbiere.
+- Prenotazioni, disponibilità Europe/Rome, turni, eccezioni, festività e protezione dalle sovrapposizioni.
+- Agenda barbiere, prenotazioni manuali senza email obbligatoria, blocchi della propria agenda e gestione servizi/prezzi.
+- Admin per utenti, barbieri, servizi, impostazioni e manutenzione automatica.
+- Informazioni barberia e indirizzo modificabile da admin o barbiere associato.
+- Avvisi di inattività e promemoria interni; schermate complete adatte all'uso mobile.
 
-Prenotazioni tramite RPC: lock per cliente e barbiere, controllo massimo 5 appuntamenti futuri e 3 mesi, intervallo completo del servizio e exclusion constraint contro sovrapposizioni tra appuntamenti e blocchi. Disponibilità in Europe/Rome, festività nazionali e Pasquetta, eccezioni prioritarie rispetto a orari settimanali. Le chiusure prevalgono sulle aperture per la stessa data.
+## Operatività e sicurezza
 
-## Configurazione Supabase Auth
+La CI installa dal lockfile, formatta, controlla TypeScript, esegue build e test e pubblica la PWA. La cache conserva la shell, non dati personali o disponibilità.
 
-In Authentication > URL Configuration impostare Site URL e Redirect URL a https://misciandosky.github.io/BarberCut/. Nel modello email Magic Link includere {{ .Token }} per consentire l'inserimento del codice OTP; il link email nello stesso browser è supportato come alternativa. Configurare un SMTP esterno per la consegna in produzione: il mittente integrato ha limiti e restrizioni. Non inserire credenziali nel repository.
+Ruoli, permessi, approvazioni e vincoli prenotazione sono verificati nel database. Le credenziali privilegiate restano su Supabase; non inserirle nel repository.
 
-Il primo admin è stato associato all'account indicato dal titolare. Per il barbiere associare un account registrato e impostarne il ruolo dall'area admin.
-
-## Limiti espliciti
-
-Non sono attivate cancellazioni automatiche di dati o account. Il flusso eliminazione account con verifica email è implementato, ma disattivato finché il titolare non definisce la conservazione e lo abilita. Preserva gli appuntamenti come storico anonimizzato, cancella quelli futuri e protegge l’ultimo admin. Retention automatica, push ed email di promemoria richiedono configurazione. I promemoria interni 24h e 1h sono attivi tramite pg_cron e deduplicati per appuntamento e orario. L'export JSON admin è un'esportazione applicativa e non sostituisce un dump PostgreSQL completo con Auth. Non sono stati svolti test fisici su Safari iPhone o Chrome Android.
+Le impostazioni live, le verifiche eseguite e i limiti sono riportati nell'[handoff](HANDOFF.md). Il progetto attuale serve una sola barberia; non isola più attività indipendenti come SaaS. L'export JSON applicativo non sostituisce un backup completo. Il controllo periodico del database non garantisce disponibilità continua sul piano Free.
 
 ## Sorgenti
 
-- src/components: componenti accessibili, installazione e aggiornamenti PWA
-- src/features: autenticazione, prenotazione, account, agenda e amministrazione
-- supabase/migrations: schema versionato
-- supabase/functions: verifica email riservata
-- scripts: icone PNG e service worker generati in CI
+- src: interfaccia e flussi applicativi.
+- supabase/migrations: schema e funzioni versionati.
+- supabase/functions: funzioni Edge.
+- supabase/tests e tests: verifiche automatiche.
+- scripts e .github/workflows: PWA, build, pubblicazione e healthcheck.
+- docs: documentazione specifica delle funzioni.
 
-Le migrations versionate corrispondono alle versioni registrate nel progetto Supabase esistente. La vecchia tabella vuota bookings è stata preservata nello schema private senza accesso ai client.
+Le migrazioni corrispondono alle versioni registrate nel progetto Supabase remoto.
