@@ -227,7 +227,3 @@ Schermata Giorno e orario organizzata in tre aree: controlli e giorno fermi in a
 ### 17 ottobre 2026 — Campo giorno adattivo su iPhone
 
 Corretto il bordo Giorno che nello screenshot iPhone 16 oltrepassava il lato destro. Griglie prenotazione con colonna minmax(0,1fr), min-width:0 per contenitori e label; campo date nativo racchiuso in un bordo del layout largo al massimo 100%, appearance normalizzata e valore interno WebKit contenuto. Font 16px, focus visibile sul contenitore e safe area laterali per controlli, orari e conferma. Restano giorno e footer fermi con solo orari scorrevoli. Nessuna modifica a dati o prenotazioni. TypeScript, build, test e pubblicazione riusciti nella [CI 39037321058](https://github.com/MISCIANDOSKY/BarberCut/actions/runs/39037321058). Verificato nel browser a larghezze 320, 360, 393 e 430px e landscape 852×393: entrambi i bordi e l’input dentro il viewport, larghezza documento senza overflow. A 393px bordo tra x=20 e x=373, input tra x=21 e x=372. Ripristinato viewport al termine. Safari iPhone fisico non disponibile per verifica diretta.
-
-### 17 ottobre 2026 — Svuotamento appuntamenti richiesto dal titolare
-
-Su richiesta esplicita eliminati tutti i record kind=appointment, passati e futuri, indipendentemente dallo stato. Rimossi 6 appuntamenti; verifica successiva: 0 appuntamenti residui. Filtro limitato agli appuntamenti: blocchi orari, utenti, barbieri, servizi, impostazioni e notifiche non modificati. Nessuna modifica al codice o allo schema.
