@@ -213,4 +213,4 @@ La scelta del servizio apre una schermata completa Giorno e orario con riepilogo
 
 ### 17 ottobre 2026 — Intervalli orari su righe separate
 
-Nel riepilogo Orari della sezione Informazioni ogni intervallo è mostrato su una riga distinta, anche nelle variazioni per data; rimossa la concatenazione affiancata con separatore. I turni salvati e il testo Chiuso restano invariati. Nessuna modifica ai dati o alle regole di disponibilità. CI e pubblicazione da confermare.
+Nel riepilogo Orari della sezione Informazioni ogni intervallo è mostrato su una riga distinta, anche nelle variazioni per data; rimossa la concatenazione affiancata con separatore. I turni salvati e il testo Chiuso restano invariati. Nessuna modifica ai dati o alle regole di disponibilità. TypeScript, build, test e pubblicazione riusciti nella [CI 39036124019](https://github.com/MISCIANDOSKY/BarberCut/actions/runs/39036124019).
