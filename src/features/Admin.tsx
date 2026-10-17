@@ -51,13 +51,20 @@ export default function Admin({
             supabase.from("services").select("*").is("deleted_at", null),
           )) as Row[],
         );
+      }
+      if (section === "Servizi" || section === "Barbieri") {
         setBarbers(
           (await result(
             supabase.from("barbers").select("*").is("deleted_at", null),
           )) as Row[],
         );
       }
-      if (section === "Configurazione")
+      function availableUsers(exceptBarberId?: string) {
+    return users.filter((account) =>
+      !barbers.some((barber) => barber.user_id === account.id && barber.id !== exceptBarberId)
+    );
+  }
+  if (section === "Configurazione")
         setSettings(
           (await result(
             supabase.from("app_settings").select("*").single(),
@@ -75,7 +82,7 @@ export default function Admin({
     try {
       await fn();
       notify("Modifiche salvate.");
-      load();
+      await load();
       refresh();
     } catch (e) {
       notify((await import("../lib/api")).friendly(e));
@@ -298,7 +305,7 @@ export default function Admin({
                   Account
                   <select name="user" defaultValue={editing.user_id || ""}>
                     <option value="">Nessuno</option>
-                    {users.map((u) => (
+                    {availableUsers(editing.id).map((u) => (
                       <option key={u.id} value={u.id}>
                         {u.first_name} {u.last_name}
                       </option>
@@ -454,15 +461,17 @@ export default function Admin({
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            const v = new FormData(e.currentTarget);
-            run(() =>
-              result(
+            const form = e.currentTarget;
+            const v = new FormData(form);
+            run(async () => {
+              await result(
                 supabase.from("barbers").insert({
                   name: v.get("name"),
                   user_id: v.get("user") || null,
                 }),
-              ),
-            );
+              );
+              form.reset();
+            });
           }}
         >
           <h3>Aggiungi barbiere</h3>
@@ -474,7 +483,7 @@ export default function Admin({
             Account associato
             <select name="user" required>
               <option value="">Scegli un account registrato</option>
-              {users.map((u) => (
+              {availableUsers().map((u) => (
                 <option key={u.id} value={u.id}>
                   {u.first_name} {u.last_name} · {u.id.slice(0, 8)}
                 </option>
@@ -483,9 +492,13 @@ export default function Admin({
           </label>
           <p className="muted">
             Il ruolo Barbiere viene assegnato automaticamente all’account
-            associato.
+            associato. Eliminando il barbiere, l’account torna Cliente e può
+            essere nuovamente associato.
           </p>
-          <button className="primary" disabled={busy}>
+          {!availableUsers().length && (
+            <p className="muted">Non ci sono account disponibili. Registra un nuovo account oppure modifica o elimina l’associazione di un barbiere esistente.</p>
+          )}
+          <button className="primary" disabled={busy || !availableUsers().length}>
             Aggiungi barbiere
           </button>
         </form>

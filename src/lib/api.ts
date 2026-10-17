@@ -20,6 +20,8 @@ export async function result<T = any>(
 export function friendly(e: unknown) {
   let m = e instanceof Error ? e.message : String(e);
   for (const [k, v] of Object.entries({
+    barbers_live_user_id_key:
+      "Questo account è già associato a un barbiere. Scegli un altro account o modifica l’agenda esistente.",
     GUEST_NAME_REQUIRED:
       "Inserisci nome e cognome del cliente; il telefono è facoltativo.",
     INVALID_SERVICE:
