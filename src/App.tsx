@@ -295,8 +295,15 @@ export default function App() {
   useEffect(() => {
     if (!user) return;
     const request = createLatestRequest<Row[]>({
-      load: () => result(supabase.from("notifications").select("*")
-        .eq("user_id", user.id).order("created_at", { ascending: false }).limit(100)),
+      load: () =>
+        result(
+          supabase
+            .from("notifications")
+            .select("*")
+            .eq("user_id", user.id)
+            .order("created_at", { ascending: false })
+            .limit(100),
+        ),
       onData: setNotifications,
       // Keep existing notifications when temporarily offline; retry on focus/online.
       onError: () => {},
