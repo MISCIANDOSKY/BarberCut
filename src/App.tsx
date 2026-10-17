@@ -292,6 +292,31 @@ export default function App() {
       document.removeEventListener("visibilitychange", update);
     };
   }, [section, user?.id, notify]);
+  useEffect(() => {
+    if (!user) return;
+    const request = createLatestRequest<Row[]>({
+      load: () => result(supabase.from("notifications").select("*")
+        .eq("user_id", user.id).order("created_at", { ascending: false }).limit(100)),
+      onData: setNotifications,
+      // Keep existing notifications when temporarily offline; retry on focus/online.
+      onError: () => {},
+    });
+    const update = () => {
+      if (!document.hidden && navigator.onLine) void request.refresh();
+    };
+    update();
+    const timer = window.setInterval(update, 30000);
+    window.addEventListener("focus", update);
+    window.addEventListener("online", update);
+    document.addEventListener("visibilitychange", update);
+    return () => {
+      request.stop();
+      window.clearInterval(timer);
+      window.removeEventListener("focus", update);
+      window.removeEventListener("online", update);
+      document.removeEventListener("visibilitychange", update);
+    };
+  }, [user?.id]);
   const staff = user && role !== "client",
     ready = staff && verified,
     canReview =
