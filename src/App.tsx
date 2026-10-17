@@ -12,6 +12,7 @@ import BarberServices from "./features/BarberServices";
 import Information from "./features/Information";
 import ManageUsers from "./features/ManageUsers";
 import BarberAddress from "./features/BarberAddress";
+import RegistrationPolicy from "./features/RegistrationPolicy";
 import { supabase, result, euro, friendly } from "./lib/api";
 import type { Row } from "./lib/api";
 export default function App() {
@@ -309,6 +310,11 @@ export default function App() {
           notify={notify}
           reload={refresh}
           deletionEnabled={!!settings.account_deletion_enabled}
+          registrationEditor={
+            canReview && (
+              <RegistrationPolicy required={settings.require_user_approval !== false} refresh={refresh} />
+            )
+          }
           addressEditor={
             ready && (
               <BarberAddress

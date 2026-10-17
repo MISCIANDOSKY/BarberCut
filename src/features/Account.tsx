@@ -88,6 +88,7 @@ export function Profile({
   reload,
   deletionEnabled,
   addressEditor,
+  registrationEditor,
 }: {
   user: Row;
   profile: Row;
@@ -95,6 +96,7 @@ export function Profile({
   reload: () => void;
   deletionEnabled: boolean;
   addressEditor?: ReactNode;
+  registrationEditor?: ReactNode;
 }) {
   const [first, setFirst] = useState(profile.first_name),
     [last, setLast] = useState(profile.last_name),
@@ -188,6 +190,7 @@ export function Profile({
       >
         Cambia password
       </button>
+      {registrationEditor}
       {addressEditor}
       <DeleteAccount
         email={user.email}

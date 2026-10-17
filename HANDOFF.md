@@ -59,6 +59,7 @@ Le prenotazioni disabilitate sono un'impostazione corrente: non riaprirle automa
 ## Clienti e approvazione iscrizioni
 
 - In Manutenzione: checkbox “Richiedi approvazione per i nuovi utenti”, selezionata di default.
+- Anche nel Profilo di admin e barbiere verificato con agenda attiva associata: Iscrizione nuovi clienti, scelta tra accettazione automatica e approvazione, con salvataggio dedicato. La politica è unica per tutta la barberia; al barbiere è consentito modificare solo questo flag, non le altre impostazioni di manutenzione.
 - Se attiva, le nuove iscrizioni hanno stato In attesa; se disattivata, quelle successive sono approvate automaticamente. Il cambio non converte gli utenti già in attesa o rifiutati.
 - I clienti esistenti sono stati conservati come approvati.
 - Admin e barbiere verificato con associazione attiva hanno il pulsante Gestisci utenti: In attesa, Approvati, Rifiutati.
@@ -170,4 +171,8 @@ Aggiunta checkbox Chiuso nella settimana abituale, con selezione giorno, campi o
 
 ### 17 ottobre 2026 — Posizione della spunta Chiuso
 
-Spostata la checkbox Chiuso dopo i campi Apertura/Chiusura e immediatamente sopra il pulsante Aggiungi intervallo (Salva giorno di chiusura quando selezionata), come richiesto. Solo ordine visivo, comportamento e dati invariati. Verificato ordine nel sorgente; esito build e pubblicazione da registrare dopo CI.
+Spostata la checkbox Chiuso dopo i campi Apertura/Chiusura e immediatamente sopra il pulsante Aggiungi intervallo (Salva giorno di chiusura quando selezionata), come richiesto. Solo ordine visivo, comportamento e dati invariati. Verificati ordine nel sorgente, build, test e pubblicazione nella [CI 39019531762](https://github.com/MISCIANDOSKY/BarberCut/actions/runs/39019531762), completata con successo.
+
+### 17 ottobre 2026 — Modalità iscrizione dal profilo barbiere
+
+Aggiunta sezione Iscrizione nuovi clienti nel profilo staff autorizzato, con Accetta automaticamente i nuovi utenti oppure Richiedi approvazione e pulsante Salva modalità di iscrizione. Unica impostazione condivisa con Manutenzione; modifica applicata solo alle registrazioni future, verifica email e stati già esistenti invariati. Estesa la RPC set_registration_policy ai soli admin verificati e barbieri verificati con agenda attiva associata, senza concedere accesso alle altre impostazioni. Migrazione remota 20261017090241. Test SQL con rollback riusciti: cliente, barbiere non verificato/inattivo/non associato esclusi; staff autorizzato ammesso; flag nullo respinto; manutenzione e altre impostazioni protette; nuovi utenti automatici e vecchi pendenti preservati. Rerun client_approval.sql riuscito, nessun account o invio reale di test. Advisor senza nuovi rilievi: INFO tabelle private volutamente senza accesso diretto e WARN preesistente protezione password compromesse disabilitata. [Documentazione del rilievo preesistente](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection). CI frontend e pubblicazione da registrare dopo completamento.
