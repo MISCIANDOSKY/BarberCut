@@ -35,6 +35,7 @@ Le prenotazioni disabilitate sono un'impostazione corrente: non riaprirle automa
 ## Interfaccia e navigazione
 
 - Interfaccia italiana, responsive, tema scuro con accenti oro.
+- Struttura viewport fissa: home scorre dentro .app, sezioni nei propri dialog; sfondo bloccato con dialog aperti, niente scorrimento laterale/rimbalzo della pagina. PWA installata: gesture limitate al trascinamento verticale e blocco pinch tramite rilevazione standalone (incluso iOS). Zoom del normale browser invariato; campi touch a 16px anche in orizzontale.
 - Home cliente: Prenota, Servizi e prezzi, Le mie prenotazioni, Informazioni.
 - Catalogo cliente: nome e durata senza descrizione inline; icona informativa color accento giallo accanto al prezzo apre la descrizione a schermata completa, con freccia indietro al catalogo. Disponibile anche nell’area Cliente dell’admin.
 - In fondo alla home admin: tasto Cliente che apre gli stessi quattro comandi cliente, senza cambio ruolo o account. La freccia dalle funzioni personali riporta al menu Cliente; dal menu Cliente torna alla home admin. Le prenotazioni personali usano il client_id dell’admin e rispettano il normale flusso personale.
@@ -214,3 +215,7 @@ La scelta del servizio apre una schermata completa Giorno e orario con riepilogo
 ### 17 ottobre 2026 — Intervalli orari su righe separate
 
 Nel riepilogo Orari della sezione Informazioni ogni intervallo è mostrato su una riga distinta, anche nelle variazioni per data; rimossa la concatenazione affiancata con separatore. I turni salvati e il testo Chiuso restano invariati. Nessuna modifica ai dati o alle regole di disponibilità. TypeScript, build, test e pubblicazione riusciti nella [CI 39036124019](https://github.com/MISCIANDOSKY/BarberCut/actions/runs/39036124019).
+
+### 17 ottobre 2026 — PWA più ferma su iPhone
+
+Viewport radice fisso con scorrimento interno della home, dialog indipendenti e sfondo bloccato durante le funzioni aperte. Disabilitati scorrimento orizzontale e propagazione/rimbalzo dello scroll; rimosso movimento hover dei pulsanti su touch. Gestione zoom limitata alla PWA installata tramite display-mode standalone e navigator.standalone iOS: touch-action pan-y e prevenzione gesture pinch, senza bloccare il normale scorrimento con un dito. Campi touch a 16px anche in landscape per evitare zoom al focus; limiti di larghezza e griglia campi con minmax(0,1fr). Nessun cambiamento a dati, ruoli o prenotazioni. L’immagine indicata dal titolare non era disponibile sul percorso allegato. CI e verifica layout responsive da completare; comportamento fisico iPhone standalone non riprodotto qui.

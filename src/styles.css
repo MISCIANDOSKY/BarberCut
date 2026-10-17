@@ -18,8 +18,33 @@
 * {
   box-sizing: border-box;
 }
+html {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  touch-action: manipulation;
+}
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
 body {
   margin: 0;
+}
+html.installed-pwa,
+html.installed-pwa body,
+html.installed-pwa .app,
+html.installed-pwa dialog {
+  touch-action: pan-y;
 }
 button,
 input,
@@ -75,6 +100,11 @@ small {
   line-height: 1.6;
 }
 .app {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
   max-width: 1280px;
   margin: auto;
   padding: 0 64px;
@@ -450,7 +480,7 @@ input[type="checkbox"] {
 }
 .two {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
 }
 .primary,
@@ -1033,7 +1063,8 @@ dialog.feature-dialog {
   border: 0;
   border-radius: 0;
   background: var(--bg);
-  overscroll-behavior: contain;
+  overscroll-behavior: none;
+  overflow-x: hidden;
 }
 dialog.feature-dialog > header {
   position: sticky;
@@ -1193,4 +1224,49 @@ input[aria-invalid="true"] {
 .shop-hours-interval {
   display: block;
   line-height: 1.6;
+}
+
+/* Keep the home still while a feature or a nested dialog owns scrolling. */
+html:has(dialog[open]) .app {
+  overflow: hidden;
+}
+dialog {
+  overscroll-behavior: none;
+  overflow-x: hidden;
+}
+input,
+select,
+textarea,
+.feature-content,
+.action-copy,
+.agenda-row > span:nth-child(2) {
+  min-width: 0;
+}
+input,
+select,
+textarea {
+  max-width: 100%;
+}
+.service > span:first-child,
+.feature-content {
+  overflow-wrap: anywhere;
+}
+@media (pointer: coarse) {
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+@media (hover: none) {
+  .action:hover {
+    transform: none;
+  }
+}
+@media (max-width: 380px) {
+  .topbar {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 16px 0;
+  }
 }
