@@ -21,6 +21,9 @@ type Props = {
   notify: (s: string) => void;
   section: string;
   isAdmin?: boolean;
+  initialBarber?: string;
+  initialDay?: string;
+  onManualBooked: (barberId: string, start: string) => void;
 };
 export default function Manage({
   user,
@@ -30,14 +33,17 @@ export default function Manage({
   notify,
   section,
   isAdmin = false,
+  initialBarber,
+  initialDay,
+  onManualBooked,
 }: Props) {
   const scopedBarbers = barbers.filter(
     (item) => isAdmin || item.user_id === user.id,
   );
   const [selectedBarber, setB] = useState(
-      barbers.find((x) => x.user_id === user.id)?.id || barbers[0]?.id || "",
+      initialBarber || barbers.find((x) => x.user_id === user.id)?.id || barbers[0]?.id || "",
     ),
-    [day, setDay] = useState(today()),
+    [day, setDay] = useState(initialDay || today()),
     [rows, setRows] = useState<Row[]>([]),
     [detail, setDetail] = useState<Row | null>(null),
     [client, setClient] = useState<Row | null>(null),
@@ -232,6 +238,7 @@ export default function Manage({
                   maxLength={40}
                 />
               </label>
+              <p className="muted">Se il telefono corrisponde a un unico account registrato, l’appuntamento comparirà anche nelle sue prenotazioni.</p>
               <button className="primary">Scegli servizio e orario</button>
             </form>
           ) : (
@@ -254,7 +261,10 @@ export default function Manage({
                 settings={settings}
                 notify={notify}
                 login={() => {}}
-                onBooked={load}
+                onBooked={(booking) => {
+                  setClient(null);
+                  onManualBooked(b, booking.start_at);
+                }}
               />
             </>
           )}

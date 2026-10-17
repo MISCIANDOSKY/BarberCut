@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createLatestRequest } from "./lib/latestRequest.mjs";
 import { clearPasswordProof } from "./lib/passwordProof";
 import type { User } from "@supabase/supabase-js";
 import { Empty, Modal } from "./components/UI";
@@ -34,6 +35,7 @@ export default function App() {
     [legal, setLegal] = useState(false),
     [appointments, setAppointments] = useState<Row[]>([]),
     [notifications, setNotifications] = useState<Row[]>([]),
+    [agendaContext, setAgendaContext] = useState<{ barberId: string; day: string } | null>(null),
     [section, setSection] = useState(() =>
       new URLSearchParams(location.search).get("book") === "1" ? "Prenota" : "",
     ),
@@ -254,6 +256,29 @@ export default function App() {
       nav.setAppBadge?.(1).catch(() => {});
     else nav.clearAppBadge?.().catch(() => {});
   }, [notifications]);
+  useEffect(() => {
+    if (!user || section !== "Le mie prenotazioni") return;
+    const request = createLatestRequest<Row[]>({
+      load: () => result(supabase.from("calendar_entries").select("*")
+        .eq("client_id", user.id).eq("kind", "appointment").eq("status", "confirmed")
+        .gte("start_at", new Date().toISOString()).order("start_at")),
+      onData: setAppointments,
+      onError: () => notify("Non riesco ad aggiornare le prenotazioni. Riprova."),
+    });
+    const update = () => {
+      if (!document.hidden && navigator.onLine) void request.refresh();
+    };
+    update();
+    const timer = window.setInterval(update, 30000);
+    window.addEventListener("focus", update);
+    document.addEventListener("visibilitychange", update);
+    return () => {
+      request.stop();
+      window.clearInterval(timer);
+      window.removeEventListener("focus", update);
+      document.removeEventListener("visibilitychange", update);
+    };
+  }, [section, user?.id, notify]);
   const staff = user && role !== "client",
     ready = staff && verified,
     canReview =
@@ -433,6 +458,17 @@ export default function App() {
           notify={notify}
           section={section}
           isAdmin={role === "admin"}
+          initialBarber={agendaContext?.barberId}
+          initialDay={agendaContext?.day}
+          onManualBooked={(barberId, start) => {
+            const bookingDay = new Intl.DateTimeFormat("en-CA", {
+              timeZone: "Europe/Rome", year: "numeric", month: "2-digit", day: "2-digit",
+            }).format(new Date(start));
+            setAgendaContext({ barberId, day: bookingDay });
+            setSection("Appuntamenti");
+            notify("Prenotazione inserita. Ecco l’agenda aggiornata.");
+            void refresh();
+          }}
         />
       );
     if (ready && section === "Agenda")

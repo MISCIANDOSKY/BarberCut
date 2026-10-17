@@ -28,7 +28,7 @@ export default function Booking({
   settings: Row;
   notify: (s: string) => void;
   login: () => void;
-  onBooked: () => void;
+  onBooked: (booking: Row) => void;
   clientId?: string;
   guest?: Row;
 }) {
@@ -167,14 +167,15 @@ export default function Booking({
               ...(clientId ? { p_client: clientId } : {}),
             }),
       );
-      setConfirmed({
+      const savedBooking = {
         start_at: selected,
         end_at: new Date(
           new Date(selected).getTime() + svc!.duration_minutes * 60000,
         ).toISOString(),
         service_name: svc!.name,
-      });
-      onBooked();
+      };
+      setConfirmed(savedBooking);
+      onBooked(savedBooking);
     } catch (e) {
       notify((await import("../lib/api")).friendly(e));
       setSelected("");

@@ -30,6 +30,10 @@ export function friendly(e: unknown) {
       "Questa richiesta è già stata gestita. Aggiorna l’elenco.",
     CLIENT_REQUIRED:
       "La richiesta non appartiene a un account cliente disponibile.",
+    PHONE_MATCH_AMBIGUOUS:
+      "Questo numero è associato a più account. Verifica il telefono del cliente o lascia il campo vuoto per una prenotazione ospite.",
+    PHONE_MATCH_CHANGED:
+      "Il telefono del cliente è stato modificato. Controllalo e riprova.",
     GUEST_NAME_REQUIRED:
       "Inserisci nome e cognome del cliente; il telefono è facoltativo.",
     INVALID_SERVICE:
