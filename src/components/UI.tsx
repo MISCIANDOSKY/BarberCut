@@ -45,7 +45,10 @@ export function Modal({
   return (
     <dialog
       ref={ref}
-      className={[wide ? "feature-dialog" : "", className].filter(Boolean).join(" ") || undefined}
+      className={
+        [wide ? "feature-dialog" : "", className].filter(Boolean).join(" ") ||
+        undefined
+      }
       onCancel={close}
       onClick={(e) => {
         if (!wide && e.target === e.currentTarget) close();
