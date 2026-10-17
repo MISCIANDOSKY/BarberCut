@@ -93,7 +93,10 @@ export default function Information() {
                       <dd>
                         {intervals.length
                           ? intervals.map((item: Row) => (
-                              <span className="shop-hours-interval" key={item.id || item.opens + "-" + item.closes}>
+                              <span
+                                className="shop-hours-interval"
+                                key={item.id || item.opens + "-" + item.closes}
+                              >
                                 {time(item.opens)}–{time(item.closes)}
                               </span>
                             ))
@@ -130,7 +133,12 @@ export default function Information() {
                           {changes.some((item: Row) => item.closed)
                             ? "Chiuso"
                             : changes.map((item: Row) => (
-                                <span className="shop-hours-interval" key={item.id || item.opens + "-" + item.closes}>
+                                <span
+                                  className="shop-hours-interval"
+                                  key={
+                                    item.id || item.opens + "-" + item.closes
+                                  }
+                                >
                                   {time(item.opens)}–{time(item.closes)}
                                 </span>
                               ))}
