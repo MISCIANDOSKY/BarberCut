@@ -1,5 +1,7 @@
 
 begin;
+-- These fixtures model clients already admitted to the barber shop.
+update public.app_settings set require_user_approval=false where id;
 do $test$
 declare u uuid:=gen_random_uuid(); other uuid:=gen_random_uuid(); b uuid; s15 uuid; s30 uuid; s45 uuid; d date:=current_date+7; n int; created uuid; t timestamptz;
 begin

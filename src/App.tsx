@@ -10,6 +10,7 @@ import Manage from "./features/Manage";
 import Admin from "./features/Admin";
 import BarberServices from "./features/BarberServices";
 import Information from "./features/Information";
+import ManageUsers from "./features/ManageUsers";
 import BarberAddress from "./features/BarberAddress";
 import { supabase, result, euro, friendly } from "./lib/api";
 import type { Row } from "./lib/api";
@@ -17,6 +18,7 @@ export default function App() {
   const [user, setUser] = useState<User | null>(null),
     [profile, setProfile] = useState<Row | null>(null),
     [role, setRole] = useState("client"),
+    [membership, setMembership] = useState("approved"),
     [verified, setVerified] = useState(false),
     [settings, setSettings] = useState<Row>({
       shop_name: "BarberCut",
@@ -31,7 +33,7 @@ export default function App() {
     [legal, setLegal] = useState(false),
     [appointments, setAppointments] = useState<Row[]>([]),
     [notifications, setNotifications] = useState<Row[]>([]),
-    [section, setSection] = useState(""),
+    [section, setSection] = useState(() => new URLSearchParams(location.search).get("book") === "1" ? "Prenota" : ""),
     [auth, setAuth] = useState(
       () => new URLSearchParams(location.search).get("keep-active") === "1",
     ),
@@ -103,7 +105,7 @@ export default function App() {
             "Il tuo account è attivo. Il conteggio dell’inattività è ripartito da oggi.",
           );
         }
-        const [p, r, v, ns, ap] = await Promise.all([
+        const [p, r, v, ns, ap, member] = await Promise.all([
           result(supabase.from("profiles").select("*").eq("id", u.id).single()),
           result(
             supabase
@@ -131,8 +133,10 @@ export default function App() {
               .gte("start_at", new Date().toISOString())
               .order("start_at"),
           ),
+          result(supabase.rpc("membership_status")),
         ]);
         if (version !== refreshVersion.current) return;
+        setMembership(String(member));
         setProfile(p as Row);
         setRole((r as Row).role);
         setVerified(!!v);
@@ -152,6 +156,7 @@ export default function App() {
       } else {
         setProfile(null);
         setRole("client");
+        setMembership("approved");
         setVerified(false);
         setNotifications([]);
         setAppointments([]);
@@ -173,6 +178,7 @@ export default function App() {
         setUser(null);
         setProfile(null);
         setRole("client");
+        setMembership("approved");
         setVerified(false);
         setNotifications([]);
         setAppointments([]);
@@ -218,6 +224,17 @@ export default function App() {
     };
   }, [user?.id]);
   useEffect(() => {
+    if (!user || role !== "client" || membership !== "pending") return;
+    const check = async () => {
+      if (document.visibilityState !== "visible" || !navigator.onLine) return;
+      const { data, error } = await supabase.rpc("membership_status");
+      if (!error && data) setMembership(String(data));
+    };
+    const timer = window.setInterval(check, 60000);
+    window.addEventListener("focus", check);
+    return () => { window.clearInterval(timer); window.removeEventListener("focus", check); };
+  }, [user?.id, role, membership]);
+  useEffect(() => {
     if (!message) return;
     const t = setTimeout(() => setMessage(""), 9000);
     return () => clearTimeout(t);
@@ -232,12 +249,14 @@ export default function App() {
     else nav.clearAppBadge?.().catch(() => {});
   }, [notifications]);
   const staff = user && role !== "client",
-    ready = staff && verified;
+    ready = staff && verified,
+    canReview = ready && (role === "admin" || barbers.some((barber) => barber.user_id === user!.id && barber.active && !barber.deleted_at));
   const choices = ready
     ? role === "admin"
       ? [
           ["♧", "Barbieri", "Persone e agende"],
           ["◉", "Utenti", "Account e ruoli"],
+          ["✓", "Gestisci utenti", "Approva le nuove iscrizioni"],
           ["✂", "Servizi", "Catalogo e prezzi"],
           ["⚙", "Configurazione", "La tua attività"],
           ["▤", "Termini", "Versioni e pubblicazione"],
@@ -250,6 +269,7 @@ export default function App() {
           ["⊘", "Blocca orario", "Una pausa, una giornata"],
           ["◷", "Orari di lavoro", "La tua settimana"],
           ["✂", "Servizi e prezzi", "Il catalogo"],
+          ...(canReview ? [["✓", "Gestisci utenti", "Approva le nuove iscrizioni"]] : []),
           ["♧", "Notifiche", "Tutte le novità"],
           ["◉", "Profilo", "Il tuo account"],
         ]
@@ -266,6 +286,7 @@ export default function App() {
     "Orari di lavoro",
   ];
   function content() {
+    if (section === "Gestisci utenti" && canReview) return <ManageUsers />;
     if (section === "Informazioni") return <Information />;
     if (section === "Profilo")
       return user && profile ? (
@@ -333,6 +354,9 @@ export default function App() {
           prezzi.
         </Empty>
       );
+    if (section === "Prenota" && user && role === "client" && membership !== "approved") {
+      return <div className="notice" role="status"><p>{membership === "rejected" ? "La tua richiesta di iscrizione non è stata approvata. Contatta la barberia per informazioni." : "Il tuo account è in attesa di approvazione. Potrai prenotare quando l’admin o un barbiere avranno approvato la tua iscrizione. Riceverai una conferma via email."}</p><button className="secondary" onClick={refresh}>Aggiorna stato</button></div>;
+    }
     if (section === "Prenota")
       return (
         <Booking
@@ -481,6 +505,7 @@ export default function App() {
             <span>{ready ? "LA TUA AREA" : "A PORTATA DI MANO"}</span>
             <span>01 — {String(choices.length).padStart(2, "0")}</span>
           </div>
+          {user && role === "client" && membership !== "approved" && <div className="notice" role="status"><p>{membership === "rejected" ? "La richiesta di iscrizione non è stata approvata. Contatta la barberia per informazioni." : "Iscrizione in attesa di approvazione. Ti avviseremo via email quando potrai prenotare."}</p></div>}
           {loading ? (
             <p className="empty" role="status">
               Prepariamo il tuo spazio…
@@ -582,6 +607,7 @@ export default function App() {
       {auth && (
         <Auth
           terms={terms}
+          requiresApproval={settings.require_user_approval !== false}
           close={() => setAuth(false)}
           notify={notify}
           onDone={refresh}

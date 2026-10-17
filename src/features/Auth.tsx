@@ -16,11 +16,13 @@ export default function Auth({
   notify,
   onDone,
   terms,
+  requiresApproval = true,
 }: {
   close: () => void;
   notify: (s: string) => void;
   onDone: () => void;
   terms: Row | null;
+  requiresApproval?: boolean;
 }) {
   const [mode, setMode] = useState("login"),
     [email, setEmail] = useState(""),
@@ -182,7 +184,7 @@ export default function Auth({
               notify(
                 verifyingLogin
                   ? "Accesso effettuato. Bentornato!"
-                  : "Email verificata! Benvenuto su BarberCut.",
+                  : "Email verificata. Puoi consultare lo stato della tua iscrizione su BarberCut.",
               );
               onDone();
               close();
@@ -302,6 +304,7 @@ export default function Auth({
             {errorMessage}
           </p>
         )}
+        {mode === "register" && requiresApproval && <p className="notice">Dopo aver verificato l’email, la tua iscrizione dovrà essere approvata dall’admin o da un barbiere. Riceverai un’email quando potrai prenotare.</p>}
         <form onSubmit={submit}>
           {mode === "register" && (
             <div className="two">

@@ -1,0 +1,11 @@
+# Approvazione dei nuovi clienti
+
+In Manutenzione, Richiedi approvazione per i nuovi utenti è inizialmente selezionata. Il salvataggio delle soglie di manutenzione e della politica di iscrizione è atomico. Quando attiva, ogni nuova registrazione ha stato pending in private.client_memberships. I profili preesistenti sono stati mantenuti approved. La disattivazione della casella abilita automaticamente solo le registrazioni successive, dopo la verifica email; non modifica richieste già valutate o in attesa.
+
+Admin e barbieri con sessione staff verificata e agenda attiva associata hanno Gestisci utenti. Possono visualizzare richieste In attesa, Approvati e Rifiutati e approvare/rifiutare quelle in attesa. Per approvare è obbligatoria la verifica email. Un rifiuto blocca la prenotazione, senza cancellare profilo o account. Una decisione già presa non è sovrascritta da richieste concorrenti. L’approvazione non concede ruoli staff.
+
+Lo stato è conservato in una tabella privata con RLS e privilegi diretti revocati ai client. I metadati Auth non decidono l’approvazione. Un trigger server impedisce inserimenti o riassegnazioni di appuntamenti a clienti pending/rejected, anche se viene aggirata l’interfaccia. Le prenotazioni manuali per ospiti restano disponibili ai barbieri, senza creare un account.
+
+Dopo l’approvazione, una coda invia l’email italiana Sei stato approvato! con il pulsante Prenota il tuo servizio. L’invio riutilizza il trasporto Auth SMTP/Brevo e il modello condizionale, con contesto temporaneo di sola presentazione nei metadati Auth. Non effettua un login e non cambia i permessi. Il link ?book=1 apre la prenotazione e richiede l’accesso se necessario; un OTP temporaneo è disponibile come alternativa. Token monouso, scadenze, controllo destinatario server e RPC service_role impediscono l’uso della funzione come relay aperto. L’invio parte dopo l’approvazione, con tentativi automatici in caso di errore (fino a sei, distanziati di 30 minuti).
+
+I test SQL con rollback verificano creazione pending, policy disattivata, preservazione utenti esistenti, impossibilità di autoapprovarsi o prenotare senza approvazione, barbiere verificato e associato, conferma email, rifiuto, idempotenza, SMTP queue e token, pulizia contesto email e impostazioni manutenzione. Nessun messaggio reale è stato inviato per i test.

@@ -1,1 +1,1 @@
-{{ if .Data.barbercut_warning_days }}BarberCut — Il tuo account sarà disattivato tra {{ .Data.barbercut_warning_days }} giorni{{ else }}BarberCut — Il tuo codice di accesso{{ end }}
+{{ if .Data.barbercut_approved }}BarberCut — Iscrizione approvata{{ else }}{{ if .Data.barbercut_warning_days }}BarberCut — Avviso di inattività{{ else }}BarberCut — Codice di accesso{{ end }}{{ end }}
