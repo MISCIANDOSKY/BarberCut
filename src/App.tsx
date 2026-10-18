@@ -47,7 +47,9 @@ export default function App() {
     [section, setSection] = useState(() =>
       new URLSearchParams(location.search).get("delete-account") === "1"
         ? "Profilo"
-        : new URLSearchParams(location.search).get("book") === "1" ? "Prenota" : "",
+        : new URLSearchParams(location.search).get("book") === "1"
+          ? "Prenota"
+          : "",
     ),
     [auth, setAuth] = useState(
       () => new URLSearchParams(location.search).get("keep-active") === "1",
@@ -62,7 +64,11 @@ export default function App() {
     const address = new URL(location.href);
     if (address.searchParams.has("delete-account")) {
       address.searchParams.delete("delete-account");
-      history.replaceState(history.state, "", address.pathname + address.search + address.hash);
+      history.replaceState(
+        history.state,
+        "",
+        address.pathname + address.search + address.hash,
+      );
     }
   }
   const refreshVersion = useRef(0);
@@ -406,7 +412,12 @@ export default function App() {
       );
     if (section === "Gestisci utenti" && canReview) return <ManageUsers />;
     if (section === "Informazioni") return <Information />;
-    if (section === "Assumi Barbiere" && ready && role === "barber_admin" && canReview)
+    if (
+      section === "Assumi Barbiere" &&
+      ready &&
+      role === "barber_admin" &&
+      canReview
+    )
       return <HireBarber refresh={refresh} notify={notify} />;
     if (section === "Profilo")
       return user && profile ? (
@@ -439,8 +450,14 @@ export default function App() {
         />
       ) : (
         <div className="content-stack">
-          <p>{deletionFromEmail ? "Apri il collegamento ricevuto via email per confermare l’eliminazione, oppure accedi e richiedi un nuovo codice dal profilo." : "Accedi per visualizzare il tuo profilo."}</p>
-          <button className="secondary" onClick={() => setAuth(true)}>Accedi</button>
+          <p>
+            {deletionFromEmail
+              ? "Apri il collegamento ricevuto via email per confermare l’eliminazione, oppure accedi e richiedi un nuovo codice dal profilo."
+              : "Accedi per visualizzare il tuo profilo."}
+          </p>
+          <button className="secondary" onClick={() => setAuth(true)}>
+            Accedi
+          </button>
         </div>
       );
     if (section === "Notifiche")

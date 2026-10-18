@@ -300,11 +300,17 @@ function DeleteAccount({
     setCodeSent(false);
     setErrorMessage("");
     if (!fromEmailLink) return;
-    const frame = requestAnimationFrame(() => detailsRef.current?.scrollIntoView({block: "start"}));
+    const frame = requestAnimationFrame(() =>
+      detailsRef.current?.scrollIntoView({ block: "start" }),
+    );
     return () => cancelAnimationFrame(frame);
   }, [email, fromEmailLink]);
   return (
-    <details ref={detailsRef} className="notice account-deletion" open={fromEmailLink || undefined}>
+    <details
+      ref={detailsRef}
+      className="notice account-deletion"
+      open={fromEmailLink || undefined}
+    >
       <summary>Elimina account</summary>
       <div className="content-stack">
         {!enabled ? (
@@ -375,39 +381,44 @@ function DeleteAccount({
             {(codeSent || usingLink) && (
               <>
                 {usingLink ? (
-                  <p className="notice">Hai aperto il collegamento di conferma. Per eliminare il profilo, seleziona la casella di conferma e premi il pulsante qui sotto. Se il collegamento è scaduto, richiedi un nuovo codice via email.</p>
+                  <p className="notice">
+                    Hai aperto il collegamento di conferma. Per eliminare il
+                    profilo, seleziona la casella di conferma e premi il
+                    pulsante qui sotto. Se il collegamento è scaduto, richiedi
+                    un nuovo codice via email.
+                  </p>
                 ) : (
                   <>
-                <p className="muted">
-                  Abbiamo inviato il codice alla tua email. Se non lo trovi,
-                  controlla anche le cartelle Spam e Posta indesiderata.
-                </p>
-                <label>
-                  Codice OTP
-                  <input
-                    value={code}
-                    onChange={(e) => {
-                      setCode(e.target.value.replace(/[^0-9]/g, ""));
-                      setErrorMessage("");
-                    }}
-                    type="text"
-                    name="delete-account-code"
-                    autoComplete="one-time-code"
-                    inputMode="numeric"
-                    pattern="[0-9]+"
-                    required
-                    disabled={busy}
-                    autoFocus
-                  />
-                </label>
-
+                    <p className="muted">
+                      Abbiamo inviato il codice alla tua email. Se non lo trovi,
+                      controlla anche le cartelle Spam e Posta indesiderata.
+                    </p>
+                    <label>
+                      Codice OTP
+                      <input
+                        value={code}
+                        onChange={(e) => {
+                          setCode(e.target.value.replace(/[^0-9]/g, ""));
+                          setErrorMessage("");
+                        }}
+                        type="text"
+                        name="delete-account-code"
+                        autoComplete="one-time-code"
+                        inputMode="numeric"
+                        pattern="[0-9]+"
+                        required
+                        disabled={busy}
+                        autoFocus
+                      />
+                    </label>
                   </>
                 )}
                 <button
                   className="danger"
                   disabled={busy || !confirmed || (!usingLink && !code.trim())}
                   onClick={async () => {
-                    if (busy || !confirmed || (!usingLink && !code.trim())) return;
+                    if (busy || !confirmed || (!usingLink && !code.trim()))
+                      return;
                     if (
                       !confirm("Eliminare definitivamente account e profilo?")
                     )
@@ -416,18 +427,18 @@ function DeleteAccount({
                     setErrorMessage("");
                     try {
                       if (!usingLink) {
-                      const { error: codeError } =
-                        await supabase.auth.verifyOtp({
-                          email,
-                          token: code.trim(),
-                          type: "email",
-                        });
-                      if (codeError) {
-                        setErrorMessage(
-                          "Errore: codice non valido o scaduto. Riprova oppure richiedi un nuovo codice.",
-                        );
-                        return;
-                      }
+                        const { error: codeError } =
+                          await supabase.auth.verifyOtp({
+                            email,
+                            token: code.trim(),
+                            type: "email",
+                          });
+                        if (codeError) {
+                          setErrorMessage(
+                            "Errore: codice non valido o scaduto. Riprova oppure richiedi un nuovo codice.",
+                          );
+                          return;
+                        }
                       }
                       const { error } = await supabase.functions.invoke(
                         "delete-account",
@@ -438,7 +449,10 @@ function DeleteAccount({
                           "Eliminazione non riuscita. Richiedi un nuovo codice; se sei l’unico amministratore, assegna prima il ruolo a un altro account.";
                         setErrorMessage(message);
                         notify(message);
-                        if (usingLink) { setUsingLink(false); setCodeSent(false); }
+                        if (usingLink) {
+                          setUsingLink(false);
+                          setCodeSent(false);
+                        }
                         return;
                       }
                       await supabase.auth.signOut({ scope: "local" });
