@@ -283,7 +283,14 @@ function DeleteAccount({
 }) {
   const [code, setCode] = useState(""),
     [busy, setBusy] = useState(false),
-    [confirmed, setConfirmed] = useState(false);
+    [confirmed, setConfirmed] = useState(false),
+    [codeSent, setCodeSent] = useState(false),
+    [errorMessage, setErrorMessage] = useState("");
+  useEffect(() => {
+    setCode("");
+    setCodeSent(false);
+    setErrorMessage("");
+  }, [email]);
   return (
     <details className="notice">
       <summary>Elimina account</summary>
@@ -304,6 +311,7 @@ function DeleteAccount({
             <input
               type="checkbox"
               checked={confirmed}
+              disabled={busy}
               onChange={(e) => setConfirmed(e.target.checked)}
             />
             Confermo di voler eliminare il mio account
@@ -312,7 +320,9 @@ function DeleteAccount({
             className="secondary"
             disabled={busy || !confirmed}
             onClick={async () => {
+              if (busy) return;
               setBusy(true);
+              setErrorMessage("");
               try {
                 await result(
                   supabase.auth.signInWithOtp({
@@ -320,73 +330,91 @@ function DeleteAccount({
                     options: {
                       shouldCreateUser: false,
                       emailRedirectTo:
-                        location.origin + import.meta.env.BASE_URL,
+                        location.origin + import.meta.env.BASE_URL + "?delete-account=1",
                     },
                   }),
                 );
+                setCode("");
+                setCodeSent(true);
                 notify(
-                  "Controlla l’email. Inserisci il codice o apri il link, poi torna qui per confermare. Controlla anche le cartelle Spam e Posta indesiderata.",
+                  "Codice inviato via email. Inseriscilo qui per confermare l’eliminazione dell’account. Controlla anche le cartelle Spam e Posta indesiderata.",
                 );
               } catch {
-                notify("Errore nell’invio, riprovare fra qualche minuto.");
+                setErrorMessage("Errore nell’invio, riprovare fra qualche minuto.");
               } finally {
                 setBusy(false);
               }
             }}
           >
-            Invia conferma email
+            {busy ? "Attendi…" : "Invia codice via email"}
           </button>
-          <p className="muted">
-            Se non trovi l’email con il codice, controlla anche le cartelle Spam
-            e Posta indesiderata.
-          </p>
-          <label>
-            Codice email (se presente)
-            <input
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              autoComplete="one-time-code"
-              inputMode="numeric"
-            />
-          </label>
-          <button
-            className="danger"
-            disabled={busy || !confirmed}
-            onClick={async () => {
-              if (!confirm("Eliminare definitivamente account e profilo?"))
-                return;
-              setBusy(true);
-              try {
-                if (code)
-                  await result(
-                    supabase.auth.verifyOtp({
+          {errorMessage && <p className="form-error" role="alert">{errorMessage}</p>}
+          {codeSent && (
+            <>
+              <p className="muted">
+                Abbiamo inviato il codice alla tua email. Se non lo trovi,
+                controlla anche le cartelle Spam e Posta indesiderata.
+              </p>
+              <label>
+                Codice OTP
+                <input
+                  value={code}
+                  onChange={(e) => {
+                    setCode(e.target.value.replace(/[^0-9]/g, ""));
+                    setErrorMessage("");
+                  }}
+                  type="text"
+                  name="delete-account-code"
+                  autoComplete="one-time-code"
+                  inputMode="numeric"
+                  pattern="[0-9]+"
+                  required
+                  disabled={busy}
+                  autoFocus
+                />
+              </label>
+              <button
+                className="danger"
+                disabled={busy || !confirmed || !code.trim()}
+                onClick={async () => {
+                  if (busy || !confirmed || !code.trim()) return;
+                  if (!confirm("Eliminare definitivamente account e profilo?")) return;
+                  setBusy(true);
+                  setErrorMessage("");
+                  try {
+                    const { error: codeError } = await supabase.auth.verifyOtp({
                       email,
-                      token: code,
+                      token: code.trim(),
                       type: "email",
-                    }),
-                  );
-                const { error } = await supabase.functions.invoke(
-                  "delete-account",
-                  { body: { confirm: true } },
-                );
-                if (error) {
-                  notify(
-                    "Eliminazione non riuscita. Verifica l’email negli ultimi 10 minuti e controlla di non essere l’unico amministratore.",
-                  );
-                  return;
-                }
-                await supabase.auth.signOut({ scope: "local" });
-                notify("Account eliminato.");
-                reload();
-              } catch {
-                notify("Conferma non valida o scaduta. Riprova.");
-              } finally {
-                setBusy(false);
-              }
-            }}
-          >
-            {busy ? "Attendi…" : "Ho verificato l’email: elimina account"}
-          </button>
+                    });
+                    if (codeError) {
+                      setErrorMessage("Errore: codice non valido o scaduto. Riprova oppure richiedi un nuovo codice.");
+                      return;
+                    }
+                    const { error } = await supabase.functions.invoke(
+                      "delete-account",
+                      { body: { confirm: true } },
+                    );
+                    if (error) {
+                      setErrorMessage(
+                        "Eliminazione non riuscita. Richiedi un nuovo codice e controlla di non essere l’unico amministratore.",
+                      );
+                      return;
+                    }
+                    await supabase.auth.signOut({ scope: "local" });
+                    notify("Account eliminato. Arrivederci!");
+                    reload();
+                  } catch {
+                    setErrorMessage("Conferma non riuscita. Riprova fra qualche minuto.");
+                  } finally {
+                    setBusy(false);
+                  }
+                }}
+              >
+                {busy ? "Attendi…" : "Conferma eliminazione account"}
+              </button>
+            </>
+          )}
         </>
       )}
     </details>
