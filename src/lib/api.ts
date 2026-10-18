@@ -20,6 +20,8 @@ export async function result<T = any>(
 export function friendly(e: unknown) {
   let m = e instanceof Error ? e.message : String(e);
   for (const [k, v] of Object.entries({
+    SERVICE_REACTIVATION_BLOCKED:
+      "Chiedi al tuo titolare di riattivare il servizio.",
     HIRE_ACCOUNT_UNAVAILABLE:
       "Email e numero di telefono non corrispondono a un account cliente disponibile. Controlla che siano quelli del profilo e che l’account non sia già associato a un barbiere.",
     INVALID_BARBER_NAME:
