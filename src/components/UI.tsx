@@ -29,12 +29,14 @@ export function Modal({
   close,
   wide = false,
   className = "",
+  actions,
 }: {
   title: string;
   children: ReactNode;
   close: () => void;
   wide?: boolean;
   className?: string;
+  actions?: ReactNode;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
@@ -54,7 +56,7 @@ export function Modal({
         if (!wide && e.target === e.currentTarget) close();
       }}
     >
-      <header>
+      <header className={actions ? "has-actions" : undefined}>
         {wide && (
           <button
             type="button"
@@ -66,6 +68,7 @@ export function Modal({
           </button>
         )}
         <h2>{title}</h2>
+        {actions && <div className="screen-header-actions">{actions}</div>}
         {!wide && (
           <button
             type="button"
@@ -114,5 +117,15 @@ export function Field({
         required={required}
       />
     </label>
+  );
+}
+
+export function TrashIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+      aria-hidden="true" focusable="false">
+      <path d="M3 6h18M9 6V4h6v2M5 6l1 14h12l1-14M10 10v6m4-6v6" />
+    </svg>
   );
 }

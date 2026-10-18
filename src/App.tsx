@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { createLatestRequest } from "./lib/latestRequest.mjs";
 import { clearPasswordProof } from "./lib/passwordProof";
 import type { User } from "@supabase/supabase-js";
-import { Empty, Modal } from "./components/UI";
+import { Empty, Modal, TrashIcon } from "./components/UI";
 import PWA from "./components/PWA";
 import Auth, { StaffGate, authorizeStaff } from "./features/Auth";
 import Booking from "./features/Booking";
@@ -59,7 +59,8 @@ export default function App() {
     [loading, setLoading] = useState(true),
     [online, setOnline] = useState(navigator.onLine),
     [reset, setReset] = useState(false),
-    [password, setPassword] = useState("");
+    [password, setPassword] = useState(""),
+    [deletingNotification, setDeletingNotification] = useState<string | null>(null);
   function dismissDeletionLink() {
     setDeletionFromEmail(false);
     const address = new URL(location.href);
@@ -73,12 +74,17 @@ export default function App() {
     }
   }
   const refreshVersion = useRef(0);
+  const notificationRevision = useRef(0);
+  const notificationDeleteInFlight = useRef(false);
+  const notificationAccount = useRef<string | null>(null);
+  notificationAccount.current = user?.id ?? null;
   const keepActiveRequested = useRef(
     new URLSearchParams(location.search).get("keep-active") === "1",
   );
   const notify = useCallback((s: string) => setMessage(s), []);
   const refresh = useCallback(async () => {
     const version = ++refreshVersion.current;
+    const notificationReadRevision = notificationRevision.current;
     try {
       const {
         data: { user: u },
@@ -150,6 +156,7 @@ export default function App() {
               .from("notifications")
               .select("*")
               .eq("user_id", u.id)
+              .is("dismissed_at", null)
               .order("created_at", { ascending: false })
               .limit(100),
           ),
@@ -172,7 +179,7 @@ export default function App() {
         setRole((r as Row).role);
         setVerified(!!v);
         setReviewAllowed(reviewPermission === true);
-        setNotifications(ns as Row[]);
+        if (notificationReadRevision === notificationRevision.current) setNotifications(ns as Row[]);
         setAppointments(ap as Row[]);
         if (ts) {
           const a = await result(
@@ -192,6 +199,8 @@ export default function App() {
         setVerified(false);
         setReviewAllowed(false);
         setNotifications([]);
+        setDeletingNotification(null);
+        notificationRevision.current++;
         setAppointments([]);
       }
     } catch (e) {
@@ -216,6 +225,8 @@ export default function App() {
         setVerified(false);
         setReviewAllowed(false);
         setNotifications([]);
+        setDeletingNotification(null);
+        notificationRevision.current++;
         setAppointments([]);
         setAccepted(true);
         setLoading(false);
@@ -342,17 +353,18 @@ export default function App() {
   }, [section, user?.id, notify]);
   useEffect(() => {
     if (!user) return;
-    const request = createLatestRequest<Row[]>({
-      load: () =>
-        result(
-          supabase
-            .from("notifications")
-            .select("*")
-            .eq("user_id", user.id)
-            .order("created_at", { ascending: false })
-            .limit(100),
-        ),
-      onData: setNotifications,
+    const request = createLatestRequest<{ rows: Row[]; revision: number }>({
+      load: async () => {
+        const revision = notificationRevision.current;
+        const rows = await result<Row[]>(
+          supabase.from("notifications").select("*").eq("user_id", user.id)
+            .is("dismissed_at", null).order("created_at", { ascending: false }).limit(100));
+        return { rows, revision };
+      },
+      onData: ({ rows, revision }) => {
+        if (!notificationDeleteInFlight.current && revision === notificationRevision.current)
+          setNotifications(rows);
+      },
       // Keep existing notifications when temporarily offline; retry on focus/online.
       onError: () => {},
     });
@@ -372,6 +384,28 @@ export default function App() {
       document.removeEventListener("visibilitychange", update);
     };
   }, [user?.id]);
+  async function removeNotification(id?: string) {
+    const owner = user?.id;
+    if (!owner || notificationDeleteInFlight.current) return;
+    if (!id && !confirm("Vuoi cancellare tutte le tue notifiche?")) return;
+    notificationDeleteInFlight.current = true;
+    notificationRevision.current++;
+    setDeletingNotification(id || "all");
+    try {
+      await result(supabase.rpc("dismiss_notifications", { p_id: id || null }));
+      if (notificationAccount.current !== owner) return;
+      notificationRevision.current++;
+      setNotifications((current) => id ? current.filter((item) => item.id !== id) : []);
+      notify(id ? "Notifica cancellata." : "Tutte le notifiche sono state cancellate.");
+      await refresh();
+    } catch (error) {
+      if (notificationAccount.current === owner) notify(friendly(error));
+    } finally {
+      notificationRevision.current++;
+      notificationDeleteInFlight.current = false;
+      if (notificationAccount.current === owner) setDeletingNotification(null);
+    }
+  }
   const staff = user && role !== "client",
     ready = staff && verified,
     canReview = ready && (role === "admin" || reviewAllowed),
@@ -507,6 +541,8 @@ export default function App() {
           reload={refresh}
           notify={notify}
           userId={user!.id}
+          deleting={deletingNotification}
+          onDelete={(id) => { void removeNotification(id); }}
         />
       );
     if (
@@ -794,6 +830,13 @@ export default function App() {
         <Modal
           key={section}
           title={section}
+          actions={section === "Notifiche" && user && (!staff || verified) ? (
+            <button type="button" className="secondary notification-delete-all"
+              aria-label="Cancella tutte le notifiche" disabled={loading || !!deletingNotification || !notifications.length}
+              onClick={() => { void removeNotification(); }}>
+              <TrashIcon /><span>{deletingNotification === "all" ? "Cancello…" : "Cancella tutto"}</span>
+            </button>
+          ) : undefined}
           wide
           close={() => {
             dismissDeletionLink();

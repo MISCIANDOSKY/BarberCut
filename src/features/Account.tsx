@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { clearPasswordProof } from "../lib/passwordProof";
-import { Empty, Field } from "../components/UI";
+import { Empty, Field, TrashIcon } from "../components/UI";
 import { supabase, result, dateLabel, timeLabel, euro } from "../lib/api";
 import type { Row } from "../lib/api";
 import { downloadCalendar } from "./Booking";
@@ -211,11 +211,15 @@ export function Notifications({
   reload,
   notify,
   userId,
+  onDelete,
+  deleting,
 }: {
   rows: Row[];
   reload: () => void;
   notify: (s: string) => void;
   userId: string;
+  onDelete: (id: string) => void;
+  deleting: string | null;
 }) {
   useEffect(() => {
     if (rows.some((n) => !n.read_at))
@@ -241,6 +245,7 @@ export function Notifications({
       {rows.some((n) => !n.read_at) && (
         <button
           className="text"
+          disabled={!!deleting}
           onClick={async () => {
             try {
               await result(
@@ -264,9 +269,16 @@ export function Notifications({
           className={"notification " + (!n.read_at ? "unread" : "")}
           key={n.id}
         >
-          <strong>{n.title}</strong>
-          <p>{n.body}</p>
-          <small>{dateLabel(n.created_at)}</small>
+          <div className="notification-copy">
+            <strong>{n.title}</strong>
+            <p>{n.body}</p>
+            <small>{dateLabel(n.created_at)}</small>
+          </div>
+          <button type="button" className="notification-delete"
+            aria-label={"Cancella notifica: " + n.title} title="Cancella notifica"
+            disabled={!!deleting} onClick={() => onDelete(n.id)}>
+            <TrashIcon />
+          </button>
         </article>
       ))}
     </>
