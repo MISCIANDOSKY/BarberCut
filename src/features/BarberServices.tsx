@@ -34,7 +34,11 @@ export default function BarberServices({
         links
           .map((link) =>
             link.services
-              ? { ...link.services, link_active: link.active !== false, staff_enabled: link.staff_enabled !== false }
+              ? {
+                  ...link.services,
+                  link_active: link.active !== false,
+                  staff_enabled: link.staff_enabled !== false,
+                }
               : null,
           )
           .filter((service) => service && !service.deleted_at)
@@ -58,9 +62,14 @@ export default function BarberServices({
     setManagementLoading(true);
     setManagementError("");
     try {
-      setCollaborators(await result<Row[]>(supabase.rpc("service_collaborators", {
-        p_source: barberId, p_service: service.id,
-      })));
+      setCollaborators(
+        await result<Row[]>(
+          supabase.rpc("service_collaborators", {
+            p_source: barberId,
+            p_service: service.id,
+          }),
+        ),
+      );
     } catch (error) {
       setManagementError(friendly(error));
     } finally {
@@ -126,7 +135,7 @@ export default function BarberServices({
                     ? " · Disattivato dal titolare"
                     : !service.link_active
                       ? " · Disattivato per te"
-                    : ""}
+                      : ""}
               </small>
               {service.description && <small>{service.description}</small>}
             </span>
@@ -169,7 +178,9 @@ export default function BarberServices({
                   }
                 }}
               >
-                {service.active && service.staff_enabled && service.link_active ? "Disattiva per me" : "Riattiva per me"}
+                {service.active && service.staff_enabled && service.link_active
+                  ? "Disattiva per me"
+                  : "Riattiva per me"}
               </button>
               {canEdit && (
                 <>
@@ -230,45 +241,77 @@ export default function BarberServices({
         ))
       )}
       {canEdit && managing && (
-        <Modal wide title="Gestisci per collaboratori" close={() => { if (!busy) setManaging(null); }}>
+        <Modal
+          wide
+          title="Gestisci per collaboratori"
+          close={() => {
+            if (!busy) setManaging(null);
+          }}
+        >
           <h3>{managing.name}</h3>
           <p className="muted">
             Spunta un collaboratore per abilitare il servizio nella sua agenda.
-            Togli la spunta per impedirgli di offrirlo: potrà riattivarlo soltanto il titolare.
-            Le modifiche vengono salvate subito.
+            Togli la spunta per impedirgli di offrirlo: potrà riattivarlo
+            soltanto il titolare. Le modifiche vengono salvate subito.
           </p>
-          {!managing.active && <p className="notice">Il servizio è disattivato globalmente dall’admin e resta indisponibile anche per i collaboratori selezionati.</p>}
-          {managementError && <p className="form-error" role="alert">{managementError}</p>}
-          {managementLoading ? <p role="status">Caricamento collaboratori…</p> :
-            !collaborators.length && !managementError ? <Empty>Non ci sono altri collaboratori attivi.</Empty> :
+          {!managing.active && (
+            <p className="notice">
+              Il servizio è disattivato globalmente dall’admin e resta
+              indisponibile anche per i collaboratori selezionati.
+            </p>
+          )}
+          {managementError && (
+            <p className="form-error" role="alert">
+              {managementError}
+            </p>
+          )}
+          {managementLoading ? (
+            <p role="status">Caricamento collaboratori…</p>
+          ) : !collaborators.length && !managementError ? (
+            <Empty>Non ci sono altri collaboratori attivi.</Empty>
+          ) : (
             collaborators.map((collaborator) => (
               <label className="check" key={collaborator.barber_id}>
-                <input type="checkbox" checked={collaborator.enabled} disabled={busy}
+                <input
+                  type="checkbox"
+                  checked={collaborator.enabled}
+                  disabled={busy}
                   onChange={async (event) => {
                     const enabled = event.currentTarget.checked;
                     setBusy(true);
                     setManagementError("");
                     try {
-                      await result(supabase.rpc("set_collaborator_service", {
-                        p_source: barberId, p_service: managing.id,
-                        p_barber: collaborator.barber_id, p_enabled: enabled,
-                      }));
+                      await result(
+                        supabase.rpc("set_collaborator_service", {
+                          p_source: barberId,
+                          p_service: managing.id,
+                          p_barber: collaborator.barber_id,
+                          p_enabled: enabled,
+                        }),
+                      );
                       await loadCollaborators(managing);
                       refresh();
-                      notify(enabled ? "Servizio abilitato per il collaboratore." : "Servizio disattivato per il collaboratore.");
+                      notify(
+                        enabled
+                          ? "Servizio abilitato per il collaboratore."
+                          : "Servizio disattivato per il collaboratore.",
+                      );
                     } catch (error) {
                       setManagementError(friendly(error));
                     } finally {
                       setBusy(false);
                     }
-                  }} />
-                <span>{collaborator.barber_name}
-                  {collaborator.enabled && !collaborator.personally_active &&
-                    <small>Disattivato personalmente dal collaboratore</small>}
+                  }}
+                />
+                <span>
+                  {collaborator.barber_name}
+                  {collaborator.enabled && !collaborator.personally_active && (
+                    <small>Disattivato personalmente dal collaboratore</small>
+                  )}
                 </span>
               </label>
             ))
-          }
+          )}
         </Modal>
       )}
       {canEdit && editing && (
