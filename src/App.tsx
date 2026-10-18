@@ -398,9 +398,9 @@ export default function App() {
           reload={refresh}
           deletionEnabled={!!settings.account_deletion_enabled}
           hiringEditor={
-            ready && role === "barber_admin" && canReview && (
-              <HireBarber refresh={refresh} notify={notify} />
-            )
+            ready &&
+            role === "barber_admin" &&
+            canReview && <HireBarber refresh={refresh} notify={notify} />
           }
           registrationEditor={
             canReview &&

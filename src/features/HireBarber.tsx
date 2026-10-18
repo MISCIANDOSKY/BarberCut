@@ -2,7 +2,10 @@ import { useState } from "react";
 import { Modal } from "../components/UI";
 import { supabase, result, friendly } from "../lib/api";
 
-export default function HireBarber({ refresh, notify }: {
+export default function HireBarber({
+  refresh,
+  notify,
+}: {
   refresh: () => void;
   notify: (message: string) => void;
 }) {
@@ -23,73 +26,111 @@ export default function HireBarber({ refresh, notify }: {
   }
   return (
     <>
-      <button type="button" className="secondary" onClick={() => {
-        reset();
-        setOpen(true);
-      }}>Assumi Barbiere</button>
+      <button
+        type="button"
+        className="secondary"
+        onClick={() => {
+          reset();
+          setOpen(true);
+        }}
+      >
+        Assumi Barbiere
+      </button>
       {open && (
-        <Modal title="Assumi Barbiere" close={() => {
-          if (!busy) setOpen(false);
-        }}>
+        <Modal
+          title="Assumi Barbiere"
+          close={() => {
+            if (!busy) setOpen(false);
+          }}
+        >
           <p>
             Prima di procedere, assicurati che il nuovo collaboratore sia già
             registrato a BarberCut come cliente. Inserisci l’email e il numero
             di telefono presenti nel suo profilo.
           </p>
-          <form onSubmit={async (event) => {
-            event.preventDefault();
-            if (busy) return;
-            setBusy(true);
-            setError("");
-            try {
-              if (!matched) {
-                await result(supabase.rpc("check_barber_hire_candidate", {
-                  p_email: email.trim(),
-                  p_phone: phone.trim(),
-                }));
-                setMatched(true);
-              } else {
-                await result(supabase.rpc("hire_barber", {
-                  p_email: email.trim(),
-                  p_phone: phone.trim(),
-                  p_name: name.trim(),
-                }));
-                setOpen(false);
-                reset();
-                notify("Barbiere aggiunto. Il ruolo Barbiere e i servizi sono stati assegnati automaticamente.");
-                refresh();
+          <form
+            onSubmit={async (event) => {
+              event.preventDefault();
+              if (busy) return;
+              setBusy(true);
+              setError("");
+              try {
+                if (!matched) {
+                  await result(
+                    supabase.rpc("check_barber_hire_candidate", {
+                      p_email: email.trim(),
+                      p_phone: phone.trim(),
+                    }),
+                  );
+                  setMatched(true);
+                } else {
+                  await result(
+                    supabase.rpc("hire_barber", {
+                      p_email: email.trim(),
+                      p_phone: phone.trim(),
+                      p_name: name.trim(),
+                    }),
+                  );
+                  setOpen(false);
+                  reset();
+                  notify(
+                    "Barbiere aggiunto. Il ruolo Barbiere e i servizi sono stati assegnati automaticamente.",
+                  );
+                  refresh();
+                }
+              } catch (err) {
+                setError(friendly(err));
+                if (matched) setMatched(false);
+              } finally {
+                setBusy(false);
               }
-            } catch (err) {
-              setError(friendly(err));
-              if (matched) setMatched(false);
-            } finally {
-              setBusy(false);
-            }
-          }}>
+            }}
+          >
             <label>
               Email del collaboratore
-              <input type="email" autoComplete="off" required maxLength={320}
-                value={email} disabled={busy || matched}
-                onChange={(event) => { setEmail(event.target.value); setError(""); }}
+              <input
+                type="email"
+                autoComplete="off"
+                required
+                maxLength={320}
+                value={email}
+                disabled={busy || matched}
+                onChange={(event) => {
+                  setEmail(event.target.value);
+                  setError("");
+                }}
               />
             </label>
             <label>
               Numero di telefono
-              <input type="tel" autoComplete="off" required maxLength={40}
-                value={phone} disabled={busy || matched}
-                onChange={(event) => { setPhone(event.target.value); setError(""); }}
+              <input
+                type="tel"
+                autoComplete="off"
+                required
+                maxLength={40}
+                value={phone}
+                disabled={busy || matched}
+                onChange={(event) => {
+                  setPhone(event.target.value);
+                  setError("");
+                }}
               />
             </label>
             {matched && (
               <>
                 <p className="notice">
-                  Email e telefono corrispondono allo stesso account disponibile.
-                  Ora scegli il nome da mostrare in agenda.
+                  Email e telefono corrispondono allo stesso account
+                  disponibile. Ora scegli il nome da mostrare in agenda.
                 </p>
                 <label>
                   Nome da mostrare in agenda
-                  <input required maxLength={160} autoFocus value={name}
-                    disabled={busy} onChange={(event) => setName(event.target.value)}
+                  <input
+                    required
+                    maxLength={160}
+                    autoFocus
+                    value={name}
+                    disabled={busy}
+                    onChange={(event) => setName(event.target.value)}
                   />
                 </label>
                 <p className="muted">
@@ -100,14 +141,34 @@ export default function HireBarber({ refresh, notify }: {
                 </p>
               </>
             )}
-            {error && <p className="form-error" role="alert">{error}</p>}
-            <button className="primary" disabled={busy || (matched && !name.trim())}>
-              {busy ? "Attendi…" : matched ? "Conferma assunzione" : "Verifica email e telefono"}
+            {error && (
+              <p className="form-error" role="alert">
+                {error}
+              </p>
+            )}
+            <button
+              className="primary"
+              disabled={busy || (matched && !name.trim())}
+            >
+              {busy
+                ? "Attendi…"
+                : matched
+                  ? "Conferma assunzione"
+                  : "Verifica email e telefono"}
             </button>
             {matched && (
-              <button type="button" className="text" disabled={busy} onClick={() => {
-                setMatched(false); setName(""); setError("");
-              }}>Modifica email o telefono</button>
+              <button
+                type="button"
+                className="text"
+                disabled={busy}
+                onClick={() => {
+                  setMatched(false);
+                  setName("");
+                  setError("");
+                }}
+              >
+                Modifica email o telefono
+              </button>
             )}
           </form>
         </Modal>
