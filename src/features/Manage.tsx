@@ -57,6 +57,7 @@ export default function Manage({
     [exceptionClosed, setExceptionClosed] = useState(false),
     [exceptions, setExceptions] = useState<Row[]>([]),
     [busy, setBusy] = useState(false);
+  const [now, setNow] = useState(Date.now);
   const b = scopedBarbers.some((item) => item.id === selectedBarber)
     ? selectedBarber
     : scopedBarbers[0]?.id || "";
@@ -115,6 +116,21 @@ export default function Manage({
     load();
   }, [b, day, section]);
   useEffect(() => {
+    if (section !== "Appuntamenti") return;
+    const updateTime = () => {
+      if (!document.hidden) setNow(Date.now());
+    };
+    updateTime();
+    const timer = window.setInterval(updateTime, 30000);
+    window.addEventListener("focus", updateTime);
+    document.addEventListener("visibilitychange", updateTime);
+    return () => {
+      window.clearInterval(timer);
+      window.removeEventListener("focus", updateTime);
+      document.removeEventListener("visibilitychange", updateTime);
+    };
+  }, [section]);
+  useEffect(() => {
     setClosed(!hours.some((h) => h.weekday === weekday));
   }, [b, weekday, hours]);
   async function save(table: string, obj: Row) {
@@ -168,7 +184,17 @@ export default function Manage({
           <div className="agenda">
             {rows.map((e) => (
               <button
-                className="agenda-row"
+                className={
+                  "agenda-row" +
+                  (e.kind === "appointment" && new Date(e.end_at).getTime() <= now
+                    ? " is-past"
+                    : "")
+                }
+                title={
+                  e.kind === "appointment" && new Date(e.end_at).getTime() <= now
+                    ? "Appuntamento concluso · Apri tutti i dettagli"
+                    : "Apri tutti i dettagli"
+                }
                 key={e.id}
                 onClick={() => setDetail(e)}
               >

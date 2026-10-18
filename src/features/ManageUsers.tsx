@@ -3,7 +3,7 @@ import { Empty } from "../components/UI";
 import { supabase, result, friendly } from "../lib/api";
 import type { Row } from "../lib/api";
 
-export default function ManageUsers() {
+export default function ManageUsers({ isAdmin = false }: { isAdmin?: boolean }) {
   const [status, setStatus] = useState("pending");
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
@@ -72,8 +72,8 @@ export default function ManageUsers() {
     <>
       <p className="muted">
         Approva o rifiuta le richieste di iscrizione alla barberia. I clienti
-        approvati possono prenotare; la gestione dei ruoli rimane riservata
-        all’admin.
+        approvati possono prenotare.
+        {isAdmin && " La gestione dei ruoli rimane riservata all’admin."}
       </p>
       <div
         className="registration-tabs"

@@ -1471,3 +1471,11 @@ dialog h2,
 .account-deletion {
   scroll-margin-top: calc(100px + env(safe-area-inset-top));
 }
+
+/* Keep completed bookings readable and interactive. */
+.agenda-row.is-past > strong,
+.agenda-row.is-past > span:nth-child(2) {
+  text-decoration-line: line-through;
+  text-decoration-thickness: 1px;
+  text-decoration-color: currentColor;
+}

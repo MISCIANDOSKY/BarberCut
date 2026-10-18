@@ -410,7 +410,7 @@ export default function App() {
           ))}
         </nav>
       );
-    if (section === "Gestisci utenti" && canReview) return <ManageUsers />;
+    if (section === "Gestisci utenti" && canReview) return <ManageUsers isAdmin={role === "admin"} />;
     if (section === "Informazioni") return <Information />;
     if (
       section === "Assumi Barbiere" &&
