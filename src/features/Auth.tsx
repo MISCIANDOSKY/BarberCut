@@ -93,7 +93,9 @@ export default function Auth({
         await result(
           supabase.auth.resetPasswordForEmail(email, { redirectTo: redirect }),
         );
-        notify("Se l’email è registrata, riceverai le istruzioni. Controlla anche le cartelle Spam e Posta indesiderata.");
+        notify(
+          "Se l’email è registrata, riceverai le istruzioni. Controlla anche le cartelle Spam e Posta indesiderata.",
+        );
         close();
       } else if (mode === "register") {
         if (terms && !accepted) throw new Error("TERMS_REQUIRED");
@@ -159,8 +161,8 @@ export default function Auth({
       >
         <p>
           Inserisci il codice ricevuto via email, oppure usa il link di conferma
-          presente nel messaggio. Se non trovi l’email, controlla anche le cartelle
-          Spam e Posta indesiderata.
+          presente nel messaggio. Se non trovi l’email, controlla anche le
+          cartelle Spam e Posta indesiderata.
         </p>
         {errorMessage && (
           <p className="form-error" role="alert">
@@ -507,7 +509,10 @@ export function StaffGate({
     <section className="panel">
       <span className="eyebrow">ACCESSO RISERVATO</span>
       <h2>Un ultimo passaggio.</h2>
-      <p>Per proteggere l’agenda, conferma l’accesso tramite la tua email. Se non trovi l’email, controlla anche le cartelle Spam e Posta indesiderata.</p>
+      <p>
+        Per proteggere l’agenda, conferma l’accesso tramite la tua email. Se non
+        trovi l’email, controlla anche le cartelle Spam e Posta indesiderata.
+      </p>
       <button className="primary" onClick={send} disabled={busy}>
         {busy ? "Attendi…" : sent ? "Invia di nuovo" : "Invia verifica email"}
       </button>
@@ -543,8 +548,8 @@ export function StaffGate({
           </button>
           <p className="muted">
             Inserisci il codice scritto nell’email. Se preferisci usare il link,
-            aprilo nello stesso browser. Se non trovi l’email, controlla anche le
-            cartelle Spam e Posta indesiderata.
+            aprilo nello stesso browser. Se non trovi l’email, controlla anche
+            le cartelle Spam e Posta indesiderata.
           </p>
         </form>
       )}
