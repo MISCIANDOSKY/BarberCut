@@ -266,7 +266,8 @@ export default function App() {
       if (document.hidden) return;
       const version = ++request;
       const { data, error } = await supabase.rpc("can_review_registrations");
-      if (!stopped && version === request) setReviewAllowed(!error && data === true);
+      if (!stopped && version === request)
+        setReviewAllowed(!error && data === true);
     };
     void check();
     const timer = window.setInterval(check, 30000);
@@ -374,9 +375,16 @@ export default function App() {
   const staff = user && role !== "client",
     ready = staff && verified,
     canReview = ready && (role === "admin" || reviewAllowed),
-    canConfigureShop = ready && (role === "admin" ||
-      (role === "barber_admin" && barbers.some((barber) =>
-        barber.user_id === user!.id && barber.active && !barber.deleted_at)));
+    canConfigureShop =
+      ready &&
+      (role === "admin" ||
+        (role === "barber_admin" &&
+          barbers.some(
+            (barber) =>
+              barber.user_id === user!.id &&
+              barber.active &&
+              !barber.deleted_at,
+          )));
   const clientChoices = [
     ["▦", "Prenota", "Trova il tuo prossimo momento"],
     ["✂", "Servizi e prezzi", "Scegli il tuo stile"],
@@ -434,8 +442,14 @@ export default function App() {
         </nav>
       );
     if (section === "Gestisci utenti")
-      return canReview ? <ManageUsers isAdmin={role === "admin"} /> :
-        <Empty>Non sei abilitato ad approvare i nuovi utenti. Rivolgiti al tuo titolare.</Empty>;
+      return canReview ? (
+        <ManageUsers isAdmin={role === "admin"} />
+      ) : (
+        <Empty>
+          Non sei abilitato ad approvare i nuovi utenti. Rivolgiti al tuo
+          titolare.
+        </Empty>
+      );
     if (section === "Informazioni") return <Information />;
     if (
       section === "Assumi Barbiere" &&
@@ -464,7 +478,8 @@ export default function App() {
           }
           addressEditor={
             ready &&
-            (role === "admin" || (role === "barber_admin" && canConfigureShop)) && (
+            (role === "admin" ||
+              (role === "barber_admin" && canConfigureShop)) && (
               <BarberAddress
                 address={settings.shop_address || ""}
                 revision={settings.address_revision || 0}

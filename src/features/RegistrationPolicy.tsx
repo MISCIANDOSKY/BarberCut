@@ -65,14 +65,26 @@ export default function RegistrationPolicy({
       </form>
       {value && (
         <>
-          <button className="secondary" disabled={busy || value !== required}
-            onClick={() => setManaging(true)}>
+          <button
+            className="secondary"
+            disabled={busy || value !== required}
+            onClick={() => setManaging(true)}
+          >
             Gestisci chi può approvare i nuovi utenti
           </button>
-          {value !== required && <p className="muted">Salva la modalità di iscrizione per gestire i permessi.</p>}
+          {value !== required && (
+            <p className="muted">
+              Salva la modalità di iscrizione per gestire i permessi.
+            </p>
+          )}
         </>
       )}
-      {managing && value && required && <RegistrationApprovers close={() => setManaging(false)} refresh={refresh} />}
+      {managing && value && required && (
+        <RegistrationApprovers
+          close={() => setManaging(false)}
+          refresh={refresh}
+        />
+      )}
       {message && (
         <p className="notice" role="status">
           {message}
