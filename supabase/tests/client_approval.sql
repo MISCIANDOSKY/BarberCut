@@ -9,7 +9,7 @@ begin
  (r,'approval-reject@example.invalid',now(),'{}'),(u,'approval-unverified@example.invalid',null,'{}');
  update public.user_roles set role='admin' where user_id=ad;
  update public.user_roles set role='barber' where user_id=orphan;
- insert into public.barbers(name,user_id) values('Approval test barber',ba) returning id into barber_id;
+ insert into public.barbers(name,user_id,can_approve_clients) values('Approval test barber',ba,true) returning id into barber_id;
  insert into public.services(name,duration_minutes,price) values('Approval test service',30,10) returning id into svc;
  if(select status from private.client_memberships where user_id=c)<>'pending' then raise exception 'new client not pending';end if;
  begin insert into public.calendar_entries(barber_id,kind,service_id,client_id,start_at,end_at,service_name,price) values(barber_id,'appointment',svc,c,now()+interval '2 days',now()+interval '2 days 30 minutes','Test',10);raise exception 'pending client booking allowed';exception when raise_exception then if sqlerrm<>'USER_APPROVAL_REQUIRED' then raise;end if;end;

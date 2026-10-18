@@ -1472,10 +1472,22 @@ dialog h2,
   scroll-margin-top: calc(100px + env(safe-area-inset-top));
 }
 
-/* Keep completed bookings readable and interactive. */
+/* One continuous line marks a finished booking without hiding its data. */
+.agenda-row.is-past {
+  position: relative;
+  color: #a9afa8;
+}
 .agenda-row.is-past > strong,
-.agenda-row.is-past > span:nth-child(2) {
-  text-decoration-line: line-through;
-  text-decoration-thickness: 1px;
-  text-decoration-color: currentColor;
+.agenda-row.is-past small {
+  color: #a9afa8;
+}
+.agenda-row.is-past::after {
+  content: "";
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  top: 50%;
+  height: 1px;
+  background: #a9afa8;
+  pointer-events: none;
 }

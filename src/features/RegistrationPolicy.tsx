@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase, result, friendly } from "../lib/api";
+import RegistrationApprovers from "./RegistrationApprovers";
 
 export default function RegistrationPolicy({
   required,
@@ -12,8 +13,10 @@ export default function RegistrationPolicy({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [managing, setManaging] = useState(false);
   useEffect(() => {
     setValue(required);
+    if (!required) setManaging(false);
   }, [required]);
   return (
     <section className="shop-address-editor content-stack">
@@ -60,6 +63,16 @@ export default function RegistrationPolicy({
           {busy ? "Salvataggio…" : "Salva modalità di iscrizione"}
         </button>
       </form>
+      {value && (
+        <>
+          <button className="secondary" disabled={busy || value !== required}
+            onClick={() => setManaging(true)}>
+            Gestisci chi può approvare i nuovi utenti
+          </button>
+          {value !== required && <p className="muted">Salva la modalità di iscrizione per gestire i permessi.</p>}
+        </>
+      )}
+      {managing && value && required && <RegistrationApprovers close={() => setManaging(false)} refresh={refresh} />}
       {message && (
         <p className="notice" role="status">
           {message}

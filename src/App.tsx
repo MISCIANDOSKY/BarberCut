@@ -24,6 +24,7 @@ export default function App() {
     [role, setRole] = useState("client"),
     [membership, setMembership] = useState("approved"),
     [verified, setVerified] = useState(false),
+    [reviewAllowed, setReviewAllowed] = useState(false),
     [settings, setSettings] = useState<Row>({
       shop_name: "BarberCut",
       accent: "#c6a66b",
@@ -134,7 +135,7 @@ export default function App() {
             "Il tuo account è attivo. Il conteggio dell’inattività è ripartito da oggi.",
           );
         }
-        const [p, r, v, ns, ap, member] = await Promise.all([
+        const [p, r, v, ns, ap, member, reviewPermission] = await Promise.all([
           result(supabase.from("profiles").select("*").eq("id", u.id).single()),
           result(
             supabase
@@ -163,12 +164,14 @@ export default function App() {
               .order("start_at"),
           ),
           result(supabase.rpc("membership_status")),
+          result(supabase.rpc("can_review_registrations")),
         ]);
         if (version !== refreshVersion.current) return;
         setMembership(String(member));
         setProfile(p as Row);
         setRole((r as Row).role);
         setVerified(!!v);
+        setReviewAllowed(reviewPermission === true);
         setNotifications(ns as Row[]);
         setAppointments(ap as Row[]);
         if (ts) {
@@ -187,6 +190,7 @@ export default function App() {
         setRole("client");
         setMembership("approved");
         setVerified(false);
+        setReviewAllowed(false);
         setNotifications([]);
         setAppointments([]);
       }
@@ -210,6 +214,7 @@ export default function App() {
         setRole("client");
         setMembership("approved");
         setVerified(false);
+        setReviewAllowed(false);
         setNotifications([]);
         setAppointments([]);
         setAccepted(true);
@@ -253,6 +258,27 @@ export default function App() {
       document.removeEventListener("visibilitychange", record);
     };
   }, [user?.id]);
+  useEffect(() => {
+    if (!user || role === "client" || !verified) return;
+    let stopped = false;
+    let request = 0;
+    const check = async () => {
+      if (document.hidden) return;
+      const version = ++request;
+      const { data, error } = await supabase.rpc("can_review_registrations");
+      if (!stopped && version === request) setReviewAllowed(!error && data === true);
+    };
+    void check();
+    const timer = window.setInterval(check, 30000);
+    window.addEventListener("focus", check);
+    document.addEventListener("visibilitychange", check);
+    return () => {
+      stopped = true;
+      window.clearInterval(timer);
+      window.removeEventListener("focus", check);
+      document.removeEventListener("visibilitychange", check);
+    };
+  }, [user?.id, role, verified]);
   useEffect(() => {
     if (!user || role !== "client" || membership !== "pending") return;
     const check = async () => {
@@ -347,13 +373,10 @@ export default function App() {
   }, [user?.id]);
   const staff = user && role !== "client",
     ready = staff && verified,
-    canReview =
-      ready &&
-      (role === "admin" ||
-        barbers.some(
-          (barber) =>
-            barber.user_id === user!.id && barber.active && !barber.deleted_at,
-        ));
+    canReview = ready && (role === "admin" || reviewAllowed),
+    canConfigureShop = ready && (role === "admin" ||
+      (role === "barber_admin" && barbers.some((barber) =>
+        barber.user_id === user!.id && barber.active && !barber.deleted_at)));
   const clientChoices = [
     ["▦", "Prenota", "Trova il tuo prossimo momento"],
     ["✂", "Servizi e prezzi", "Scegli il tuo stile"],
@@ -383,7 +406,7 @@ export default function App() {
             ? [["✓", "Gestisci utenti", "Approva le nuove iscrizioni"]]
             : []),
           ["♧", "Notifiche", "Tutte le novità"],
-          ...(role === "barber_admin" && canReview
+          ...(role === "barber_admin" && canConfigureShop
             ? [["＋", "Assumi Barbiere", "Aggiungi un collaboratore"]]
             : []),
           ["◉", "Profilo", "Il tuo account"],
@@ -410,14 +433,15 @@ export default function App() {
           ))}
         </nav>
       );
-    if (section === "Gestisci utenti" && canReview)
-      return <ManageUsers isAdmin={role === "admin"} />;
+    if (section === "Gestisci utenti")
+      return canReview ? <ManageUsers isAdmin={role === "admin"} /> :
+        <Empty>Non sei abilitato ad approvare i nuovi utenti. Rivolgiti al tuo titolare.</Empty>;
     if (section === "Informazioni") return <Information />;
     if (
       section === "Assumi Barbiere" &&
       ready &&
       role === "barber_admin" &&
-      canReview
+      canConfigureShop
     )
       return <HireBarber refresh={refresh} notify={notify} />;
     if (section === "Profilo")
@@ -430,7 +454,7 @@ export default function App() {
           deletionEnabled={!!settings.account_deletion_enabled}
           deletionFromEmail={deletionFromEmail}
           registrationEditor={
-            canReview &&
+            canConfigureShop &&
             role === "barber_admin" && (
               <RegistrationPolicy
                 required={settings.require_user_approval !== false}
@@ -440,7 +464,7 @@ export default function App() {
           }
           addressEditor={
             ready &&
-            (role === "admin" || (role === "barber_admin" && canReview)) && (
+            (role === "admin" || (role === "barber_admin" && canConfigureShop)) && (
               <BarberAddress
                 address={settings.shop_address || ""}
                 revision={settings.address_revision || 0}

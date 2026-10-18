@@ -11,7 +11,7 @@ begin
  (rejected_user,'review-name-rejected@example.invalid',now(),'{"first_name":"Rejected","last_name":"Client"}'),
  (pending_user,'review-name-pending@example.invalid',now(),'{"first_name":"Pending","last_name":"Client"}');
  update public.user_roles set role='admin' where user_id=ad;
- insert into public.barbers(name,user_id) values('Review name barber',barber_user) returning id into agenda;
+ insert into public.barbers(name,user_id,can_approve_clients) values('Review name barber',barber_user,true) returning id into agenda;
  perform public.staff_authorize_session(ad,'review-name-admin');
  perform public.staff_authorize_session(barber_user,'review-name-barber');
  perform set_config('request.jwt.claims',jsonb_build_object('sub',ad,'role','authenticated','session_id','review-name-admin')::text,true);
