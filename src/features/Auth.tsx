@@ -506,7 +506,7 @@ export function StaffGate({
     }
   }
   return (
-    <section className="panel">
+    <section className="panel content-stack">
       <span className="eyebrow">ACCESSO RISERVATO</span>
       <h2>Un ultimo passaggio.</h2>
       <p>

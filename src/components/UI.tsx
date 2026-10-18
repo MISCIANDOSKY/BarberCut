@@ -19,7 +19,7 @@ export function Panel({
         )}
         <h2>{title}</h2>
       </header>
-      {children}
+      <div className="content-stack">{children}</div>
     </section>
   );
 }
@@ -77,7 +77,11 @@ export function Modal({
           </button>
         )}
       </header>
-      {wide ? <div className="feature-content">{children}</div> : children}
+      {wide ? (
+        <div className="feature-content content-stack">{children}</div>
+      ) : (
+        <div className="dialog-content content-stack">{children}</div>
+      )}
     </dialog>
   );
 }

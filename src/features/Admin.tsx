@@ -419,7 +419,7 @@ export default function Admin({
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "stretch",
-                    gap: ".25rem",
+                    gap: ".75rem",
                   }}
                 >
                   <button

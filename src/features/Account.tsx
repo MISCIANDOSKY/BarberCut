@@ -156,7 +156,7 @@ export function Profile({
           {busy ? "Salvataggio…" : "Salva profilo"}
         </button>
       </form>
-      <div style={{ marginTop: ".75rem", marginBottom: ".75rem" }}>
+      <div>
         <button
           type="button"
           className="secondary"
@@ -297,6 +297,7 @@ function DeleteAccount({
   return (
     <details className="notice">
       <summary>Elimina account</summary>
+      <div className="content-stack">
       {!enabled ? (
         <p>
           La cancellazione definitiva non è ancora attivata dal titolare, che
@@ -435,6 +436,7 @@ function DeleteAccount({
           )}
         </>
       )}
+      </div>
     </details>
   );
 }

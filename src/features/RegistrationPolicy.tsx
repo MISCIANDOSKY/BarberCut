@@ -16,7 +16,7 @@ export default function RegistrationPolicy({
     setValue(required);
   }, [required]);
   return (
-    <section className="shop-address-editor">
+    <section className="shop-address-editor content-stack">
       <h3>Iscrizione nuovi clienti</h3>
       <p className="muted">
         Scegli come accogliere i nuovi iscritti. La scelta vale per tutta la

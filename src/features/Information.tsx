@@ -43,7 +43,7 @@ export default function Information() {
   return (
     <>
       <h3>{data.shop_name}</h3>
-      <section className="shop-address">
+      <section className="shop-address content-stack">
         <h3>Dove siamo</h3>
         {data.address ? (
           <>
@@ -79,7 +79,7 @@ export default function Information() {
           ...new Set<string>(barber.exceptions.map((item: Row) => item.day)),
         ];
         return (
-          <section key={barber.id} className="shop-hours">
+          <section key={barber.id} className="shop-hours content-stack">
             <h3>{barber.name}</h3>
             {barber.hours.length ? (
               <dl>

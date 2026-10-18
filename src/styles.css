@@ -474,7 +474,7 @@ input[type="checkbox"] {
 .check {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 10px;
   min-height: 44px;
 }
@@ -1376,4 +1376,94 @@ textarea {
 .booking-date-control input[type="date"]::-webkit-datetime-edit {
   min-width: 0;
   padding: 0;
+}
+
+/* Shared vertical rhythm keeps focus outlines clear of the next control. */
+.content-stack {
+  display: grid;
+  gap: 18px;
+  align-content: start;
+  min-width: 0;
+}
+.content-stack > *,
+form > * {
+  min-width: 0;
+}
+.content-stack > *,
+form > p,
+form > h3,
+form > .notice {
+  margin-block: 0;
+}
+details.notice > .content-stack {
+  margin-top: 16px;
+}
+details.notice > summary {
+  cursor: pointer;
+}
+div.notice {
+  display: grid;
+  gap: 16px;
+}
+div.notice > * {
+  margin-block: 0;
+}
+.check > input[type="checkbox"] {
+  flex: 0 0 18px;
+  height: 18px;
+  margin: 0;
+}
+label,
+dialog h2,
+.panel-heading h2 {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.primary,
+.secondary,
+.danger {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.4;
+}
+.table-row {
+  flex-wrap: wrap;
+}
+.table-row > span:first-child {
+  flex: 1 1 160px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.table-row > div:last-child {
+  max-width: 100%;
+}
+.table-row select {
+  max-width: 100%;
+}
+.agenda-row > strong,
+.agenda-row > span:last-child {
+  flex-shrink: 0;
+}
+.agenda-row > span:nth-child(2) {
+  overflow-wrap: anywhere;
+}
+@media (max-width: 380px) {
+  .service {
+    flex-wrap: wrap;
+    row-gap: 12px;
+  }
+  .service > span:first-child {
+    flex: 1 1 140px;
+  }
+  .service-price-info {
+    margin-left: auto;
+  }
+}
+
+.auth-links {
+  gap: 12px;
+}
+.registration-actions {
+  gap: 12px;
 }

@@ -66,7 +66,7 @@ export default function Maintenance({
     }
   }
   return (
-    <section>
+    <section className="content-stack">
       <h3>Manutenzione automatica giornaliera</h3>
       <p className="muted">
         Le operazioni attive vengono eseguite automaticamente ogni giorno. Puoi
@@ -181,6 +181,7 @@ export default function Maintenance({
           <summary>
             Account disattivati automaticamente ({status.disabled_count})
           </summary>
+          <div className="content-stack">
           <p className="muted">
             Puoi riattivare un account. La sua soglia di inattività ripartirà da
             oggi. Sono mostrati gli ultimi 100 account disattivati.
@@ -221,6 +222,7 @@ export default function Maintenance({
               </button>
             </div>
           ))}
+          </div>
         </details>
       )}
     </section>

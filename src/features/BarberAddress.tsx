@@ -70,7 +70,7 @@ export default function BarberAddress({
     }
   }
   return (
-    <section className="shop-address-editor">
+    <section className="shop-address-editor content-stack">
       <h3>Indirizzo della barberia</h3>
       <p className="muted">
         L’indirizzo è condiviso con i clienti nella sezione Informazioni. Dopo

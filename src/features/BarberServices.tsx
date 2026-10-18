@@ -113,7 +113,7 @@ export default function BarberServices({
               style={{
                 display: "flex",
                 flexDirection: "column",
-                gap: ".25rem",
+                gap: ".75rem",
               }}
             >
               <button
