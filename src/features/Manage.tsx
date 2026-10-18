@@ -200,7 +200,10 @@ export default function Manage({
                     : "Apri tutti i dettagli"
                 }
                 key={e.id}
-                onClick={() => { setMoving(false); setDetail(e); }}
+                onClick={() => {
+                  setMoving(false);
+                  setDetail(e);
+                }}
               >
                 <strong>{timeLabel(e.start_at)}</strong>
                 <span>
@@ -604,12 +607,18 @@ export default function Manage({
             </a>
           )}
           {detail.kind === "appointment" && (
-            <button className="secondary" disabled={busy} onClick={() => setMoving(true)}>
+            <button
+              className="secondary"
+              disabled={busy}
+              onClick={() => setMoving(true)}
+            >
               Sposta appuntamento
             </button>
           )}
           {detail.kind === "appointment" && moving && (
-            <RescheduleAppointment appointment={detail} close={() => setMoving(false)}
+            <RescheduleAppointment
+              appointment={detail}
+              close={() => setMoving(false)}
               onSaved={(start) => {
                 const nextDay = romeDay(new Date(start));
                 setMoving(false);
@@ -617,7 +626,8 @@ export default function Manage({
                 setDay(nextDay);
                 if (nextDay === day) void load();
                 notify("Appuntamento spostato. Ecco l’agenda aggiornata.");
-              }} />
+              }}
+            />
           )}
           <button
             className="danger"
