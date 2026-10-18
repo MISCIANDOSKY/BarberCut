@@ -407,18 +407,18 @@ function DeleteAccount({
                       { body: { confirm: true } },
                     );
                     if (error) {
-                      setErrorMessage(
-                        "Eliminazione non riuscita. Richiedi un nuovo codice e controlla di non essere l’unico amministratore.",
-                      );
+                      const message = "Eliminazione non riuscita. Richiedi un nuovo codice e controlla di non essere l’unico amministratore.";
+                      setErrorMessage(message);
+                      notify(message);
                       return;
                     }
                     await supabase.auth.signOut({ scope: "local" });
                     notify("Account eliminato. Arrivederci!");
                     reload();
                   } catch {
-                    setErrorMessage(
-                      "Conferma non riuscita. Riprova fra qualche minuto.",
-                    );
+                    const message = "Conferma non riuscita. Riprova fra qualche minuto.";
+                    setErrorMessage(message);
+                    notify(message);
                   } finally {
                     setBusy(false);
                   }
