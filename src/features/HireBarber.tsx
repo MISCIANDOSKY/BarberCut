@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Modal } from "../components/UI";
 import { supabase, result, friendly } from "../lib/api";
 
 export default function HireBarber({
@@ -9,7 +8,6 @@ export default function HireBarber({
   refresh: () => void;
   notify: (message: string) => void;
 }) {
-  const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [name, setName] = useState("");
@@ -26,23 +24,6 @@ export default function HireBarber({
   }
   return (
     <>
-      <button
-        type="button"
-        className="secondary"
-        onClick={() => {
-          reset();
-          setOpen(true);
-        }}
-      >
-        Assumi Barbiere
-      </button>
-      {open && (
-        <Modal
-          title="Assumi Barbiere"
-          close={() => {
-            if (!busy) setOpen(false);
-          }}
-        >
           <p>
             Prima di procedere, assicurati che il nuovo collaboratore sia già
             registrato a BarberCut come cliente. Inserisci l’email e il numero
@@ -71,7 +52,6 @@ export default function HireBarber({
                       p_name: name.trim(),
                     }),
                   );
-                  setOpen(false);
                   reset();
                   notify(
                     "Barbiere aggiunto. Il ruolo Barbiere e i servizi sono stati assegnati automaticamente.",
@@ -171,8 +151,6 @@ export default function HireBarber({
               </button>
             )}
           </form>
-        </Modal>
-      )}
     </>
   );
 }

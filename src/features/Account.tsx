@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { clearPasswordProof } from "../lib/passwordProof";
 import { Empty, Field } from "../components/UI";
@@ -89,7 +89,7 @@ export function Profile({
   deletionEnabled,
   addressEditor,
   registrationEditor,
-  hiringEditor,
+  deletionFromEmail = false,
 }: {
   user: Row;
   profile: Row;
@@ -98,7 +98,7 @@ export function Profile({
   deletionEnabled: boolean;
   addressEditor?: ReactNode;
   registrationEditor?: ReactNode;
-  hiringEditor?: ReactNode;
+  deletionFromEmail?: boolean;
 }) {
   const [first, setFirst] = useState(profile.first_name),
     [last, setLast] = useState(profile.last_name),
@@ -194,10 +194,10 @@ export function Profile({
       >
         Cambia password
       </button>
-      {hiringEditor}
       {registrationEditor}
       {addressEditor}
       <DeleteAccount
+        fromEmailLink={deletionFromEmail}
         email={user.email}
         enabled={deletionEnabled}
         notify={notify}
@@ -275,11 +275,13 @@ export function Notifications({
 
 function DeleteAccount({
   email,
+  fromEmailLink = false,
   enabled,
   notify,
   reload,
 }: {
   email: string;
+  fromEmailLink?: boolean;
   enabled: boolean;
   notify: (s: string) => void;
   reload: () => void;
@@ -288,14 +290,21 @@ function DeleteAccount({
     [busy, setBusy] = useState(false),
     [confirmed, setConfirmed] = useState(false),
     [codeSent, setCodeSent] = useState(false),
+    [usingLink, setUsingLink] = useState(fromEmailLink),
     [errorMessage, setErrorMessage] = useState("");
+  const detailsRef = useRef<HTMLDetailsElement>(null);
   useEffect(() => {
+    setUsingLink(fromEmailLink);
+    setConfirmed(false);
     setCode("");
     setCodeSent(false);
     setErrorMessage("");
-  }, [email]);
+    if (!fromEmailLink) return;
+    const frame = requestAnimationFrame(() => detailsRef.current?.scrollIntoView({block: "start"}));
+    return () => cancelAnimationFrame(frame);
+  }, [email, fromEmailLink]);
   return (
-    <details className="notice">
+    <details ref={detailsRef} className="notice account-deletion" open={fromEmailLink || undefined}>
       <summary>Elimina account</summary>
       <div className="content-stack">
         {!enabled ? (
@@ -314,6 +323,7 @@ function DeleteAccount({
             <label className="check">
               <input
                 type="checkbox"
+                autoFocus={fromEmailLink}
                 checked={confirmed}
                 disabled={busy}
                 onChange={(e) => setConfirmed(e.target.checked)}
@@ -342,6 +352,7 @@ function DeleteAccount({
                   );
                   setCode("");
                   setCodeSent(true);
+                  setUsingLink(false);
                   notify(
                     "Codice inviato via email. Inseriscilo qui per confermare l’eliminazione dell’account. Controlla anche le cartelle Spam e Posta indesiderata.",
                   );
@@ -361,8 +372,12 @@ function DeleteAccount({
                 {errorMessage}
               </p>
             )}
-            {codeSent && (
+            {(codeSent || usingLink) && (
               <>
+                {usingLink ? (
+                  <p className="notice">Hai aperto il collegamento di conferma. Per eliminare il profilo, seleziona la casella di conferma e premi il pulsante qui sotto. Se il collegamento è scaduto, richiedi un nuovo codice via email.</p>
+                ) : (
+                  <>
                 <p className="muted">
                   Abbiamo inviato il codice alla tua email. Se non lo trovi,
                   controlla anche le cartelle Spam e Posta indesiderata.
@@ -385,11 +400,14 @@ function DeleteAccount({
                     autoFocus
                   />
                 </label>
+
+                  </>
+                )}
                 <button
                   className="danger"
-                  disabled={busy || !confirmed || !code.trim()}
+                  disabled={busy || !confirmed || (!usingLink && !code.trim())}
                   onClick={async () => {
-                    if (busy || !confirmed || !code.trim()) return;
+                    if (busy || !confirmed || (!usingLink && !code.trim())) return;
                     if (
                       !confirm("Eliminare definitivamente account e profilo?")
                     )
@@ -397,6 +415,7 @@ function DeleteAccount({
                     setBusy(true);
                     setErrorMessage("");
                     try {
+                      if (!usingLink) {
                       const { error: codeError } =
                         await supabase.auth.verifyOtp({
                           email,
@@ -409,15 +428,17 @@ function DeleteAccount({
                         );
                         return;
                       }
+                      }
                       const { error } = await supabase.functions.invoke(
                         "delete-account",
                         { body: { confirm: true } },
                       );
                       if (error) {
                         const message =
-                          "Eliminazione non riuscita. Richiedi un nuovo codice e controlla di non essere l’unico amministratore.";
+                          "Eliminazione non riuscita. Richiedi un nuovo codice; se sei l’unico amministratore, assegna prima il ruolo a un altro account.";
                         setErrorMessage(message);
                         notify(message);
+                        if (usingLink) { setUsingLink(false); setCodeSent(false); }
                         return;
                       }
                       await supabase.auth.signOut({ scope: "local" });

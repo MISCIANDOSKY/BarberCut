@@ -1467,3 +1467,7 @@ dialog h2,
 .registration-actions {
   gap: 12px;
 }
+
+.account-deletion {
+  scroll-margin-top: calc(100px + env(safe-area-inset-top));
+}

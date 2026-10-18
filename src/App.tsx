@@ -41,8 +41,13 @@ export default function App() {
       barberId: string;
       day: string;
     } | null>(null),
+    [deletionFromEmail, setDeletionFromEmail] = useState(
+      () => new URLSearchParams(location.search).get("delete-account") === "1",
+    ),
     [section, setSection] = useState(() =>
-      new URLSearchParams(location.search).get("book") === "1" ? "Prenota" : "",
+      new URLSearchParams(location.search).get("delete-account") === "1"
+        ? "Profilo"
+        : new URLSearchParams(location.search).get("book") === "1" ? "Prenota" : "",
     ),
     [auth, setAuth] = useState(
       () => new URLSearchParams(location.search).get("keep-active") === "1",
@@ -52,6 +57,14 @@ export default function App() {
     [online, setOnline] = useState(navigator.onLine),
     [reset, setReset] = useState(false),
     [password, setPassword] = useState("");
+  function dismissDeletionLink() {
+    setDeletionFromEmail(false);
+    const address = new URL(location.href);
+    if (address.searchParams.has("delete-account")) {
+      address.searchParams.delete("delete-account");
+      history.replaceState(history.state, "", address.pathname + address.search + address.hash);
+    }
+  }
   const refreshVersion = useRef(0);
   const keepActiveRequested = useRef(
     new URLSearchParams(location.search).get("keep-active") === "1",
@@ -184,6 +197,7 @@ export default function App() {
     } = supabase.auth.onAuthStateChange((event) => {
       if (event === "PASSWORD_RECOVERY") setReset(true);
       if (event === "SIGNED_OUT") {
+        dismissDeletionLink();
         refreshVersion.current++;
         setUser(null);
         setProfile(null);
@@ -363,6 +377,9 @@ export default function App() {
             ? [["✓", "Gestisci utenti", "Approva le nuove iscrizioni"]]
             : []),
           ["♧", "Notifiche", "Tutte le novità"],
+          ...(role === "barber_admin" && canReview
+            ? [["＋", "Assumi Barbiere", "Aggiungi un collaboratore"]]
+            : []),
           ["◉", "Profilo", "Il tuo account"],
         ]
     : clientChoices;
@@ -389,6 +406,8 @@ export default function App() {
       );
     if (section === "Gestisci utenti" && canReview) return <ManageUsers />;
     if (section === "Informazioni") return <Information />;
+    if (section === "Assumi Barbiere" && ready && role === "barber_admin" && canReview)
+      return <HireBarber refresh={refresh} notify={notify} />;
     if (section === "Profilo")
       return user && profile ? (
         <Profile
@@ -397,11 +416,7 @@ export default function App() {
           notify={notify}
           reload={refresh}
           deletionEnabled={!!settings.account_deletion_enabled}
-          hiringEditor={
-            ready &&
-            role === "barber_admin" &&
-            canReview && <HireBarber refresh={refresh} notify={notify} />
-          }
+          deletionFromEmail={deletionFromEmail}
           registrationEditor={
             canReview &&
             role === "barber_admin" && (
@@ -423,7 +438,10 @@ export default function App() {
           }
         />
       ) : (
-        <Empty>Accedi per visualizzare il tuo profilo.</Empty>
+        <div className="content-stack">
+          <p>{deletionFromEmail ? "Apri il collegamento ricevuto via email per confermare l’eliminazione, oppure accedi e richiedi un nuovo codice dal profilo." : "Accedi per visualizzare il tuo profilo."}</p>
+          <button className="secondary" onClick={() => setAuth(true)}>Accedi</button>
+        </div>
       );
     if (section === "Notifiche")
       return (
@@ -721,6 +739,7 @@ export default function App() {
           title={section}
           wide
           close={() => {
+            dismissDeletionLink();
             if (
               ready &&
               role === "admin" &&
