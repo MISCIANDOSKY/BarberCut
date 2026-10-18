@@ -182,46 +182,46 @@ export default function Maintenance({
             Account disattivati automaticamente ({status.disabled_count})
           </summary>
           <div className="content-stack">
-          <p className="muted">
-            Puoi riattivare un account. La sua soglia di inattività ripartirà da
-            oggi. Sono mostrati gli ultimi 100 account disattivati.
-          </p>
-          {status.disabled_accounts.map((account: Row) => (
-            <div className="table-row" key={account.user_id}>
-              <span>
-                {account.first_name || "Cliente"} {account.last_name}
-                <small>
-                  {new Date(account.disabled_at).toLocaleDateString("it-IT", {
-                    timeZone: "Europe/Rome",
-                  })}
-                </small>
-              </span>
-              <button
-                className="secondary"
-                disabled={busy}
-                onClick={async () => {
-                  setBusy(true);
-                  setError("");
-                  setFeedback("");
-                  try {
-                    await result(
-                      supabase.rpc("reactivate_inactive_account", {
-                        p_user: account.user_id,
-                      }),
-                    );
-                    await load();
-                    setFeedback("Account riattivato.");
-                  } catch (e) {
-                    setError(friendly(e));
-                  } finally {
-                    setBusy(false);
-                  }
-                }}
-              >
-                Riattiva
-              </button>
-            </div>
-          ))}
+            <p className="muted">
+              Puoi riattivare un account. La sua soglia di inattività ripartirà
+              da oggi. Sono mostrati gli ultimi 100 account disattivati.
+            </p>
+            {status.disabled_accounts.map((account: Row) => (
+              <div className="table-row" key={account.user_id}>
+                <span>
+                  {account.first_name || "Cliente"} {account.last_name}
+                  <small>
+                    {new Date(account.disabled_at).toLocaleDateString("it-IT", {
+                      timeZone: "Europe/Rome",
+                    })}
+                  </small>
+                </span>
+                <button
+                  className="secondary"
+                  disabled={busy}
+                  onClick={async () => {
+                    setBusy(true);
+                    setError("");
+                    setFeedback("");
+                    try {
+                      await result(
+                        supabase.rpc("reactivate_inactive_account", {
+                          p_user: account.user_id,
+                        }),
+                      );
+                      await load();
+                      setFeedback("Account riattivato.");
+                    } catch (e) {
+                      setError(friendly(e));
+                    } finally {
+                      setBusy(false);
+                    }
+                  }}
+                >
+                  Riattiva
+                </button>
+              </div>
+            ))}
           </div>
         </details>
       )}
