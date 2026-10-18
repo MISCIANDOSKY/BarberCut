@@ -28,7 +28,11 @@ export default function BarberServices({
       )) as Row[];
       setRows(
         links
-          .map((link) => link.services ? { ...link.services, link_active: link.active !== false } : null)
+          .map((link) =>
+            link.services
+              ? { ...link.services, link_active: link.active !== false }
+              : null,
+          )
           .filter((service) => service && !service.deleted_at)
           .sort((a, b) => a.name.localeCompare(b.name, "it")),
       );
@@ -77,13 +81,15 @@ export default function BarberServices({
           ? "Gestisci i servizi della tua agenda. Le modifiche valgono per i tuoi servizi; gli altri barbieri mantengono i propri prezzi."
           : "Puoi disattivare o riattivare i servizi soltanto per la tua agenda. Per aggiungerli, modificarli o eliminarli rivolgiti all’admin o a un Barbiere Admin."}
       </p>
-      {canEdit && <button
-        className="primary"
-        onClick={() => setEditing({})}
-        disabled={busy}
-      >
-        ＋ Aggiungi servizio
-      </button>}
+      {canEdit && (
+        <button
+          className="primary"
+          onClick={() => setEditing({})}
+          disabled={busy}
+        >
+          ＋ Aggiungi servizio
+        </button>
+      )}
       {loading ? (
         <p role="status">Caricamento servizi…</p>
       ) : !rows.length ? (
@@ -95,11 +101,21 @@ export default function BarberServices({
               <strong>{service.name}</strong>
               <small>
                 {service.duration_minutes} minuti · {euro(service.price)}
-                {!service.active ? " · Disattivato dall’admin" : !service.link_active ? " · Disattivato per te" : ""}
+                {!service.active
+                  ? " · Disattivato dall’admin"
+                  : !service.link_active
+                    ? " · Disattivato per te"
+                    : ""}
               </small>
               {service.description && <small>{service.description}</small>}
             </span>
-            <div style={{ display: "flex", flexDirection: "column", gap: ".25rem" }}>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: ".25rem",
+              }}
+            >
               <button
                 className="text"
                 disabled={busy || !service.active}
@@ -107,14 +123,20 @@ export default function BarberServices({
                   if (busy) return;
                   setBusy(true);
                   try {
-                    await result(supabase.rpc("set_barber_service_active", {
-                      p_barber: barberId,
-                      p_service: service.id,
-                      p_active: !service.link_active,
-                    }));
+                    await result(
+                      supabase.rpc("set_barber_service_active", {
+                        p_barber: barberId,
+                        p_service: service.id,
+                        p_active: !service.link_active,
+                      }),
+                    );
                     await load();
                     refresh();
-                    notify(service.link_active ? "Servizio disattivato per la tua agenda." : "Servizio riattivato per la tua agenda.");
+                    notify(
+                      service.link_active
+                        ? "Servizio disattivato per la tua agenda."
+                        : "Servizio riattivato per la tua agenda.",
+                    );
                   } catch (error) {
                     notify(friendly(error));
                   } finally {
@@ -124,45 +146,49 @@ export default function BarberServices({
               >
                 {service.link_active ? "Disattiva per me" : "Riattiva per me"}
               </button>
-              {canEdit && <><button
-                className="text"
-                disabled={busy}
-                onClick={() => setEditing(service)}
-              >
-                Modifica
-              </button>{" "}
-              <button
-                className="text danger-text"
-                disabled={busy}
-                onClick={async () => {
-                  if (
-                    !confirm(
-                      "Eliminare " +
-                        service.name +
-                        " dai tuoi servizi? Gli appuntamenti già presenti saranno conservati.",
-                    )
-                  )
-                    return;
-                  setBusy(true);
-                  try {
-                    await result(
-                      supabase.rpc("remove_barber_service", {
-                        p_barber: barberId,
-                        p_service: service.id,
-                      }),
-                    );
-                    await load();
-                    refresh();
-                    notify("Servizio eliminato dalla tua agenda.");
-                  } catch (error) {
-                    notify(friendly(error));
-                  } finally {
-                    setBusy(false);
-                  }
-                }}
-              >
-                Elimina
-              </button></>}
+              {canEdit && (
+                <>
+                  <button
+                    className="text"
+                    disabled={busy}
+                    onClick={() => setEditing(service)}
+                  >
+                    Modifica
+                  </button>{" "}
+                  <button
+                    className="text danger-text"
+                    disabled={busy}
+                    onClick={async () => {
+                      if (
+                        !confirm(
+                          "Eliminare " +
+                            service.name +
+                            " dai tuoi servizi? Gli appuntamenti già presenti saranno conservati.",
+                        )
+                      )
+                        return;
+                      setBusy(true);
+                      try {
+                        await result(
+                          supabase.rpc("remove_barber_service", {
+                            p_barber: barberId,
+                            p_service: service.id,
+                          }),
+                        );
+                        await load();
+                        refresh();
+                        notify("Servizio eliminato dalla tua agenda.");
+                      } catch (error) {
+                        notify(friendly(error));
+                      } finally {
+                        setBusy(false);
+                      }
+                    }}
+                  >
+                    Elimina
+                  </button>
+                </>
+              )}
             </div>
           </article>
         ))

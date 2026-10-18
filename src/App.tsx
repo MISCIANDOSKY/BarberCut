@@ -406,7 +406,8 @@ export default function App() {
             )
           }
           addressEditor={
-            ready && (role === "admin" || (role === "barber_admin" && canReview)) && (
+            ready &&
+            (role === "admin" || (role === "barber_admin" && canReview)) && (
               <BarberAddress
                 address={settings.shop_address || ""}
                 revision={settings.address_revision || 0}
@@ -427,7 +428,11 @@ export default function App() {
           userId={user!.id}
         />
       );
-    if (section === "Servizi e prezzi" && ready && (role === "barber" || role === "barber_admin")) {
+    if (
+      section === "Servizi e prezzi" &&
+      ready &&
+      (role === "barber" || role === "barber_admin")
+    ) {
       const ownBarber = barbers.find(
         (item) => item.user_id === user!.id && item.active,
       );
