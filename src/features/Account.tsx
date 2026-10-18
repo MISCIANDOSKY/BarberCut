@@ -407,7 +407,8 @@ function DeleteAccount({
                       { body: { confirm: true } },
                     );
                     if (error) {
-                      const message = "Eliminazione non riuscita. Richiedi un nuovo codice e controlla di non essere l’unico amministratore.";
+                      const message =
+                        "Eliminazione non riuscita. Richiedi un nuovo codice e controlla di non essere l’unico amministratore.";
                       setErrorMessage(message);
                       notify(message);
                       return;
@@ -416,7 +417,8 @@ function DeleteAccount({
                     notify("Account eliminato. Arrivederci!");
                     reload();
                   } catch {
-                    const message = "Conferma non riuscita. Riprova fra qualche minuto.";
+                    const message =
+                      "Conferma non riuscita. Riprova fra qualche minuto.";
                     setErrorMessage(message);
                     notify(message);
                   } finally {
