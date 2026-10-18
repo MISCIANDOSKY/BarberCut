@@ -1,6 +1,6 @@
 # BarberCut — Handoff
 
-Ultimo aggiornamento: 17 ottobre 2026 (Europe/Rome).
+Ultimo aggiornamento: 18 ottobre 2026 (Europe/Rome).
 
 ## Regola permanente del titolare
 
@@ -236,3 +236,7 @@ Migrazione 20261017140840: RPC staff get_manual_booking_slots e book_manual_appo
 ### 17 ottobre 2026 — Promemoria in app 24 ore e 1 ora prima
 
 Verificato cron barbercut-appointment-reminders attivo ogni 5 minuti, ultimo esito riuscito. Aggiornata funzione privata con testo italiano “Ricordati del tuo appuntamento! Hai prenotato [servizio] per il [data] alle [ora]. Ti aspettiamo in barberia.”, titoli distinti 24 ore / 1 ora e date Europe/Rome. Migrazione 20261017141313. Mantenute finestre di recupero esistenti: promemoria giornaliero tra 24 e 23 ore residue, orario entro l’ultima ora prima dell’inizio; normale generazione al primo ciclo successivo alla soglia. Doppioni impediti dall’event_key per appuntamento, tipo e orario prenotato. Esclusi passato, annullati, ospiti senza account e blocchi. App aggiorna elenco/badge notifiche ogni 30 secondi mentre visibile, al focus, al ritorno online e quando torna visibile. Nessuna push, email o richiesta di permesso aggiunta. Test appointment_reminders.sql superato con rollback: due soglie, testo, deduplica, esclusioni, visibilità proprietario e lettura, cron attivo e invocazione client negata. Nessuna notifica reale di prova conservata. TypeScript, build, test frontend e pubblicazione GitHub Pages riusciti nella [CI 39039912452](https://github.com/MISCIANDOSKY/BarberCut/actions/runs/39039912452). Advisor invariati rispetto ai rilievi preesistenti. Nessuna prova con attesa reale di 24 ore su dispositivo fisico; generazione delle due soglie verificata nel test SQL.
+
+### 18 ottobre 2026 — Associazione catalogo a un’altra agenda
+
+Associati tutti i 13 servizi attivi anche alla seconda agenda attiva richiesta dal titolare. Conservate le associazioni precedenti, i prezzi, le durate e le descrizioni. Verifica sul database remoto: entrambe le agende hanno 13 servizi attivi su 13 del catalogo. Nessuna modifica al codice o allo schema.
