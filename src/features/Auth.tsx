@@ -70,7 +70,7 @@ export default function Auth({
       setRetrySeconds(60);
       setMode("otpVerify");
       notify(
-        "Se l’email è associata a un account, riceverai il codice di accesso. Controlla anche la cartella spam.",
+        "Se l’email è associata a un account, riceverai il codice di accesso. Controlla anche le cartelle Spam e Posta indesiderata.",
       );
     } catch {
       setErrorMessage(SEND_ERROR);
@@ -93,7 +93,7 @@ export default function Auth({
         await result(
           supabase.auth.resetPasswordForEmail(email, { redirectTo: redirect }),
         );
-        notify("Se l’email è registrata, riceverai le istruzioni.");
+        notify("Se l’email è registrata, riceverai le istruzioni. Controlla anche le cartelle Spam e Posta indesiderata.");
         close();
       } else if (mode === "register") {
         if (terms && !accepted) throw new Error("TERMS_REQUIRED");
@@ -117,7 +117,7 @@ export default function Auth({
           close();
         } else {
           notify(
-            "Controlla la tua email: inserisci il codice ricevuto oppure apri il link di conferma.",
+            "Controlla la tua email: inserisci il codice ricevuto oppure apri il link di conferma. Controlla anche le cartelle Spam e Posta indesiderata.",
           );
           setRegistrationCode("");
           setRetrySeconds(60);
@@ -159,7 +159,8 @@ export default function Auth({
       >
         <p>
           Inserisci il codice ricevuto via email, oppure usa il link di conferma
-          presente nel messaggio.
+          presente nel messaggio. Se non trovi l’email, controlla anche le cartelle
+          Spam e Posta indesiderata.
         </p>
         {errorMessage && (
           <p className="form-error" role="alert">
@@ -258,7 +259,7 @@ export default function Auth({
               if (error) throw error;
               setRetrySeconds(60);
               notify(
-                "Se l’account è in attesa di conferma, riceverai una nuova email. Controlla anche la cartella spam.",
+                "Se l’account è in attesa di conferma, riceverai una nuova email. Controlla anche le cartelle Spam e Posta indesiderata.",
               );
             } catch {
               setErrorMessage(SEND_ERROR);
@@ -296,7 +297,7 @@ export default function Auth({
       >
         <p className="muted">
           {mode === "otp"
-            ? "Inserisci l’email del tuo account: ti invieremo un codice per accedere senza password."
+            ? "Inserisci l’email del tuo account: ti invieremo un codice per accedere senza password. Se non trovi l’email, controlla anche le cartelle Spam e Posta indesiderata."
             : "Il tuo prossimo appuntamento comincia qui."}
         </p>
         {errorMessage && (
@@ -477,7 +478,7 @@ export function StaffGate({
       );
       setSent(true);
       notify(
-        "Email inviata. Inserisci il codice oppure apri il link nello stesso browser.",
+        "Email inviata. Inserisci il codice oppure apri il link nello stesso browser. Controlla anche le cartelle Spam e Posta indesiderata.",
       );
     } catch {
       setSendError(SEND_ERROR);
@@ -506,7 +507,7 @@ export function StaffGate({
     <section className="panel">
       <span className="eyebrow">ACCESSO RISERVATO</span>
       <h2>Un ultimo passaggio.</h2>
-      <p>Per proteggere l’agenda, conferma l’accesso tramite la tua email.</p>
+      <p>Per proteggere l’agenda, conferma l’accesso tramite la tua email. Se non trovi l’email, controlla anche le cartelle Spam e Posta indesiderata.</p>
       <button className="primary" onClick={send} disabled={busy}>
         {busy ? "Attendi…" : sent ? "Invia di nuovo" : "Invia verifica email"}
       </button>
@@ -542,7 +543,8 @@ export function StaffGate({
           </button>
           <p className="muted">
             Inserisci il codice scritto nell’email. Se preferisci usare il link,
-            aprilo nello stesso browser.
+            aprilo nello stesso browser. Se non trovi l’email, controlla anche le
+            cartelle Spam e Posta indesiderata.
           </p>
         </form>
       )}

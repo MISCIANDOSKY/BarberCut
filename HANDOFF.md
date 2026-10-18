@@ -240,3 +240,7 @@ Verificato cron barbercut-appointment-reminders attivo ogni 5 minuti, ultimo esi
 ### 18 ottobre 2026 — Associazione catalogo a un’altra agenda
 
 Associati tutti i 13 servizi attivi anche alla seconda agenda attiva richiesta dal titolare. Conservate le associazioni precedenti, i prezzi, le durate e le descrizioni. Verifica sul database remoto: entrambe le agende hanno 13 servizi attivi su 13 del catalogo. Nessuna modifica al codice o allo schema.
+
+### 18 ottobre 2026 — Indicazione Spam nei messaggi email
+
+Aggiunta ai messaggi esistenti l’indicazione di controllare le cartelle Spam e Posta indesiderata: invio e reinvio OTP di accesso, registrazione, verifica staff e conferma eliminazione account; presente anche nelle schermate di inserimento codice e nel recupero password. Nessuna modifica all’invio, ai template email o alle regole di autenticazione. Controllati tutti i punti di invio nel frontend. Build e pubblicazione da verificare nella CI del commit.

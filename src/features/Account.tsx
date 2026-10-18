@@ -185,7 +185,7 @@ export function Profile({
           await supabase.auth.resetPasswordForEmail(user.email, {
             redirectTo: location.origin + import.meta.env.BASE_URL,
           });
-          notify("Controlla l’email per cambiare la password.");
+          notify("Controlla l’email per cambiare la password. Controlla anche le cartelle Spam e Posta indesiderata.");
         }}
       >
         Cambia password
@@ -323,7 +323,7 @@ function DeleteAccount({
                   }),
                 );
                 notify(
-                  "Controlla l’email. Inserisci il codice o apri il link, poi torna qui per confermare.",
+                  "Controlla l’email. Inserisci il codice o apri il link, poi torna qui per confermare. Controlla anche le cartelle Spam e Posta indesiderata.",
                 );
               } catch {
                 notify("Errore nell’invio, riprovare fra qualche minuto.");
@@ -334,6 +334,10 @@ function DeleteAccount({
           >
             Invia conferma email
           </button>
+          <p className="muted">
+            Se non trovi l’email con il codice, controlla anche le cartelle Spam e
+            Posta indesiderata.
+          </p>
           <label>
             Codice email (se presente)
             <input
