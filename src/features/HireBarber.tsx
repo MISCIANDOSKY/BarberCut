@@ -115,10 +115,10 @@ export default function HireBarber({
             </label>
             <p className="muted">
               Il nuovo collaboratore riceverà il ruolo Barbiere e i servizi
-              attivi già presenti, insieme a una copia dei tuoi orari settimanali.
-              Potrà disattivare o riattivare i servizi consentiti dal titolare per
-              la propria agenda. Solo l’admin può assegnare il ruolo Barbiere
-              Admin.
+              attivi già presenti, insieme a una copia dei tuoi orari
+              settimanali. Potrà disattivare o riattivare i servizi consentiti
+              dal titolare per la propria agenda. Solo l’admin può assegnare il
+              ruolo Barbiere Admin.
             </p>
           </>
         )}
