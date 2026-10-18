@@ -92,6 +92,7 @@ Le prenotazioni disabilitate sono un'impostazione corrente: non riaprirle automa
 ## Barbieri, servizi e ruoli
 
 - Creare un barbiere associato a un account assegna automaticamente il ruolo Barbiere, preservando eventuale ruolo Admin.
+- Ogni nuova agenda eredita automaticamente le associazioni ai servizi attivi degli altri barbieri attivi e non eliminati, senza duplicare lo stesso servizio. Operazione atomica nel database alla creazione; modifiche/riattivazioni successive non ripristinano servizi rimossi. Gestione personale successiva tramite il flusso esistente con isolamento delle modifiche ai servizi condivisi.
 - Eliminare il barbiere riporta l'account a Cliente quando non rimangono associazioni attive; revoca le sessioni staff e preserva gli admin.
 - Disattivazione temporanea distinta dall'eliminazione.
 - Un account di barbiere eliminato può essere associato nuovamente: indice univoco parziale sulle agende non eliminate.
@@ -244,3 +245,7 @@ Associati tutti i 13 servizi attivi anche alla seconda agenda attiva richiesta d
 ### 18 ottobre 2026 — Indicazione Spam nei messaggi email
 
 Aggiunta ai messaggi esistenti l’indicazione di controllare le cartelle Spam e Posta indesiderata: invio e reinvio OTP di accesso, registrazione, verifica staff e conferma eliminazione account; presente anche nelle schermate di inserimento codice e nel recupero password. Nessuna modifica all’invio, ai template email o alle regole di autenticazione. Controllati tutti i punti di invio nel frontend. TypeScript, build, test e pubblicazione GitHub Pages riusciti nella [CI 39116031583](https://github.com/MISCIANDOSKY/BarberCut/actions/runs/39116031583). Nessun codice reale richiesto né email di prova inviata.
+
+### 18 ottobre 2026 — Servizi automatici alla creazione del barbiere
+
+Migrazione 20261018094431: trigger privato dopo INSERT su barbers associa i servizi attivi e non archiviati degli altri barbieri attivi e non eliminati. Associazioni distinte e nello stesso salvataggio, nessuna modifica retroattiva ad agende esistenti. Senza servizi eleggibili il barbiere viene creato senza associazioni. Funzione non eseguibile direttamente da anon/authenticated; creazione agenda resta soggetta ai permessi admin. Aggiunta spiegazione nel form Aggiungi barbiere. Test new_barber_services.sql e barber_workflows.sql superati con rollback: catalogo corretto, esclusione servizi/agende non attivi o archiviati, ruolo automatico, nessun ripristino su modifica, gestione autonoma e isolamento dei servizi condivisi, cliente/barbiere esclusi dalla creazione agende. Nessun account reale o associazione reale di prova conservati. Advisor invariati rispetto ai rilievi precedenti. CI frontend e pubblicazione da verificare; nessuna prova autenticata su dispositivo fisico.

@@ -501,7 +501,9 @@ export default function Admin({
           </label>
           <p className="muted">
             Il ruolo Barbiere viene assegnato automaticamente all’account
-            associato. Eliminando il barbiere, l’account torna Cliente e può
+            associato. I servizi attivi degli altri barbieri attivi vengono associati
+            automaticamente; il nuovo barbiere potrà poi gestirli da Servizi e
+            prezzi. Eliminando il barbiere, l’account torna Cliente e può
             essere nuovamente associato.
           </p>
           {!availableUsers().length && (
