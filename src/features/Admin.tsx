@@ -329,14 +329,28 @@ export default function Admin({
           )}
         </Modal>
       )}
+      {section === "Utenti" && (
+        <p className="muted">
+          I nuovi barbieri ricevono automaticamente il ruolo Barbiere. Solo
+          l’admin può assegnare Barbiere Admin da questo menu.
+        </p>
+      )}
       {section === "Utenti"
         ? rows.map((r) => {
             const p = users.find((u) => u.id === r.user_id);
+            const currentRoleLabel =
+              r.role === "barber_admin"
+                ? "Barbiere Admin"
+                : r.role === "barber"
+                  ? "Barbiere"
+                  : r.role === "admin"
+                    ? "Admin"
+                    : "Cliente";
             return (
               <article className="table-row" key={r.user_id}>
                 <span>
                   {p?.first_name || "Account"} {p?.last_name}
-                  <small>{r.user_id}</small>
+                  <small>{currentRoleLabel}</small>
                 </span>
                 <select
                   aria-label={"Ruolo di " + (p?.first_name || r.user_id)}
