@@ -330,7 +330,9 @@ function DeleteAccount({
                     options: {
                       shouldCreateUser: false,
                       emailRedirectTo:
-                        location.origin + import.meta.env.BASE_URL + "?delete-account=1",
+                        location.origin +
+                        import.meta.env.BASE_URL +
+                        "?delete-account=1",
                     },
                   }),
                 );
@@ -340,7 +342,9 @@ function DeleteAccount({
                   "Codice inviato via email. Inseriscilo qui per confermare l’eliminazione dell’account. Controlla anche le cartelle Spam e Posta indesiderata.",
                 );
               } catch {
-                setErrorMessage("Errore nell’invio, riprovare fra qualche minuto.");
+                setErrorMessage(
+                  "Errore nell’invio, riprovare fra qualche minuto.",
+                );
               } finally {
                 setBusy(false);
               }
@@ -348,7 +352,11 @@ function DeleteAccount({
           >
             {busy ? "Attendi…" : "Invia codice via email"}
           </button>
-          {errorMessage && <p className="form-error" role="alert">{errorMessage}</p>}
+          {errorMessage && (
+            <p className="form-error" role="alert">
+              {errorMessage}
+            </p>
+          )}
           {codeSent && (
             <>
               <p className="muted">
@@ -378,7 +386,8 @@ function DeleteAccount({
                 disabled={busy || !confirmed || !code.trim()}
                 onClick={async () => {
                   if (busy || !confirmed || !code.trim()) return;
-                  if (!confirm("Eliminare definitivamente account e profilo?")) return;
+                  if (!confirm("Eliminare definitivamente account e profilo?"))
+                    return;
                   setBusy(true);
                   setErrorMessage("");
                   try {
@@ -388,7 +397,9 @@ function DeleteAccount({
                       type: "email",
                     });
                     if (codeError) {
-                      setErrorMessage("Errore: codice non valido o scaduto. Riprova oppure richiedi un nuovo codice.");
+                      setErrorMessage(
+                        "Errore: codice non valido o scaduto. Riprova oppure richiedi un nuovo codice.",
+                      );
                       return;
                     }
                     const { error } = await supabase.functions.invoke(
@@ -405,7 +416,9 @@ function DeleteAccount({
                     notify("Account eliminato. Arrivederci!");
                     reload();
                   } catch {
-                    setErrorMessage("Conferma non riuscita. Riprova fra qualche minuto.");
+                    setErrorMessage(
+                      "Conferma non riuscita. Riprova fra qualche minuto.",
+                    );
                   } finally {
                     setBusy(false);
                   }
