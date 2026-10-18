@@ -3,7 +3,11 @@ import { Empty } from "../components/UI";
 import { supabase, result, friendly } from "../lib/api";
 import type { Row } from "../lib/api";
 
-export default function ManageUsers({ isAdmin = false }: { isAdmin?: boolean }) {
+export default function ManageUsers({
+  isAdmin = false,
+}: {
+  isAdmin?: boolean;
+}) {
   const [status, setStatus] = useState("pending");
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);

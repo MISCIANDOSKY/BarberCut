@@ -186,12 +186,14 @@ export default function Manage({
               <button
                 className={
                   "agenda-row" +
-                  (e.kind === "appointment" && new Date(e.end_at).getTime() <= now
+                  (e.kind === "appointment" &&
+                  new Date(e.end_at).getTime() <= now
                     ? " is-past"
                     : "")
                 }
                 title={
-                  e.kind === "appointment" && new Date(e.end_at).getTime() <= now
+                  e.kind === "appointment" &&
+                  new Date(e.end_at).getTime() <= now
                     ? "Appuntamento concluso · Apri tutti i dettagli"
                     : "Apri tutti i dettagli"
                 }
