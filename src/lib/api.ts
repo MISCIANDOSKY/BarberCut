@@ -20,6 +20,10 @@ export async function result<T = any>(
 export function friendly(e: unknown) {
   let m = e instanceof Error ? e.message : String(e);
   for (const [k, v] of Object.entries({
+    HIRE_ACCOUNT_UNAVAILABLE:
+      "Email e numero di telefono non corrispondono a un account cliente disponibile. Controlla che siano quelli del profilo e che l’account non sia già associato a un barbiere.",
+    INVALID_BARBER_NAME:
+      "Inserisci il nome da mostrare in agenda, fino a 160 caratteri.",
     barbers_live_user_id_key:
       "Questo account è già associato a un barbiere. Scegli un altro account o modifica l’agenda esistente.",
     USER_APPROVAL_REQUIRED:

@@ -10,6 +10,7 @@ import { Appointments, Profile, Notifications } from "./features/Account";
 import Manage from "./features/Manage";
 import Admin from "./features/Admin";
 import BarberServices from "./features/BarberServices";
+import HireBarber from "./features/HireBarber";
 import ServiceCatalog from "./features/ServiceCatalog";
 import Information from "./features/Information";
 import ManageUsers from "./features/ManageUsers";
@@ -396,6 +397,11 @@ export default function App() {
           notify={notify}
           reload={refresh}
           deletionEnabled={!!settings.account_deletion_enabled}
+          hiringEditor={
+            ready && role === "barber_admin" && canReview && (
+              <HireBarber refresh={refresh} notify={notify} />
+            )
+          }
           registrationEditor={
             canReview &&
             role === "barber_admin" && (
