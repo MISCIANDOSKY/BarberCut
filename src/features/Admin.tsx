@@ -527,7 +527,9 @@ export default function Admin({
           <p className="muted">
             Il ruolo Barbiere viene assegnato automaticamente all’account
             associato. I servizi attivi degli altri barbieri attivi vengono
-            associati automaticamente; il nuovo barbiere potrà soltanto
+            associati automaticamente. Vengono copiati anche gli orari settimanali
+            di un barbiere di riferimento: prima la tua agenda, se presente,
+            altrimenti un Barbiere Admin attivo. Il nuovo barbiere potrà soltanto
             disattivarli o riattivarli per sé da Servizi e prezzi. Per
             consentire anche aggiunta, modifica ed eliminazione, assegna il
             ruolo Barbiere Admin da Utenti. Eliminando il barbiere, l’account
