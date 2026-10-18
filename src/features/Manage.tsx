@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { romeLocalToISO } from "../lib/dates.mjs";
+import { romeLocalToISO, romeDay } from "../lib/dates.mjs";
+import RescheduleAppointment from "./RescheduleAppointment";
 import { Empty, Modal } from "../components/UI";
 import { supabase, result, dateLabel, timeLabel, today } from "../lib/api";
 import type { Row } from "../lib/api";
@@ -49,6 +50,7 @@ export default function Manage({
     [day, setDay] = useState(initialDay || today()),
     [rows, setRows] = useState<Row[]>([]),
     [detail, setDetail] = useState<Row | null>(null),
+    [moving, setMoving] = useState(false),
     [client, setClient] = useState<Row | null>(null),
     [hours, setHours] = useState<Row[]>([]),
     [hoursBarber, setHoursBarber] = useState(""),
@@ -198,7 +200,7 @@ export default function Manage({
                     : "Apri tutti i dettagli"
                 }
                 key={e.id}
-                onClick={() => setDetail(e)}
+                onClick={() => { setMoving(false); setDetail(e); }}
               >
                 <strong>{timeLabel(e.start_at)}</strong>
                 <span>
@@ -602,36 +604,20 @@ export default function Manage({
             </a>
           )}
           {detail.kind === "appointment" && (
-            <form
-              onSubmit={async (e) => {
-                e.preventDefault();
-                setBusy(true);
-                try {
-                  const v = new FormData(e.currentTarget);
-                  await result(
-                    supabase.rpc("reschedule_appointment", {
-                      p_id: detail.id,
-                      p_start: romeLocalToISO(String(v.get("start"))),
-                    }),
-                  );
-                  notify("Appuntamento modificato.");
-                  setDetail(null);
-                  load();
-                } catch (e) {
-                  notify((await import("../lib/api")).friendly(e));
-                } finally {
-                  setBusy(false);
-                }
-              }}
-            >
-              <label>
-                Nuova data e ora (Europe/Rome)
-                <input type="datetime-local" step="900" name="start" required />
-              </label>
-              <button className="secondary" disabled={busy}>
-                Sposta appuntamento
-              </button>
-            </form>
+            <button className="secondary" disabled={busy} onClick={() => setMoving(true)}>
+              Sposta appuntamento
+            </button>
+          )}
+          {detail.kind === "appointment" && moving && (
+            <RescheduleAppointment appointment={detail} close={() => setMoving(false)}
+              onSaved={(start) => {
+                const nextDay = romeDay(new Date(start));
+                setMoving(false);
+                setDetail(null);
+                setDay(nextDay);
+                if (nextDay === day) void load();
+                notify("Appuntamento spostato. Ecco l’agenda aggiornata.");
+              }} />
           )}
           <button
             className="danger"
