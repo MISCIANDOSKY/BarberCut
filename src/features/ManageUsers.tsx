@@ -135,6 +135,14 @@ export default function ManageUsers() {
                   timeZone: "Europe/Rome",
                 })}
               </small>
+              {account.status !== "pending" && (
+                <small>
+                  {account.status === "approved" ? "Approvato" : "Rifiutato"}
+                  {account.reviewed_by_name
+                    ? " da " + account.reviewed_by_name
+                    : " · Autore non disponibile"}
+                </small>
+              )}
               {!account.email_verified && (
                 <small>
                   Email ancora da verificare: l’approvazione sarà disponibile
