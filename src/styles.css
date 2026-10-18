@@ -1493,14 +1493,52 @@ dialog h2,
 }
 
 /* Notification actions remain accessible on narrow screens. */
-.feature-dialog > header.has-actions { gap: 10px; }
-.feature-dialog > header.has-actions h2 { flex: 1; min-width: 0; }
-.screen-header-actions { margin-left: auto; flex: 0 0 auto; }
-.notification-delete-all { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 10px 8px; font-size: 12px; }
-.notification { display: grid; grid-template-columns: minmax(0, 1fr) 44px; align-items: start; gap: 16px; }
-.notification-copy { min-width: 0; overflow-wrap: anywhere; }
-.notification-delete { display: grid; place-items: center; width: 44px; min-height: 44px; padding: 0; border: 1px solid var(--border); border-radius: 4px; background: transparent; color: var(--accent); }
+.feature-dialog > header.has-actions {
+  gap: 10px;
+}
+.feature-dialog > header.has-actions h2 {
+  flex: 1;
+  min-width: 0;
+}
+.screen-header-actions {
+  margin-left: auto;
+  flex: 0 0 auto;
+}
+.notification-delete-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 10px 8px;
+  font-size: 12px;
+}
+.notification {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 44px;
+  align-items: start;
+  gap: 16px;
+}
+.notification-copy {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.notification-delete {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--accent);
+}
 @media (max-width: 380px) {
-  .feature-dialog > header.has-actions h2 { font-size: 20px; }
-  .notification-delete-all { font-size: 11px; padding: 8px 6px; }
+  .feature-dialog > header.has-actions h2 {
+    font-size: 20px;
+  }
+  .notification-delete-all {
+    font-size: 11px;
+    padding: 8px 6px;
+  }
 }

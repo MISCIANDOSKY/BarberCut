@@ -60,7 +60,9 @@ export default function App() {
     [online, setOnline] = useState(navigator.onLine),
     [reset, setReset] = useState(false),
     [password, setPassword] = useState(""),
-    [deletingNotification, setDeletingNotification] = useState<string | null>(null);
+    [deletingNotification, setDeletingNotification] = useState<string | null>(
+      null,
+    );
   function dismissDeletionLink() {
     setDeletionFromEmail(false);
     const address = new URL(location.href);
@@ -179,7 +181,8 @@ export default function App() {
         setRole((r as Row).role);
         setVerified(!!v);
         setReviewAllowed(reviewPermission === true);
-        if (notificationReadRevision === notificationRevision.current) setNotifications(ns as Row[]);
+        if (notificationReadRevision === notificationRevision.current)
+          setNotifications(ns as Row[]);
         setAppointments(ap as Row[]);
         if (ts) {
           const a = await result(
@@ -357,12 +360,21 @@ export default function App() {
       load: async () => {
         const revision = notificationRevision.current;
         const rows = await result<Row[]>(
-          supabase.from("notifications").select("*").eq("user_id", user.id)
-            .is("dismissed_at", null).order("created_at", { ascending: false }).limit(100));
+          supabase
+            .from("notifications")
+            .select("*")
+            .eq("user_id", user.id)
+            .is("dismissed_at", null)
+            .order("created_at", { ascending: false })
+            .limit(100),
+        );
         return { rows, revision };
       },
       onData: ({ rows, revision }) => {
-        if (!notificationDeleteInFlight.current && revision === notificationRevision.current)
+        if (
+          !notificationDeleteInFlight.current &&
+          revision === notificationRevision.current
+        )
           setNotifications(rows);
       },
       // Keep existing notifications when temporarily offline; retry on focus/online.
@@ -395,8 +407,14 @@ export default function App() {
       await result(supabase.rpc("dismiss_notifications", { p_id: id || null }));
       if (notificationAccount.current !== owner) return;
       notificationRevision.current++;
-      setNotifications((current) => id ? current.filter((item) => item.id !== id) : []);
-      notify(id ? "Notifica cancellata." : "Tutte le notifiche sono state cancellate.");
+      setNotifications((current) =>
+        id ? current.filter((item) => item.id !== id) : [],
+      );
+      notify(
+        id
+          ? "Notifica cancellata."
+          : "Tutte le notifiche sono state cancellate.",
+      );
       await refresh();
     } catch (error) {
       if (notificationAccount.current === owner) notify(friendly(error));
@@ -542,7 +560,9 @@ export default function App() {
           notify={notify}
           userId={user!.id}
           deleting={deletingNotification}
-          onDelete={(id) => { void removeNotification(id); }}
+          onDelete={(id) => {
+            void removeNotification(id);
+          }}
         />
       );
     if (
@@ -830,13 +850,28 @@ export default function App() {
         <Modal
           key={section}
           title={section}
-          actions={section === "Notifiche" && user && (!staff || verified) ? (
-            <button type="button" className="secondary notification-delete-all"
-              aria-label="Cancella tutte le notifiche" disabled={loading || !!deletingNotification || !notifications.length}
-              onClick={() => { void removeNotification(); }}>
-              <TrashIcon /><span>{deletingNotification === "all" ? "Cancello…" : "Cancella tutto"}</span>
-            </button>
-          ) : undefined}
+          actions={
+            section === "Notifiche" && user && (!staff || verified) ? (
+              <button
+                type="button"
+                className="secondary notification-delete-all"
+                aria-label="Cancella tutte le notifiche"
+                disabled={
+                  loading || !!deletingNotification || !notifications.length
+                }
+                onClick={() => {
+                  void removeNotification();
+                }}
+              >
+                <TrashIcon />
+                <span>
+                  {deletingNotification === "all"
+                    ? "Cancello…"
+                    : "Cancella tutto"}
+                </span>
+              </button>
+            ) : undefined
+          }
           wide
           close={() => {
             dismissDeletionLink();

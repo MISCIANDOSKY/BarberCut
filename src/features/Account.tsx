@@ -274,9 +274,14 @@ export function Notifications({
             <p>{n.body}</p>
             <small>{dateLabel(n.created_at)}</small>
           </div>
-          <button type="button" className="notification-delete"
-            aria-label={"Cancella notifica: " + n.title} title="Cancella notifica"
-            disabled={!!deleting} onClick={() => onDelete(n.id)}>
+          <button
+            type="button"
+            className="notification-delete"
+            aria-label={"Cancella notifica: " + n.title}
+            title="Cancella notifica"
+            disabled={!!deleting}
+            onClick={() => onDelete(n.id)}
+          >
             <TrashIcon />
           </button>
         </article>
