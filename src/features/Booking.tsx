@@ -51,7 +51,7 @@ export default function Booking({
       s.active &&
       links.some(
         (link) =>
-          link.service_id === s.id &&
+          link.service_id === s.id && link.active !== false &&
           barbers.some((item) => item.id === link.barber_id && item.active),
       ),
   );
@@ -59,7 +59,7 @@ export default function Booking({
     (b) =>
       b.active &&
       links.some(
-        (link) => link.barber_id === b.id && link.service_id === service,
+        (link) => link.barber_id === b.id && link.service_id === service && link.active !== false,
       ),
   );
   const chosenBarber = eligibleBarbers.some((b) => b.id === barber)
@@ -425,8 +425,8 @@ export default function Booking({
               close={() => setClosedConfirmation(false)}
             >
               <p>
-                Questo giorno non devi lavorare. Sei sicuro di inserire un
-                appuntamento?
+                In questo giorno o in questa fascia oraria risulti chiuso. Sei sicuro
+                di voler inserire un appuntamento?
               </p>
               <div className="two">
                 <button

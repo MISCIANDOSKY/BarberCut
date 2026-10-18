@@ -398,7 +398,7 @@ export default function App() {
           deletionEnabled={!!settings.account_deletion_enabled}
           registrationEditor={
             canReview &&
-            role === "barber" && (
+            role === "barber_admin" && (
               <RegistrationPolicy
                 required={settings.require_user_approval !== false}
                 refresh={refresh}
@@ -406,7 +406,7 @@ export default function App() {
             )
           }
           addressEditor={
-            ready && (
+            ready && (role === "admin" || (role === "barber_admin" && canReview)) && (
               <BarberAddress
                 address={settings.shop_address || ""}
                 revision={settings.address_revision || 0}
@@ -427,13 +427,14 @@ export default function App() {
           userId={user!.id}
         />
       );
-    if (section === "Servizi e prezzi" && ready && role === "barber") {
+    if (section === "Servizi e prezzi" && ready && (role === "barber" || role === "barber_admin")) {
       const ownBarber = barbers.find(
         (item) => item.user_id === user!.id && item.active,
       );
       return ownBarber ? (
         <BarberServices
           barberId={ownBarber.id}
+          canEdit={role === "barber_admin"}
           notify={notify}
           refresh={refresh}
         />

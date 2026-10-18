@@ -1,0 +1,100 @@
+begin;
+update public.app_settings set require_user_approval=false where id;
+do $test$
+declare
+ ad uuid:=gen_random_uuid(); normal_user uuid:=gen_random_uuid(); lead_user uuid:=gen_random_uuid(); client_user uuid:=gen_random_uuid();
+ bn uuid; bl uuid; s uuid; own_s uuid; new_s uuid; ap uuid; d date:=(now() at time zone 'Europe/Rome')::date+3;
+ t timestamptz; last_t timestamptz; cfg record; n integer;
+begin
+ insert into auth.users(id,email,raw_user_meta_data) values
+ (ad,'role-admin@example.invalid','{"first_name":"Test","last_name":"Admin","phone":"000"}'),
+ (normal_user,'role-normal@example.invalid','{"first_name":"Test","last_name":"Normal","phone":"001"}'),
+ (lead_user,'role-lead@example.invalid','{"first_name":"Test","last_name":"Lead","phone":"002"}'),
+ (client_user,'role-client@example.invalid','{"first_name":"Test","last_name":"Client","phone":"003"}');
+ update public.user_roles set role='admin' where user_id=ad;
+ insert into public.barbers(name,user_id) values('Role normal',normal_user) returning id into bn;
+ insert into public.barbers(name,user_id) values('Role lead',lead_user) returning id into bl;
+ update public.user_roles set role='barber_admin' where user_id=lead_user;
+ -- Updates to the agenda must preserve the administrator-barber role.
+ update public.barbers set name='Role lead renamed' where id=bl;
+ if (select role from public.user_roles where user_id=lead_user)<>'barber_admin' then raise exception 'Lead role downgraded';end if;
+ insert into public.services(name,description,duration_minutes,price) values('Role service','Description',30,20) returning id into s;
+ insert into public.barber_services(barber_id,service_id) values(bn,s),(bl,s);
+ insert into public.working_hours(barber_id,weekday,opens,closes)
+ select b,w,'09:00','17:00' from (values(bn),(bl))bs(b) cross join generate_series(0,6)w;
+ while private.is_holiday(d) loop d:=d+1;end loop;
+ t:=d::timestamp at time zone 'Europe/Rome';
+ last_t:=((d+1)::timestamp at time zone 'Europe/Rome')-interval '30 minutes';
+ select shop_address,address_revision into cfg from public.app_settings where id;
+ perform public.staff_authorize_session(ad,'roles-admin');
+ perform public.staff_authorize_session(normal_user,'roles-normal');
+ perform public.staff_authorize_session(lead_user,'roles-lead');
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',normal_user,'role','authenticated','session_id','roles-normal')::text,true);
+ set local role authenticated;
+ if not public.staff_session_status() then raise exception 'Normal staff blocked';end if;
+ begin perform public.save_barber_service(bn,s,'Forbidden','',30,30);raise exception 'Normal edit accepted';exception when raise_exception then if sqlerrm<>'ACCESS_DENIED' then raise;end if;end;
+ begin perform public.save_barber_service(bn,null,'Forbidden','',30,30);raise exception 'Normal add accepted';exception when raise_exception then if sqlerrm<>'ACCESS_DENIED' then raise;end if;end;
+ begin perform public.remove_barber_service(bn,s);raise exception 'Normal delete accepted';exception when raise_exception then if sqlerrm<>'ACCESS_DENIED' then raise;end if;end;
+ begin perform public.set_registration_policy(true);raise exception 'Normal policy accepted';exception when raise_exception then if sqlerrm<>'ACCESS_DENIED' then raise;end if;end;
+ begin perform public.update_shop_address('Via test 1',cfg.address_revision,true);raise exception 'Normal address accepted';exception when raise_exception then if sqlerrm<>'ACCESS_DENIED' then raise;end if;end;
+ perform public.set_barber_service_active(bn,s,false);
+ if exists(select 1 from public.get_available_slots(bn,s,d)) then raise exception 'Disabled service bookable';end if;
+ if exists(select 1 from public.get_manual_booking_slots(bn,s,d)) then raise exception 'Disabled manual service bookable';end if;
+ if not exists(select 1 from public.barber_services where barber_id=bl and service_id=s and active) then raise exception 'Other barber disabled';end if;
+ perform public.set_barber_service_active(bn,s,true);
+ begin perform public.set_barber_service_active(bl,s,false);raise exception 'Other agenda toggle accepted';exception when raise_exception then if sqlerrm<>'ACCESS_DENIED' then raise;end if;end;
+ update public.user_roles set role='barber_admin' where user_id=normal_user;
+ reset role;
+ if (select role from public.user_roles where user_id=normal_user)<>'barber' then raise exception 'Self promotion accepted';end if;
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',normal_user,'role','authenticated','session_id','roles-normal')::text,true);
+ set local role authenticated;
+ select count(*) into n from public.get_manual_booking_slots(bn,s,d);
+ if n<>floor(extract(epoch from (((d+1)::timestamp at time zone 'Europe/Rome')-t))/900)::integer-1 then raise exception 'Incorrect full-day slots: %',n;end if;
+ if not exists(select 1 from public.get_manual_booking_slots(bn,s,d) where start_at=t and requires_confirmation) then raise exception 'Midnight missing confirmation';end if;
+ if not exists(select 1 from public.get_manual_booking_slots(bn,s,d) where start_at=last_t and requires_confirmation) then raise exception 'End of day missing';end if;
+ if not exists(select 1 from public.get_manual_booking_slots(bn,s,d) where start_at=t+interval '10 hours' and not requires_confirmation) then raise exception 'Working slot incorrectly flagged';end if;
+ if exists(select 1 from public.get_available_slots(bn,s,d) where start_at=t) then raise exception 'Customer availability expanded';end if;
+ begin perform public.book_manual_appointment(bn,s,t,'Test','Guest','',false);raise exception 'Missing confirmation accepted';exception when raise_exception then if sqlerrm<>'CLOSED_DAY_CONFIRM_REQUIRED' then raise;end if;end;
+ begin perform public.book_guest_appointment(bn,s,t,'Test','Guest','');raise exception 'Legacy closure bypass';exception when raise_exception then if sqlerrm<>'CLOSED_DAY_CONFIRM_REQUIRED' then raise;end if;end;
+ ap:=public.book_manual_appointment(bn,s,t,'Test','Guest','',true);
+ if exists(select 1 from public.get_manual_booking_slots(bn,s,d) where start_at<t+interval '30 minutes') then raise exception 'Overlap offered';end if;
+ ap:=public.book_manual_appointment(bn,s,last_t,'Test','Last','',true);
+ if not exists(select 1 from public.calendar_entries where id=ap and end_at=((d+1)::timestamp at time zone 'Europe/Rome')) then raise exception 'Midnight end invalid';end if;
+ insert into public.schedule_exceptions(barber_id,day,closed) values(bn,d+1,true);
+ if exists(select 1 from public.get_manual_booking_slots(bn,s,d+1) where not requires_confirmation) then raise exception 'Closed day not flagged';end if;
+ reset role;
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',lead_user,'role','authenticated','session_id','roles-lead')::text,true);
+ set local role authenticated;
+ if not public.staff_session_status() then raise exception 'Lead verification failed';end if;
+ perform public.set_registration_policy(true);
+ perform public.update_shop_address('Via test nuova 10',cfg.address_revision,true);
+ perform public.set_barber_service_active(bl,s,false);
+ own_s:=public.save_barber_service(bl,s,'Personal lead','Lead description',45,25);
+ if own_s=s then raise exception 'Shared service not isolated';end if;
+ if not exists(select 1 from public.barber_services where barber_id=bl and service_id=own_s and not active) then raise exception 'Edit lost disabled state';end if;
+ if not exists(select 1 from public.services where id=s and name='Role service' and price=20 and duration_minutes=30 and active) then raise exception 'Source service altered';end if;
+ perform public.set_barber_service_active(bl,own_s,true);
+ new_s:=public.save_barber_service(bl,null,'New lead','',15,10);
+ perform public.remove_barber_service(bl,new_s);
+ if not exists(select 1 from public.get_manual_booking_slots(bl,own_s,d) where start_at=t and requires_confirmation) then raise exception 'Lead midnight unavailable';end if;
+ ap:=public.book_manual_appointment(bl,own_s,t,'Test','Lead guest','',true);
+ begin perform public.save_barber_service(bn,s,'Other','',30,1);raise exception 'Lead modified other agenda';exception when raise_exception then if sqlerrm<>'ACCESS_DENIED' then raise;end if;end;
+ begin perform public.admin_delete_resource('barber',bn);raise exception 'Lead gained global admin';exception when raise_exception then if sqlerrm<>'ACCESS_DENIED' then raise;end if;end;
+ reset role;
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',ad,'role','authenticated','session_id','roles-admin')::text,true);
+ set local role authenticated;
+ update public.user_roles set role='barber_admin' where user_id=normal_user;
+ update public.user_roles set role='barber' where user_id=lead_user;
+ reset role;
+ if (select role from public.user_roles where user_id=normal_user)<>'barber_admin' or (select role from public.user_roles where user_id=lead_user)<>'barber' then raise exception 'Admin cannot assign roles';end if;
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',lead_user,'role','authenticated','session_id','roles-lead')::text,true);
+ set local role authenticated;
+ begin perform public.set_registration_policy(false);raise exception 'Demoted staff retained permission';exception when raise_exception then if sqlerrm<>'ACCESS_DENIED' then raise;end if;end;
+ reset role;
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',client_user,'role','authenticated','session_id','roles-client')::text,true);
+ set local role authenticated;
+ begin perform public.get_manual_booking_slots(bn,s,d);raise exception 'Client manual access';exception when raise_exception then if sqlerrm<>'ACCESS_DENIED' then raise;end if;end;
+ begin perform public.set_barber_service_active(bn,s,false);raise exception 'Client toggle access';exception when raise_exception then if sqlerrm<>'ACCESS_DENIED' then raise;end if;end;
+ reset role;
+end $test$;
+rollback;

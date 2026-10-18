@@ -8,6 +8,7 @@ begin
  insert into public.barbers(name,user_id) values('Public test barber',a) returning id into b;
  insert into public.barbers(name,active) values('Hidden test barber',false) returning id into hidden;
  insert into public.working_hours(barber_id,weekday,opens,closes) values(b,1,'09:00','13:00'),(b,1,'15:00','19:00'),(hidden,1,'09:00','18:00');
+ update public.user_roles set role='barber_admin' where user_id=a;
  perform public.staff_authorize_session(a,'shop-test');
  update public.app_settings set shop_address='',address_revision=0 where id;
  perform set_config('request.jwt.claims',jsonb_build_object('sub',a,'role','authenticated','session_id','shop-test')::text,true);

@@ -26,7 +26,7 @@ begin
   insert into public.barber_services values(source_id,shared_id),(source_id,disabled_id),(source_id,archived_id),(inactive_id,inactive_only),(deleted_id,deleted_only);
   select array_agg(distinct s.id order by s.id) into expected_ids
   from public.barber_services bs join public.barbers b on b.id=bs.barber_id join public.services s on s.id=bs.service_id
-  where b.active and b.deleted_at is null and s.active and s.deleted_at is null;
+  where b.active and b.deleted_at is null and bs.active and s.active and s.deleted_at is null;
   insert into public.barbers(name,user_id) values('Seed target',barber_user) returning id into target_id;
   select array_agg(service_id order by service_id) into actual_ids from public.barber_services where barber_id=target_id;
   if actual_ids is distinct from expected_ids then raise exception 'Incorrect initial services'; end if;
@@ -37,6 +37,7 @@ begin
   insert into public.barber_services values(target_id,shared_id);
   reset role;
   if (select role from public.user_roles where user_id=barber_user)<>'barber' then raise exception 'Role not assigned'; end if;
+  update public.user_roles set role='barber_admin' where user_id=barber_user;
   perform public.staff_authorize_session(barber_user,'seed-barber-session');
   perform set_config('request.jwt.claims',jsonb_build_object('sub',barber_user,'role','authenticated','session_id','seed-barber-session')::text,true);
   set local role authenticated;

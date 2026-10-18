@@ -62,7 +62,7 @@ Le prenotazioni disabilitate sono un'impostazione corrente: non riaprirle automa
 ## Clienti e approvazione iscrizioni
 
 - Admin > Configurazione: unica checkbox “Accetta i nuovi clienti senza approvazione”, subito prima di Apri le prenotazioni online. Rimossa da Manutenzione.
-- Nel Profilo del barbiere verificato con agenda attiva associata: Iscrizione nuovi clienti, stessa unica checkbox e salvataggio dedicato. La politica è unica per tutta la barberia; al barbiere è consentito modificare solo questo flag, non le altre impostazioni di manutenzione.
+- Nel Profilo del Barbiere Admin verificato con agenda attiva associata: Iscrizione nuovi clienti, stessa unica checkbox e salvataggio dedicato. La politica è unica per tutta la barberia; al Barbiere Admin è consentito modificare solo questo flag, non le altre impostazioni di manutenzione.
 - Spunta attiva = accettazione automatica dopo verifica email (require_user_approval=false); spunta disattiva = richiesta approvazione (require_user_approval=true). Il cambio non converte gli utenti già in attesa o rifiutati.
 - I clienti esistenti sono stati conservati come approvati.
 - Admin e barbiere verificato con associazione attiva hanno il pulsante Gestisci utenti: In attesa, Approvati, Rifiutati.
@@ -86,10 +86,12 @@ Le prenotazioni disabilitate sono un'impostazione corrente: non riaprirle automa
 - Telefono corrispondente a un solo profilo disponibile: collegamento automatico all’account tramite client_id, visibile in Le mie prenotazioni. Confronto canonico del numero completo, con prefissi +39/0039 e numeri locali italiani. Numeri duplicati richiedono correzione o campo vuoto per ospite. Nessuna nuova utenza o associazione retroattiva.
 - Salvataggio manuale riuscito: ritorno automatico ad Appuntamenti sulla stessa agenda e data prenotata. Le mie prenotazioni ricarica all’apertura, al ritorno in primo piano e ogni 30 secondi mentre visibile.
 - Il barbiere può bloccare soltanto la propria agenda.
-- Prenotazione manuale staff su festivi, chiusure settimanali e ferie: orari selezionabili sul giorno completo con conferma esplicita Sì/No prima del salvataggio. Giorni lavorativi e prenotazioni clienti conservano la disponibilità normale; appuntamenti e blocchi esistenti non vengono sovrapposti.
+- Prenotazione manuale staff per entrambi i ruoli barbiere: giornata locale completa 00:00–24:00 anche nei giorni lavorativi, intera durata entro mezzanotte. Fuori dai turni, su festivi, chiusure e ferie: conferma Sì/No prima del salvataggio, richiesta anche sul server. Disponibilità clienti invariata; appuntamenti e blocchi non vengono sovrapposti.
 - Promemoria in app 24 ore e 1 ora prima, deduplicati per appuntamento/orario/tipo. Testo “Ricordati del tuo appuntamento! Hai prenotato [servizio] per il [data] alle [ora]. Ti aspettiamo in barberia.”; nessun promemoria email appuntamento o Web Push implementato. Cron ogni 5 minuti; aggiornamento notifiche visibili ogni 30 secondi, al focus e al ritorno online.
 
 ## Barbieri, servizi e ruoli
+
+- Ruoli: Cliente, Barbiere, Barbiere Admin (barber_admin), Admin. Solo l’admin globale assegna ruoli da Utenti. Barbiere Admin mantiene accesso alla sola propria agenda, non all’amministrazione globale; può inoltre modificare indirizzo e politica approvazione dal Profilo. Verifica staff richiesta per entrambi i ruoli barbiere.
 
 - Creare un barbiere associato a un account assegna automaticamente il ruolo Barbiere, preservando eventuale ruolo Admin.
 - Ogni nuova agenda eredita automaticamente le associazioni ai servizi attivi degli altri barbieri attivi e non eliminati, senza duplicare lo stesso servizio. Operazione atomica nel database alla creazione; modifiche/riattivazioni successive non ripristinano servizi rimossi. Gestione personale successiva tramite il flusso esistente con isolamento delle modifiche ai servizi condivisi.
@@ -98,12 +100,12 @@ Le prenotazioni disabilitate sono un'impostazione corrente: non riaprirle automa
 - Un account di barbiere eliminato può essere associato nuovamente: indice univoco parziale sulle agende non eliminate.
 - Admin: Modifica, Disattiva/Riattiva, Elimina, disposti uno sotto l'altro per servizi e barbieri.
 - Eliminazione catalogo tramite archiviazione: storico preservato; barbiere con appuntamenti futuri confermati non eliminabile.
-- Barbiere: aggiunta, modifica, eliminazione dei propri servizi/prezzi. Se un servizio è condiviso, la modifica crea la variante per quel barbiere senza alterare gli altri o le prenotazioni già effettuate.
+- Barbiere normale: può disattivare/riattivare solo per la propria agenda (barber_services.active), senza cambiare il servizio globale o gli altri barbieri. Barbiere Admin: aggiunta, modifica, eliminazione e disattivazione dei propri servizi/prezzi. Se un servizio è condiviso, la modifica crea la variante per quel barbiere senza alterare gli altri o le prenotazioni già effettuate.
 
 ## Informazioni barberia
 
 - Pulsante Informazioni dopo Le mie prenotazioni: indirizzo, collegamento Google Maps, orari dei barbieri attivi ed eccezioni dei prossimi 30 giorni.
-- L'indirizzo si modifica dal profilo solo come admin o barbiere verificato associato attivamente.
+- L'indirizzo si modifica dal profilo solo come admin o Barbiere Admin verificato associato attivamente. Il Barbiere normale non può modificarlo.
 - Primo salvataggio senza conferma aggiuntiva. Dalla modifica successiva:
   “Sei sicuro che vuoi modificare l’indirizzo della barberia?”.
 - Controllo revisione sul server per evitare che due modifiche simultanee si sovrascrivano.
@@ -249,3 +251,11 @@ Aggiunta ai messaggi esistenti l’indicazione di controllare le cartelle Spam e
 ### 18 ottobre 2026 — Servizi automatici alla creazione del barbiere
 
 Migrazione 20261018094431: trigger privato dopo INSERT su barbers associa i servizi attivi e non archiviati degli altri barbieri attivi e non eliminati. Associazioni distinte e nello stesso salvataggio, nessuna modifica retroattiva ad agende esistenti. Senza servizi eleggibili il barbiere viene creato senza associazioni. Funzione non eseguibile direttamente da anon/authenticated; creazione agenda resta soggetta ai permessi admin. Aggiunta spiegazione nel form Aggiungi barbiere. Test new_barber_services.sql e barber_workflows.sql superati con rollback: catalogo corretto, esclusione servizi/agende non attivi o archiviati, ruolo automatico, nessun ripristino su modifica, gestione autonoma e isolamento dei servizi condivisi, cliente/barbiere esclusi dalla creazione agende. Nessun account reale o associazione reale di prova conservati. Advisor invariati rispetto ai rilievi precedenti. TypeScript, build, test frontend e pubblicazione GitHub Pages riusciti nella [CI 39116596025](https://github.com/MISCIANDOSKY/BarberCut/actions/runs/39116596025). Nessuna prova autenticata su dispositivo fisico.
+
+### 18 ottobre 2026 — Barbiere Admin, servizi per agenda e manuali 24 ore
+
+Migrazione 20261018095042: aggiunto ruolo barber_admin e riconoscimento staff/autorizzazione sessioni; ruolo preservato nelle modifiche dell’agenda e rimosso tornando Cliente quando viene eliminata l’ultima associazione. Permessi server per aggiunta/modifica/eliminazione servizi e modifica indirizzo/politica iscrizioni riservati all’admin globale o Barbiere Admin con agenda attiva. Barbiere normale limitato alla disattivazione/riattivazione dei propri servizi; nuova colonna barber_services.active e RPC controllata, esclusione dalla disponibilità e dalla selezione UI, mantenimento dello stato in caso di variante condivisa. Associazione automatica nuove agende considera solo associazioni attive. Nessun ampliamento della gestione utenti o delle agende altrui. Menu Utenti con scelta Barbiere Admin; profilo e servizi mostrano azioni coerenti. Richiesta assegnazione all’agenda indicata dal titolare da completare prima della chiusura dell’intervento, senza identificativi personali nel repository.
+
+Prenotazioni manuali su tutta la giornata locale per entrambi i ruoli, intera durata entro le 00:00 successive; conferma richiesta anche fuori fascia nei giorni aperti. Messaggio aggiornato a “In questo giorno o in questa fascia oraria risulti chiuso. Sei sicuro di voler inserire un appuntamento?”. Restano limite cinque, collegamento telefono, approvazione clienti, scadenza tre mesi e conflitti. Prenotazioni personali mantengono orari ordinari.
+
+Test SQL barber_admin_permissions.sql superato con rollback: limiti ruoli, promozione/declassamento solo admin, editor e toggle per agenda, isolamento dati, piena giornata, conferma e conflitti. Aggiornati e rieseguiti barber_workflows.sql, new_barber_services.sql, registration_policy.sql, shop_information.sql e manual_closed_days.sql secondo i nuovi permessi: tutti superati con rollback. Nessun dato di test conservato. Advisor invariati (tabelle private volutamente senza accesso diretto e rilievo preesistente protezione password compromesse). CI e pubblicazione da verificare; nessuna prova autenticata su dispositivo fisico.

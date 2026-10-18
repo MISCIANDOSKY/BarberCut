@@ -5,10 +5,12 @@ import type { Row } from "../lib/api";
 
 export default function BarberServices({
   barberId,
+  canEdit,
   notify,
   refresh,
 }: {
   barberId: string;
+  canEdit: boolean;
   notify: (message: string) => void;
   refresh: () => void;
 }) {
@@ -26,7 +28,7 @@ export default function BarberServices({
       )) as Row[];
       setRows(
         links
-          .map((link) => link.services)
+          .map((link) => link.services ? { ...link.services, link_active: link.active !== false } : null)
           .filter((service) => service && !service.deleted_at)
           .sort((a, b) => a.name.localeCompare(b.name, "it")),
       );
@@ -44,7 +46,7 @@ export default function BarberServices({
   }, [barberId]);
   async function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (busy) return;
+    if (busy || !canEdit) return;
     const values = new FormData(event.currentTarget);
     setBusy(true);
     try {
@@ -71,20 +73,21 @@ export default function BarberServices({
   return (
     <>
       <p className="muted">
-        Gestisci i servizi della tua agenda. Le modifiche valgono per i tuoi
-        servizi; gli altri barbieri mantengono i propri prezzi.
+        {canEdit
+          ? "Gestisci i servizi della tua agenda. Le modifiche valgono per i tuoi servizi; gli altri barbieri mantengono i propri prezzi."
+          : "Puoi disattivare o riattivare i servizi soltanto per la tua agenda. Per aggiungerli, modificarli o eliminarli rivolgiti all’admin o a un Barbiere Admin."}
       </p>
-      <button
+      {canEdit && <button
         className="primary"
         onClick={() => setEditing({})}
         disabled={busy}
       >
         ＋ Aggiungi servizio
-      </button>
+      </button>}
       {loading ? (
         <p role="status">Caricamento servizi…</p>
       ) : !rows.length ? (
-        <Empty>Non hai ancora servizi associati. Aggiungi il primo.</Empty>
+        <Empty>Non hai ancora servizi associati alla tua agenda.</Empty>
       ) : (
         rows.map((service) => (
           <article className="table-row" key={service.id}>
@@ -92,12 +95,36 @@ export default function BarberServices({
               <strong>{service.name}</strong>
               <small>
                 {service.duration_minutes} minuti · {euro(service.price)}
-                {!service.active ? " · Non attivo" : ""}
+                {!service.active ? " · Disattivato dall’admin" : !service.link_active ? " · Disattivato per te" : ""}
               </small>
               {service.description && <small>{service.description}</small>}
             </span>
-            <div>
+            <div style={{ display: "flex", flexDirection: "column", gap: ".25rem" }}>
               <button
+                className="text"
+                disabled={busy || !service.active}
+                onClick={async () => {
+                  if (busy) return;
+                  setBusy(true);
+                  try {
+                    await result(supabase.rpc("set_barber_service_active", {
+                      p_barber: barberId,
+                      p_service: service.id,
+                      p_active: !service.link_active,
+                    }));
+                    await load();
+                    refresh();
+                    notify(service.link_active ? "Servizio disattivato per la tua agenda." : "Servizio riattivato per la tua agenda.");
+                  } catch (error) {
+                    notify(friendly(error));
+                  } finally {
+                    setBusy(false);
+                  }
+                }}
+              >
+                {service.link_active ? "Disattiva per me" : "Riattiva per me"}
+              </button>
+              {canEdit && <><button
                 className="text"
                 disabled={busy}
                 onClick={() => setEditing(service)}
@@ -135,12 +162,12 @@ export default function BarberServices({
                 }}
               >
                 Elimina
-              </button>
+              </button></>}
             </div>
           </article>
         ))
       )}
-      {editing && (
+      {canEdit && editing && (
         <Modal
           title={editing.id ? "Modifica servizio" : "Nuovo servizio"}
           close={() => {

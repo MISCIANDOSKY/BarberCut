@@ -16,6 +16,7 @@ insert into public.barbers(name,user_id) values('Test barber B',b) returning id 
 insert into public.barbers(name,user_id) values('Test admin barber',ad) returning id into bad;
 if(select role from public.user_roles where user_id=a)<>'barber' then raise exception 'barber role not assigned';end if;
 if(select role from public.user_roles where user_id=ad)<>'admin' then raise exception 'admin role downgraded';end if;
+update public.user_roles set role='barber_admin' where user_id=a;
 perform public.staff_authorize_session(a,'test-a');perform public.staff_authorize_session(b,'test-b');perform public.staff_authorize_session(ad,'test-admin');
 insert into public.services(name,duration_minutes,price) values('Shared test',30,20) returning id into s;
 insert into public.barber_services values(ba,s),(bb,s);

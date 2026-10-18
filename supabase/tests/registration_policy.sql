@@ -18,6 +18,7 @@ begin
   update public.user_roles set role='admin' where user_id=ad;
   update public.user_roles set role='barber' where user_id=orphan;
   insert into public.barbers(name,user_id) values('Policy test barber',ba) returning id into agenda;
+  update public.user_roles set role='barber_admin' where user_id in(ba,orphan);
   select to_jsonb(s)-'require_user_approval' into before_settings from public.app_settings s where id;
 
   perform set_config('request.jwt.claims',jsonb_build_object('sub',cl,'role','authenticated')::text,true);

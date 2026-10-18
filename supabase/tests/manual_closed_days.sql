@@ -51,8 +51,8 @@ begin
  raise exception 'vacation booked without yes';
  exception when raise_exception then if sqlerrm<>'CLOSED_DAY_CONFIRM_REQUIRED' then raise;end if;end;
  perform public.book_manual_appointment(own_barber,service_id,t,'Test','Vacation','',true);
- if exists(select 1 from public.get_manual_booking_slots(own_barber,service_id,normal_day) where requires_confirmation) then raise exception 'regular day unnecessarily flagged';end if;
- if exists(select 1 from public.get_manual_booking_slots(own_barber,service_id,normal_day) where (start_at at time zone 'Europe/Rome')::time<time '09:00') then raise exception 'regular hours widened';end if;
+ if not exists(select 1 from public.get_manual_booking_slots(own_barber,service_id,normal_day) where requires_confirmation) then raise exception 'outside-hours confirmation missing';end if;
+ if exists(select 1 from public.get_available_slots(own_barber,service_id,normal_day) where (start_at at time zone 'Europe/Rome')::time<time '09:00') then raise exception 'customer regular hours widened';end if;
  perform public.book_manual_appointment(own_barber,service_id,(normal_day+time '10:00') at time zone 'Europe/Rome','Test','Normal','',false);
  begin perform public.get_manual_booking_slots(other_barber,service_id,holiday);
  raise exception 'other agenda manual slots exposed';
@@ -77,5 +77,5 @@ begin
  if has_function_privilege('anon','public.get_manual_booking_slots(uuid,uuid,date)','execute') or
  has_function_privilege('anon','public.book_manual_appointment(uuid,uuid,timestamptz,text,text,text,boolean)','execute') then raise exception 'anonymous grant';end if;
 end $test$;
-select 'PASS: holiday/vacation/weekly closure require yes; normal hours unchanged; conflicts/blocks/roles/horizon preserved; rollback' as result;
+select 'PASS: holiday/vacation/weekly closure require yes; customer hours unchanged; staff outside hours require yes; conflicts/blocks/roles/horizon preserved; rollback' as result;
 rollback;

@@ -344,9 +344,10 @@ export default function Admin({
                   disabled={busy}
                   onChange={(e) => {
                     const role = e.target.value;
+                    const roleLabel = role === "barber_admin" ? "Barbiere Admin" : role === "barber" ? "Barbiere" : role === "admin" ? "Admin" : "Cliente";
                     if (
                       confirm(
-                        "Confermi il ruolo " + role + " per questo account?",
+                        "Confermi il ruolo " + roleLabel + " per questo account?",
                       )
                     )
                       run(() =>
@@ -361,6 +362,7 @@ export default function Admin({
                 >
                   <option value="client">Cliente</option>
                   <option value="barber">Barbiere</option>
+                  <option value="barber_admin">Barbiere Admin</option>
                   <option value="admin">Admin</option>
                 </select>
               </article>
@@ -503,7 +505,8 @@ export default function Admin({
             Il ruolo Barbiere viene assegnato automaticamente all’account
             associato. I servizi attivi degli altri barbieri attivi vengono
             associati automaticamente; il nuovo barbiere potrà poi gestirli da
-            Servizi e prezzi. Eliminando il barbiere, l’account torna Cliente e
+            Servizi e prezzi. Per consentire anche aggiunta, modifica ed eliminazione,
+            assegna il ruolo Barbiere Admin da Utenti. Eliminando il barbiere, l’account torna Cliente e
             può essere nuovamente associato.
           </p>
           {!availableUsers().length && (
