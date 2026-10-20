@@ -64,11 +64,13 @@ export function AppDialogs() {
               : "Controlla il campo indicato e inserisci un valore valido.";
       void informInApp(message).then(() => {
         handling = false;
-        if (!field.isConnected) return;
-        const control = field
-          .closest(".app-control")
-          ?.querySelector<HTMLButtonElement>("button");
-        (control || field).focus();
+        window.requestAnimationFrame(() => {
+          if (!field.isConnected) return;
+          const control = field
+            .closest(".app-control")
+            ?.querySelector<HTMLButtonElement>("button");
+          (control || field).focus();
+        });
       });
     };
     document.addEventListener("invalid", invalid, true);
