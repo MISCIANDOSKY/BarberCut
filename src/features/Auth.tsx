@@ -99,8 +99,13 @@ export default function Auth({
         );
         close();
       } else if (mode === "register") {
-        if (!/^\+[1-9][0-9]{0,2}$/.test(phonePrefix) || !/^[0-9]{10}$/.test(phone)) {
-          setErrorMessage("Controlla il prefisso e inserisci un numero di telefono composto da 10 cifre.");
+        if (
+          !/^\+[1-9][0-9]{0,2}$/.test(phonePrefix) ||
+          !/^[0-9]{10}$/.test(phone)
+        ) {
+          setErrorMessage(
+            "Controlla il prefisso e inserisci un numero di telefono composto da 10 cifre.",
+          );
           return;
         }
         if (terms && !accepted) throw new Error("TERMS_REQUIRED");
@@ -109,7 +114,13 @@ export default function Auth({
           password,
           options: {
             emailRedirectTo: redirect,
-            data: { first_name: first, last_name: last, phone: phonePrefix + phone, phone_country_code: phonePrefix, phone_national: phone },
+            data: {
+              first_name: first,
+              last_name: last,
+              phone: phonePrefix + phone,
+              phone_country_code: phonePrefix,
+              phone_national: phone,
+            },
           },
         });
         if (error) throw error;
@@ -345,49 +356,64 @@ export default function Auth({
           />
           {mode === "register" && (
             <div className="registration-phone">
-            <label>
-              Prefisso
-              <input
-                type="tel"
-                name="tel-country-code"
-                inputMode="tel"
-                autoComplete="tel-country-code"
-                value={phonePrefix}
-                maxLength={4}
-                pattern="\+[1-9][0-9]{0,2}"
-                required
-                data-app-control="true"
-                aria-label="Prefisso internazionale"
-                onChange={(event) => {
-                  const prefix = "+" + event.target.value.replace(/[^0-9]/g, "");
-                  event.currentTarget.setCustomValidity(/^\+[1-9][0-9]{0,2}$/.test(prefix) ? "" : "Inserisci un prefisso valido, per esempio +39.");
-                  setPhonePrefix(prefix);
-                }}
-              />
-            </label>
-            <label>
-              Numero di telefono
-              <input
-                name="tel"
-                type="tel"
-                inputMode="numeric"
-                autoComplete="tel-national"
-                pattern="[0-9]{10}"
-                minLength={10}
-                required
-                value={phone}
-                aria-describedby="registration-phone-help"
-                aria-invalid={!!phone && !/^[0-9]{10}$/.test(phone)}
-                data-app-control="true"
-                onChange={(event) => {
-                  const digits = event.target.value.replace(/[^0-9]/g, "");
-                  event.currentTarget.setCustomValidity(/^[0-9]{10}$/.test(digits) ? "" : "Inserisci un numero di telefono composto da 10 cifre.");
-                  setPhone(digits);
-                }}
-              />
-              <small id="registration-phone-help">Inserisci 10 cifre, senza prefisso internazionale.</small>
-              {phone && !/^[0-9]{10}$/.test(phone) && <span className="danger-text">Il numero deve contenere esattamente 10 cifre.</span>}
-            </label>
+              <label>
+                Prefisso
+                <input
+                  type="tel"
+                  name="tel-country-code"
+                  inputMode="tel"
+                  autoComplete="tel-country-code"
+                  value={phonePrefix}
+                  maxLength={4}
+                  pattern="\+[1-9][0-9]{0,2}"
+                  required
+                  data-app-control="true"
+                  aria-label="Prefisso internazionale"
+                  onChange={(event) => {
+                    const prefix =
+                      "+" + event.target.value.replace(/[^0-9]/g, "");
+                    event.currentTarget.setCustomValidity(
+                      /^\+[1-9][0-9]{0,2}$/.test(prefix)
+                        ? ""
+                        : "Inserisci un prefisso valido, per esempio +39.",
+                    );
+                    setPhonePrefix(prefix);
+                  }}
+                />
+              </label>
+              <label>
+                Numero di telefono
+                <input
+                  name="tel"
+                  type="tel"
+                  inputMode="numeric"
+                  autoComplete="tel-national"
+                  pattern="[0-9]{10}"
+                  minLength={10}
+                  required
+                  value={phone}
+                  aria-describedby="registration-phone-help"
+                  aria-invalid={!!phone && !/^[0-9]{10}$/.test(phone)}
+                  data-app-control="true"
+                  onChange={(event) => {
+                    const digits = event.target.value.replace(/[^0-9]/g, "");
+                    event.currentTarget.setCustomValidity(
+                      /^[0-9]{10}$/.test(digits)
+                        ? ""
+                        : "Inserisci un numero di telefono composto da 10 cifre.",
+                    );
+                    setPhone(digits);
+                  }}
+                />
+                <small id="registration-phone-help">
+                  Inserisci 10 cifre, senza prefisso internazionale.
+                </small>
+                {phone && !/^[0-9]{10}$/.test(phone) && (
+                  <span className="danger-text">
+                    Il numero deve contenere esattamente 10 cifre.
+                  </span>
+                )}
+              </label>
             </div>
           )}
           {(mode === "login" || mode === "register") && (
