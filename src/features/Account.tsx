@@ -1,3 +1,4 @@
+import PasswordRecovery from "./PasswordRecovery";
 import ProfileTerms from "./ProfileTerms";
 import { PushSettingsPanel } from "./PushSettings";
 import { detachPushDevice } from "../lib/push";
@@ -91,6 +92,7 @@ export function Profile({
   reload,
   deletionEnabled,
   deletionFromEmail = false,
+  onRecovery,
 }: {
   user: Row;
   profile: Row;
@@ -98,6 +100,7 @@ export function Profile({
   reload: () => void;
   deletionEnabled: boolean;
   deletionFromEmail?: boolean;
+  onRecovery: () => void;
 }) {
   const [first, setFirst] = useState(profile.first_name),
     [last, setLast] = useState(profile.last_name),
@@ -109,12 +112,14 @@ export function Profile({
     setNotice(text);
     outerNotify(text);
   };
+  const [recovering,setRecovering] = useState(false);
   const [page, setPage] = useState(deletionFromEmail ? "Elimina account" : "");
   useEffect(() => {
     if (deletionFromEmail) setPage("Elimina account");
   }, [deletionFromEmail]);
   return (
     <>
+      {recovering && <PasswordRecovery initialEmail={user.email || ""} lockEmail close={()=>setRecovering(false)} verified={()=>{clearPasswordProof();setRecovering(false);onRecovery();reload();}} />}
       <nav className="profile-menu" aria-label="Impostazioni del profilo">
         {[
           "Informazioni personali",
@@ -254,14 +259,7 @@ export function Profile({
               </div>
               <button
                 className="text"
-                onClick={async () => {
-                  await supabase.auth.resetPasswordForEmail(user.email, {
-                    redirectTo: location.origin + import.meta.env.BASE_URL,
-                  });
-                  notify(
-                    "Controlla l’email per cambiare la password. Controlla anche le cartelle Spam e Posta indesiderata.",
-                  );
-                }}
+                onClick={() => setRecovering(true)}
               >
                 Cambia password
               </button>

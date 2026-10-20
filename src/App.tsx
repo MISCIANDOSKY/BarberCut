@@ -1,3 +1,4 @@
+import { ResetPasswordDialog } from "./features/PasswordRecovery";
 import BookingHorizon from "./features/BookingHorizon";
 import { PushOnboarding } from "./features/PushSettings";
 import { detachPushDevice } from "./lib/push";
@@ -67,7 +68,6 @@ export default function App() {
     [loading, setLoading] = useState(true),
     [online, setOnline] = useState(navigator.onLine),
     [reset, setReset] = useState(false),
-    [password, setPassword] = useState(""),
     [deletingNotification, setDeletingNotification] = useState<string | null>(
       null,
     );
@@ -576,6 +576,7 @@ export default function App() {
           profile={profile}
           notify={notify}
           reload={refresh}
+          onRecovery={()=>setReset(true)}
           deletionEnabled={!!settings.account_deletion_enabled}
           deletionFromEmail={deletionFromEmail}
         />
@@ -716,39 +717,7 @@ export default function App() {
       return <Admin section={section} notify={notify} refresh={refresh} />;
     return null;
   }
-  const resetDialog = (
-    <>
-      {reset && (
-        <Modal title="Scegli una nuova password" close={() => setReset(false)}>
-          <form
-            onSubmit={async (e) => {
-              e.preventDefault();
-              try {
-                await result(supabase.auth.updateUser({ password }));
-                setReset(false);
-                notify("Password aggiornata.");
-              } catch (e) {
-                notify(friendly(e));
-              }
-            }}
-          >
-            <label>
-              Nuova password
-              <input
-                type="password"
-                minLength={8}
-                autoComplete="new-password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </label>
-            <button className="primary">Salva password</button>
-          </form>
-        </Modal>
-      )}
-    </>
-  );
+  const resetDialog = reset && <ResetPasswordDialog close={()=>setReset(false)} done={()=>{setReset(false);clearPasswordProof();notify("Password aggiornata.");void refresh();}} />;
   if (user && role === "shop")
     return (
       <div className="app shop-app">
@@ -1049,6 +1018,7 @@ export default function App() {
           requiresApproval={settings.require_user_approval !== false}
           close={() => setAuth(false)}
           notify={notify}
+          onRecovery={()=>setReset(true)}
           onDone={refresh}
         />
       )}

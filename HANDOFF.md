@@ -76,7 +76,7 @@ Le prenotazioni disabilitate sono un'impostazione corrente: non riaprirle automa
 ## Prenotazioni e agenda
 
 - Disponibilità calcolata dal server, fuso Europe/Rome, scatti di 15 minuti; verifica dell'intera durata del servizio.
-- Limiti: massimo 5 appuntamenti normali futuri per cliente e prenotazione entro 6 mesi. Le ricorrenze aggiuntive hanno un limite separato (default 5 futuri, configurabile o senza limite di numero) e nessun limite di data.
+- Limiti: massimo 5 appuntamenti normali futuri per cliente; orizzonte in mesi configurabile (iniziale 6) da Admin > Manutenzione o Barbiere Admin > Configurazione. Le ricorrenze aggiuntive hanno un limite separato (default 5 futuri, configurabile o senza limite di numero) e nessun limite di data.
 - Prenotazione in due schermate: scelta servizio, poi schermata completa Giorno e orario con riepilogo, disponibilità, giorno fisso in alto e Conferma prenotazione fisso in basso. Solo la zona degli orari è scorrevole. Freccia indietro ai servizi; conferma disabilitata senza orario, offline o durante salvataggio. Errori mostrati anche nella schermata attiva.
 - Dopo una prenotazione personale riuscita, apertura automatica di Le mie prenotazioni e aggiornamento elenco, anche per l’admin dall’area Cliente. I salvataggi manuali staff continuano invece a tornare all’agenda.
 - Orari settimanali, turni, eccezioni per data, festività nazionali e Pasquetta; le chiusure prevalgono sulle aperture.
@@ -539,4 +539,12 @@ Test personal_reminder_settings.sql superato prima/dopo migrazione con rollback:
 - Migrazione `20261020202041_configurable_standard_booking_horizon`: campo `app_settings.booking_horizon_months`, limite centrale server Europe/Rome, applicato a disponibilità, inserimento normale/manuale e spostamenti. Prenotazioni periodiche e loro spostamenti esclusi; appuntamenti già salvati preservati.
 - Calendari frontend aggiornati al valore configurato; gestione dei fine mese e anni bisestili.
 - Test SQL remoto con rollback PASS: permessi, valore iniziale, limiti validi, confine inclusivo, blocco salvataggio oltre limite, estensione/riduzione e periodicità esclusa. Advisor sicurezza invariato: 16 INFO private intenzionali e WARN preesistente leaked-password protection disabilitata.
-- Test date aggiunti; compilazione/test/deploy da verificare nella pipeline GitHub. Recupero password OTP più link già richiesto ancora in lavorazione.
+- Test date, TypeScript, build e pubblicazione GitHub Pages riusciti nella pipeline `39491380873`.
+
+## 20 ottobre 2026 — Recupero password con OTP e pulsante email; posizione limite mesi
+
+- Recupero password da Accesso e Profilo > Informazioni personali: invio email con codice e collegamento, campo OTP integrato, opzione «Ho già un codice», reinvio con attesa 60 secondi, avviso Spam/Posta indesiderata ed errori in italiano.
+- Verifica esclusivamente con `verifyOtp({type:"recovery"})` e sessione valida; scelta nuova password con conferma, controllo corrispondenza, errori inline e blocco doppio invio. Conservato il flusso link tramite evento PASSWORD_RECOVERY. Nessun cambiamento alle verifiche staff.
+- Template Supabase Recovery salvato via dashboard: oggetto «BarberUp — Reimposta la tua password», codice dinamico `{{ .Token }}`, pulsante `{{ .ConfirmationURL }}`, istruzioni italiane per inserire il codice nella PWA aperta da Home. Template versionato in `supabase/templates/recovery.html`. Il link su iOS può aprire Safari; il codice consente di proseguire nella PWA installata.
+- Su successiva richiesta, campo mesi spostato da Configurazione a **Manutenzione per Admin**; per **Barbiere Admin resta Configurazione**. Campo condiviso iniziale 6, periodiche escluse.
+- Template verificato in anteprima dopo ricaricamento dashboard. Nessuna email inviata ad account reali e nessuna password reale modificata per prova. Test helper con mock aggiunti; verifica finale build/test/deploy in corso.

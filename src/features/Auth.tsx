@@ -1,3 +1,4 @@
+import PasswordRecovery from "./PasswordRecovery";
 import { useEffect, useId, useState } from "react";
 import {
   savePasswordProof,
@@ -15,12 +16,14 @@ export default function Auth({
   close,
   notify,
   onDone,
+  onRecovery,
   terms,
   requiresApproval = true,
 }: {
   close: () => void;
   notify: (s: string) => void;
   onDone: () => void;
+  onRecovery: () => void;
   terms: Row | null;
   requiresApproval?: boolean;
 }) {
@@ -90,15 +93,7 @@ export default function Auth({
     setErrorMessage("");
     try {
       const redirect = location.origin + import.meta.env.BASE_URL;
-      if (mode === "reset") {
-        await result(
-          supabase.auth.resetPasswordForEmail(email, { redirectTo: redirect }),
-        );
-        notify(
-          "Se l’email è registrata, riceverai le istruzioni. Controlla anche le cartelle Spam e Posta indesiderata.",
-        );
-        close();
-      } else if (mode === "register") {
+      if (mode === "register") {
         if (
           !/^\+[1-9][0-9]{0,2}$/.test(phonePrefix) ||
           !/^[0-9]{10}$/.test(phone)
@@ -164,6 +159,7 @@ export default function Auth({
       setBusy(false);
     }
   }
+  if (mode === "reset") return <PasswordRecovery initialEmail={email} close={()=>setMode("login")} verified={()=>{clearPasswordProof();onRecovery();onDone();close();}} />;
   const verifyingLogin = mode === "otpVerify";
   if (mode === "verify" || verifyingLogin)
     return (

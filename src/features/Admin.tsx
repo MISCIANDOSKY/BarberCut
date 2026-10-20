@@ -67,7 +67,7 @@ export default function Admin({
           )) as Row[],
         );
       }
-      if (section === "Configurazione") {
+      if (section === "Configurazione" || section === "Manutenzione") {
         const config = await result<Row>(
           supabase.from("app_settings").select("*").single(),
         );
@@ -109,13 +109,6 @@ export default function Admin({
         <BarberAddress
           address={settings.shop_address || ""}
           revision={settings.address_revision || 0}
-          refresh={() => {
-            void load();
-            refresh();
-          }}
-        />
-        <BookingHorizon
-          settings={settings}
           refresh={() => {
             void load();
             refresh();
@@ -213,6 +206,7 @@ export default function Admin({
   if (section === "Manutenzione")
     return (
       <>
+        {settings ? <BookingHorizon settings={settings} refresh={()=>{void load();refresh();}} /> : <Empty>Caricamento impostazioni prenotazioni…</Empty>}
         <Maintenance notify={notify} />
         <h3>Esportazione dati</h3>
         <button
