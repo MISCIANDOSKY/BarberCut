@@ -23,7 +23,7 @@ export default function ShopAgenda({
     [selectedBarber, setSelectedBarber] = useState("");
   const [day, setDay] = useState(today),
     [rows, setRows] = useState<Row[]>([]),
-    [order, setOrder] = useState("future"),
+    [order, setOrder] = useState("asc"),
     [now, setNow] = useState(Date.now);
   const [loadingBarbers, setLoadingBarbers] = useState(true),
     [loading, setLoading] = useState(false),
@@ -36,16 +36,10 @@ export default function ShopAgenda({
     ? selectedBarber
     : barbers[0]?.id || "";
   const ordered = [...rows].sort((a, b) => {
-    const ap = new Date(a.end_at).getTime() <= now,
-      bp = new Date(b.end_at).getTime() <= now;
-    if (ap !== bp)
-      return order === "future"
-        ? Number(ap) - Number(bp)
-        : Number(bp) - Number(ap);
-    const diff =
+    const difference =
       new Date(a.start_at).getTime() - new Date(b.start_at).getTime();
     return (
-      ((order === "future" ? !ap : ap) ? diff : -diff) ||
+      (order === "asc" ? difference : -difference) ||
       String(a.id).localeCompare(String(b.id))
     );
   });
@@ -193,8 +187,8 @@ export default function ShopAgenda({
       <label>
         Ordine appuntamenti
         <select value={order} onChange={(e) => setOrder(e.target.value)}>
-          <option value="future">Prima i futuri</option>
-          <option value="past">Prima i passati</option>
+          <option value="asc">Orario crescente</option>
+          <option value="desc">Orario decrescente</option>
         </select>
       </label>
       {error && (

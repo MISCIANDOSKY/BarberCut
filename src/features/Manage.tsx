@@ -69,21 +69,12 @@ export default function Manage({
       return date.toISOString().slice(0, 10);
     });
   }
-  const [agendaOrder, setAgendaOrder] = useState<"future" | "past">("future");
+  const [agendaOrder, setAgendaOrder] = useState<"asc" | "desc">("asc");
   const orderedRows = [...rows].sort((a, b) => {
-    const aPast = new Date(a.end_at).getTime() <= now;
-    const bPast = new Date(b.end_at).getTime() <= now;
-    if (aPast !== bPast)
-      return agendaOrder === "future"
-        ? Number(aPast) - Number(bPast)
-        : Number(bPast) - Number(aPast);
-    const timeDifference =
+    const difference =
       new Date(a.start_at).getTime() - new Date(b.start_at).getTime();
-    // Reverse the time order too, so a day containing only past or only
-    // future entries still responds visibly to the selected ordering.
-    const ascending = agendaOrder === "future" ? !aPast : aPast;
     return (
-      (ascending ? timeDifference : -timeDifference) ||
+      (agendaOrder === "asc" ? difference : -difference) ||
       String(a.id).localeCompare(String(b.id))
     );
   });
@@ -246,12 +237,12 @@ export default function Manage({
               value={agendaOrder}
               onChange={(event) =>
                 setAgendaOrder(
-                  event.target.value === "past" ? "past" : "future",
+                  event.target.value === "desc" ? "desc" : "asc",
                 )
               }
             >
-              <option value="future">Prima i futuri</option>
-              <option value="past">Prima i passati</option>
+              <option value="asc">Orario crescente</option>
+              <option value="desc">Orario decrescente</option>
             </select>
           </label>
           <div className="agenda">
