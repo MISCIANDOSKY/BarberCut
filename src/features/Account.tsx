@@ -1,10 +1,10 @@
+import ProfileTerms from "./ProfileTerms";
 import { PushSettingsPanel } from "./PushSettings";
 import { detachPushDevice } from "../lib/push";
 import { confirmInApp } from "../components/AppDialogs";
 import { useEffect, useRef, useState } from "react";
-import type { ReactNode } from "react";
 import { clearPasswordProof } from "../lib/passwordProof";
-import { Empty, Field, TrashIcon } from "../components/UI";
+import { Empty, Field, Modal, TrashIcon } from "../components/UI";
 import { supabase, result, dateLabel, timeLabel, euro } from "../lib/api";
 import type { Row } from "../lib/api";
 import { downloadCalendar } from "./Booking";
@@ -85,31 +85,61 @@ export function Appointments({
   );
 }
 export function Profile({
-  user,
-  profile,
-  notify,
-  reload,
-  deletionEnabled,
-  addressEditor,
-  registrationEditor,
-  deletionFromEmail = false,
+  user, profile, notify: outerNotify, reload, deletionEnabled, deletionFromEmail = false,
 }: {
-  user: Row;
-  profile: Row;
-  notify: (s: string) => void;
-  reload: () => void;
-  deletionEnabled: boolean;
-  addressEditor?: ReactNode;
-  registrationEditor?: ReactNode;
-  deletionFromEmail?: boolean;
+  user: Row; profile: Row; notify: (s: string) => void; reload: () => void;
+  deletionEnabled: boolean; deletionFromEmail?: boolean;
 }) {
   const [first, setFirst] = useState(profile.first_name),
     [last, setLast] = useState(profile.last_name),
     [phone, setPhone] = useState(profile.phone),
     [busy, setBusy] = useState(false),
     [loggingOut, setLoggingOut] = useState(false);
+  const [notice, setNotice] = useState("");
+  const notify = (text: string) => { setNotice(text); outerNotify(text); };
+  const [page, setPage] = useState(deletionFromEmail ? "Elimina account" : "");
+  useEffect(() => { if (deletionFromEmail) setPage("Elimina account"); }, [deletionFromEmail]);
   return (
     <>
+      <nav className="profile-menu" aria-label="Impostazioni del profilo">
+        {["Informazioni personali", "Termini e condizioni", "Notifiche", "Elimina account"].map((label) => (
+          <button key={label} type="button" className={"secondary " + (label === "Elimina account" ? "danger-text" : "")} onClick={() => { setNotice(""); setPage(label); }}>
+            <span>{label}</span><span aria-hidden="true">→</span>
+          </button>
+        ))}
+      </nav>
+      <div>
+        <button
+          type="button"
+          className="secondary"
+          disabled={busy || loggingOut}
+          style={{ width: "100%" }}
+          onClick={async () => {
+            if (loggingOut) return;
+            setLoggingOut(true);
+            try {
+              await detachPushDevice();
+              const { error } = await supabase.auth.signOut({ scope: "local" });
+              if (error) throw error;
+              clearPasswordProof();
+              notify("Hai effettuato l’uscita dal tuo account.");
+              reload();
+            } catch {
+              notify("Non riesco a uscire dall’account. Riprova.");
+            } finally {
+              setLoggingOut(false);
+            }
+          }}
+        >
+          {loggingOut ? "Uscita in corso…" : "Esci dal tuo account"}
+        </button>
+      </div>
+
+      {page && (
+        <Modal title={page} wide close={() => setPage("")}>
+          {notice && <p className="notice" role="status">{notice}</p>}
+          {page === "Informazioni personali" && (
+            <>
       <form
         onSubmit={async (e) => {
           e.preventDefault();
@@ -122,6 +152,7 @@ export function Profile({
                 .eq("id", user.id),
             );
             notify("Profilo aggiornato.");
+            setPage("");
             reload();
           } catch {
             notify("Impossibile salvare il profilo.");
@@ -198,16 +229,14 @@ export function Profile({
       >
         Cambia password
       </button>
-      <PushSettingsPanel userId={user.id} />
-      {registrationEditor}
-      {addressEditor}
-      <DeleteAccount
-        fromEmailLink={deletionFromEmail}
-        email={user.email}
-        enabled={deletionEnabled}
-        notify={notify}
-        reload={reload}
-      />
+
+            </>
+          )}
+          {page === "Termini e condizioni" && <ProfileTerms userId={user.id} refresh={reload} />}
+          {page === "Notifiche" && <PushSettingsPanel userId={user.id} />}
+          {page === "Elimina account" && <DeleteAccount fromEmailLink={deletionFromEmail} email={user.email} enabled={deletionEnabled} notify={notify} reload={reload} />}
+        </Modal>
+      )}
     </>
   );
 }
@@ -314,7 +343,7 @@ function DeleteAccount({
     [codeSent, setCodeSent] = useState(false),
     [usingLink, setUsingLink] = useState(fromEmailLink),
     [errorMessage, setErrorMessage] = useState("");
-  const detailsRef = useRef<HTMLDetailsElement>(null);
+  const detailsRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     setUsingLink(fromEmailLink);
     setConfirmed(false);
@@ -328,12 +357,7 @@ function DeleteAccount({
     return () => cancelAnimationFrame(frame);
   }, [email, fromEmailLink]);
   return (
-    <details
-      ref={detailsRef}
-      className="notice account-deletion"
-      open={fromEmailLink || undefined}
-    >
-      <summary>Elimina account</summary>
+    <div ref={detailsRef} className="notice account-deletion">
       <div className="content-stack">
         {!enabled ? (
           <p>
@@ -500,6 +524,6 @@ function DeleteAccount({
           </>
         )}
       </div>
-    </details>
+    </div>
   );
 }

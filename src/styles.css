@@ -1822,3 +1822,7 @@ dialog h2,
 .push-settings > .content-stack {
   padding-top: 14px;
 }
+
+.profile-menu { display: grid; gap: 12px; }
+.profile-menu > button { display: flex; align-items: center; justify-content: space-between; gap: 16px; width: 100%; min-height: 60px; text-align: left; }
+.profile-terms-version { padding-top: 20px; border-top: 1px solid var(--border); }

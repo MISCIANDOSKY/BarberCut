@@ -97,8 +97,7 @@ export function PushSettingsPanel({ userId }: { userId: string }) {
     }
   };
   return (
-    <details className="push-settings">
-      <summary>Notifiche</summary>
+    <div className="push-settings">
       <div className="content-stack">
         <p>
           Ricevi un promemoria push circa 24 ore e 1 ora prima dei tuoi
@@ -150,7 +149,7 @@ export function PushSettingsPanel({ userId }: { userId: string }) {
           </p>
         )}
       </div>
-    </details>
+    </div>
   );
 }
 export function PushOnboarding({ userId }: { userId: string }) {
