@@ -23,6 +23,9 @@ begin
  anchor:=public.book_appointment(b,s,(d+time '10:00')at time zone 'Europe/Rome');
  p:=public.create_recurring_plan(anchor,28,5);
  if public.create_recurring_plan(anchor,28,5)<>p then raise exception 'plan duplicated';end if;
+ begin
+  perform public.create_recurring_plan(anchor,9,5);raise exception 'Invalid frequency allowed';
+ exception when raise_exception then if sqlerrm<>'RECURRENCE_LOCKED' then raise;end if;end;
  begin perform public.set_recurring_policy(200,true);raise exception 'Client policy allowed';exception when raise_exception then if sqlerrm<>'ACCESS_DENIED'then raise;end if;end;
  reset role;
  -- Conflict on one date, even when outside the six-month horizon.
@@ -86,6 +89,25 @@ begin
  set local role authenticated;
  begin perform public.set_recurring_policy(5,false);raise exception 'Normal barber policy allowed';exception when raise_exception then if sqlerrm<>'ACCESS_DENIED'then raise;end if;end;
  reset role;
+ -- Unlimited means no numeric business limit; results remain paginated.
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',u,'role','authenticated')::text,true);
+ select e.id into ep from public.calendar_entries e
+ where e.client_id=u and e.id<>anchor and e.status='confirmed' and not exists(select 1 from private.recurring_occurrences o where o.entry_id=e.id) limit 1;
+ set local role authenticated;
+ ep:=public.create_recurring_plan(ep,28,30);
+ if (select count(*) from public.list_recurring_dates(ep,0))<>25
+ or (select count(*) from public.list_recurring_dates(ep,25))<>5 then raise exception 'Pagination failed';end if;
+ for n in 1..6 loop
+  select start_at into st from public.get_recurring_slots(ep,future) where start_at=(future+time '15:00')at time zone 'Europe/Rome';
+  if st is null then raise exception 'Unlimited alternative missing';end if;
+  perform public.save_recurring_date(ep,n,st);
+  reset role;
+  future:=future+1;
+  while private.is_holiday(future)loop future:=future+1;end loop;
+  set local role authenticated;
+ end loop;
+ reset role;
+ if private.recurring_count(u)<=5 then raise exception 'Unlimited count still capped';end if;
  -- Six-month normal boundary and local wall-clock recurrence across DST.
  future:=((now()at time zone 'Europe/Rome')::date+interval '5 months')::date;
  while private.is_holiday(future)loop future:=future+1;end loop;
