@@ -2,7 +2,7 @@ begin;
 update public.app_settings set require_user_approval=false where id;
 do $test$
 declare viewer uuid:=gen_random_uuid(); normal uuid:=gen_random_uuid();lead uuid:=gen_random_uuid();customer uuid:=gen_random_uuid();ad uuid:=gen_random_uuid();
- b uuid;bl uuid;inactive uuid;orphan uuid;global_b uuid;s uuid;ap uuid;closed_ap uuid;hidden uuid;block_id uuid;d date:=(now()at time zone 'Europe/Rome')::date+3;t timestamptz;n integer;
+ shop_session uuid:=gen_random_uuid(); b uuid;bl uuid;inactive uuid;orphan uuid;global_b uuid;s uuid;ap uuid;closed_ap uuid;hidden uuid;block_id uuid;d date:=(now()at time zone 'Europe/Rome')::date+3;t timestamptz;n integer;
 begin
  insert into auth.users(id,email,email_confirmed_at,raw_user_meta_data)values
  (viewer,'shop-view@example.invalid',now(),'{}'),(normal,'shop-normal@example.invalid',now(),'{}'),
@@ -32,12 +32,12 @@ begin
  update public.user_roles set role='shop'where user_id=viewer;
  reset role;
  if(select role from public.user_roles where user_id=viewer)<>'shop'then raise exception 'Admin cannot assign Shop';end if;
- -- New role requires verified staff access.
- perform set_config('request.jwt.claims',jsonb_build_object('sub',viewer,'role','authenticated','session_id','shop-view')::text,true);
+ -- Shop requires a real active login session, without an additional OTP.
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',viewer,'role','authenticated','session_id',shop_session::text)::text,true);
  set local role authenticated;
- begin perform public.shop_barbers();raise exception 'Unverified shop allowed';exception when raise_exception then if sqlerrm<>'ACCESS_DENIED'then raise;end if;end;
+ begin perform public.shop_barbers();raise exception 'Shop without active Auth session allowed';exception when raise_exception then if sqlerrm<>'ACCESS_DENIED'then raise;end if;end;
  reset role;
- perform public.staff_authorize_session(viewer,'shop-view');
+ insert into auth.sessions(id,user_id,created_at,updated_at,not_after)values(shop_session,viewer,now(),now(),now()+interval '1 day');
  set local role authenticated;
  if not public.staff_session_status()then raise exception 'Shop authorization failed';end if;
  if not exists(select 1 from public.shop_barbers()where id=b)or not exists(select 1 from public.shop_barbers()where id=bl)
