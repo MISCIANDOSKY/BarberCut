@@ -341,8 +341,10 @@ export default function Admin({
       )}
       {section === "Utenti" && (
         <p className="muted">
-          Registra l’account Barberia come cliente e assegna qui il ruolo Barberia per aprire direttamente le agende dei barbieri. I nuovi barbieri ricevono automaticamente il ruolo Barbiere. Solo
-          l’admin può assegnare Barbiere Admin da questo menu.
+          Registra l’account Barberia come cliente e assegna qui il ruolo
+          Barberia per aprire direttamente le agende dei barbieri. I nuovi
+          barbieri ricevono automaticamente il ruolo Barbiere. Solo l’admin può
+          assegnare Barbiere Admin da questo menu.
         </p>
       )}
       {section === "Utenti"
@@ -355,7 +357,9 @@ export default function Admin({
                   ? "Barbiere"
                   : r.role === "admin"
                     ? "Admin"
-                    : r.role === "shop" ? "Barberia" : "Cliente";
+                    : r.role === "shop"
+                      ? "Barberia"
+                      : "Cliente";
             return (
               <article className="table-row" key={r.user_id}>
                 <span>
@@ -375,7 +379,9 @@ export default function Admin({
                           ? "Barbiere"
                           : role === "admin"
                             ? "Admin"
-                            : role === "shop" ? "Barberia" : "Cliente";
+                            : role === "shop"
+                              ? "Barberia"
+                              : "Cliente";
                     if (
                       confirm(
                         "Confermi il ruolo " +

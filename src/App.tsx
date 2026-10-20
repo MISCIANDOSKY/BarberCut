@@ -716,7 +716,8 @@ export default function App() {
       return <Admin section={section} notify={notify} refresh={refresh} />;
     return null;
   }
-  const resetDialog = (<>
+  const resetDialog = (
+    <>
       {reset && (
         <Modal title="Scegli una nuova password" close={() => setReset(false)}>
           <form
@@ -746,29 +747,58 @@ export default function App() {
           </form>
         </Modal>
       )}
-</>);
+    </>
+  );
   if (user && role === "shop")
     return (
       <div className="app shop-app">
         <header className="topbar shop-topbar">
           <h1>{settings.shop_name} · Agenda</h1>
-          <button type="button" className="text" onClick={async () => {
-            try {
-              const {error}=await supabase.auth.signOut({scope:"local"});
-              if(error)throw error;
-              clearPasswordProof();
-              setSection("");
-              await refresh();
-            } catch {notify("Non riesco a uscire dall’account. Riprova.");}
-          }}>Esci</button>
+          <button
+            type="button"
+            className="text"
+            onClick={async () => {
+              try {
+                const { error } = await supabase.auth.signOut({
+                  scope: "local",
+                });
+                if (error) throw error;
+                clearPasswordProof();
+                setSection("");
+                await refresh();
+              } catch {
+                notify("Non riesco a uscire dall’account. Riprova.");
+              }
+            }}
+          >
+            Esci
+          </button>
         </header>
-        {!online && <p className="offline" role="status">Sei offline. Collegati per aggiornare l’agenda.</p>}
+        {!online && (
+          <p className="offline" role="status">
+            Sei offline. Collegati per aggiornare l’agenda.
+          </p>
+        )}
         <main className="shop-workspace">
-          {loading ? <p role="status">Caricamento agenda…</p> : !verified
-            ? <StaffGate email={user.email!} done={refresh} notify={notify}/>
-            : <ShopAgenda onAccessChanged={refresh}/>}
+          {loading ? (
+            <p role="status">Caricamento agenda…</p>
+          ) : !verified ? (
+            <StaffGate email={user.email!} done={refresh} notify={notify} />
+          ) : (
+            <ShopAgenda onAccessChanged={refresh} />
+          )}
         </main>
-        {message && <div className="toast" role="status"><span>{message}</span><button onClick={()=>setMessage("")} aria-label="Chiudi messaggio">×</button></div>}
+        {message && (
+          <div className="toast" role="status">
+            <span>{message}</span>
+            <button
+              onClick={() => setMessage("")}
+              aria-label="Chiudi messaggio"
+            >
+              ×
+            </button>
+          </div>
+        )}
         {resetDialog}
       </div>
     );
