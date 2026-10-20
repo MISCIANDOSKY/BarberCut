@@ -335,8 +335,8 @@ export default function RecurringBooking({
                 ? "Conferma queste date e continua"
                 : "Conferma prenotazioni periodiche"}
           </button>
-          <button className="text" disabled={busy} onClick={done}>
-            Termina e vai alle mie prenotazioni
+          <button className="secondary" disabled={busy} onClick={done}>
+            Annulla e vai alle mie prenotazioni
           </button>
         </>
       )}
