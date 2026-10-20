@@ -22,7 +22,9 @@ export default function RecurringBooking({
   booking: Row;
   done: () => void;
 }) {
-  const [stage, setStage] = useState<"ask" | "configure" | "review" | "complete">("ask");
+  const [stage, setStage] = useState<
+    "ask" | "configure" | "review" | "complete"
+  >("ask");
   const [allowance, setAllowance] = useState<Row | null>(null),
     [every, setEvery] = useState(7),
     [count, setCount] = useState(5);
@@ -128,17 +130,29 @@ export default function RecurringBooking({
         }
       }
       setRows(next);
-      const duration = Date.parse(booking.end_at) - Date.parse(booking.start_at);
-      setCalendarEvents((old) => [...new Map([
-        ...old,
-        ...next.filter((row) => row.state === "booked" && row.entry_id && row.booked_start).map((row) => ({
-          id: row.entry_id,
-          start_at: row.booked_start,
-          end_at: new Date(Date.parse(row.booked_start) + duration).toISOString(),
-          service_name: booking.service_name,
-          barber_name: booking.barber_name,
-        })),
-      ].map((event) => [event.id, event])).values()]);
+      const duration =
+        Date.parse(booking.end_at) - Date.parse(booking.start_at);
+      setCalendarEvents((old) => [
+        ...new Map(
+          [
+            ...old,
+            ...next
+              .filter(
+                (row) =>
+                  row.state === "booked" && row.entry_id && row.booked_start,
+              )
+              .map((row) => ({
+                id: row.entry_id,
+                start_at: row.booked_start,
+                end_at: new Date(
+                  Date.parse(row.booked_start) + duration,
+                ).toISOString(),
+                service_name: booking.service_name,
+                barber_name: booking.barber_name,
+              })),
+          ].map((event) => [event.id, event]),
+        ).values(),
+      ]);
       if (failure) {
         setChoices((old) =>
           Object.fromEntries(
@@ -173,10 +187,16 @@ export default function RecurringBooking({
         close={close}
       >
         <p className="notice">La tua prenotazione è confermata.</p>
-        <button className="secondary" onClick={() => downloadCalendar(booking as CalendarEvent)}>
+        <button
+          className="secondary"
+          onClick={() => downloadCalendar(booking as CalendarEvent)}
+        >
           Aggiungi al calendario
         </button>
-        <p className="muted">Conferma il salvataggio nel tuo calendario. Spostamenti e cancellazioni successivi vanno aggiornati anche lì.</p>
+        <p className="muted">
+          Conferma il salvataggio nel tuo calendario. Spostamenti e
+          cancellazioni successivi vanno aggiornati anche lì.
+        </p>
         <p>
           Puoi programmare i tuoi prossimi appuntamenti con lo stesso barbiere e
           servizio. Ricorda che puoi sempre cancellare un singolo appuntamento
@@ -198,13 +218,28 @@ export default function RecurringBooking({
         <p className="notice">Le date scelte sono state salvate.</p>
         {calendarEvents.length > 0 ? (
           <>
-            <button className="primary" onClick={() => downloadCalendar(calendarEvents)}>
+            <button
+              className="primary"
+              onClick={() => downloadCalendar(calendarEvents)}
+            >
               Aggiungi al calendario
             </button>
-            <p className="muted">Aggiunge i {calendarEvents.length} appuntamenti periodici confermati. Il primo appuntamento ha il suo tasto separato. Conferma il salvataggio nel calendario; eventuali spostamenti o cancellazioni successivi non si aggiornano automaticamente.</p>
+            <p className="muted">
+              Aggiunge i {calendarEvents.length} appuntamenti periodici
+              confermati. Il primo appuntamento ha il suo tasto separato.
+              Conferma il salvataggio nel calendario; eventuali spostamenti o
+              cancellazioni successivi non si aggiornano automaticamente.
+            </p>
           </>
-        ) : <p>Tutte le ripetizioni sono state saltate: nessun appuntamento periodico da aggiungere.</p>}
-        <button className="secondary" onClick={done}>Vai alle mie prenotazioni</button>
+        ) : (
+          <p>
+            Tutte le ripetizioni sono state saltate: nessun appuntamento
+            periodico da aggiungere.
+          </p>
+        )}
+        <button className="secondary" onClick={done}>
+          Vai alle mie prenotazioni
+        </button>
       </Modal>
     );
   return (
@@ -369,7 +404,11 @@ export default function RecurringBooking({
                 : "Conferma prenotazioni periodiche"}
           </button>
           {calendarEvents.length > 0 && (
-            <button className="secondary" disabled={busy} onClick={() => downloadCalendar(calendarEvents)}>
+            <button
+              className="secondary"
+              disabled={busy}
+              onClick={() => downloadCalendar(calendarEvents)}
+            >
               Aggiungi al calendario le date già confermate
             </button>
           )}
