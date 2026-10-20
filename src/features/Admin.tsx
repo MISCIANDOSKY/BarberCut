@@ -341,7 +341,7 @@ export default function Admin({
       )}
       {section === "Utenti" && (
         <p className="muted">
-          I nuovi barbieri ricevono automaticamente il ruolo Barbiere. Solo
+          Registra l’account Barberia come cliente e assegna qui il ruolo Barberia per aprire direttamente le agende dei barbieri. I nuovi barbieri ricevono automaticamente il ruolo Barbiere. Solo
           l’admin può assegnare Barbiere Admin da questo menu.
         </p>
       )}
@@ -355,7 +355,7 @@ export default function Admin({
                   ? "Barbiere"
                   : r.role === "admin"
                     ? "Admin"
-                    : "Cliente";
+                    : r.role === "shop" ? "Barberia" : "Cliente";
             return (
               <article className="table-row" key={r.user_id}>
                 <span>
@@ -375,7 +375,7 @@ export default function Admin({
                           ? "Barbiere"
                           : role === "admin"
                             ? "Admin"
-                            : "Cliente";
+                            : role === "shop" ? "Barberia" : "Cliente";
                     if (
                       confirm(
                         "Confermi il ruolo " +
@@ -396,6 +396,7 @@ export default function Admin({
                   <option value="client">Cliente</option>
                   <option value="barber">Barbiere</option>
                   <option value="barber_admin">Barbiere Admin</option>
+                  <option value="shop">Barberia</option>
                   <option value="admin">Admin</option>
                 </select>
               </article>

@@ -4,6 +4,7 @@ import { clearPasswordProof } from "./lib/passwordProof";
 import type { User } from "@supabase/supabase-js";
 import { Empty, Modal, TrashIcon } from "./components/UI";
 import PWA from "./components/PWA";
+import ShopAgenda from "./features/ShopAgenda";
 import Auth, { StaffGate, authorizeStaff } from "./features/Auth";
 import Booking from "./features/Booking";
 import { Appointments, Profile, Notifications } from "./features/Account";
@@ -715,6 +716,62 @@ export default function App() {
       return <Admin section={section} notify={notify} refresh={refresh} />;
     return null;
   }
+  const resetDialog = (<>
+      {reset && (
+        <Modal title="Scegli una nuova password" close={() => setReset(false)}>
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              try {
+                await result(supabase.auth.updateUser({ password }));
+                setReset(false);
+                notify("Password aggiornata.");
+              } catch (e) {
+                notify(friendly(e));
+              }
+            }}
+          >
+            <label>
+              Nuova password
+              <input
+                type="password"
+                minLength={8}
+                autoComplete="new-password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </label>
+            <button className="primary">Salva password</button>
+          </form>
+        </Modal>
+      )}
+</>);
+  if (user && role === "shop")
+    return (
+      <div className="app shop-app">
+        <header className="topbar shop-topbar">
+          <h1>{settings.shop_name} · Agenda</h1>
+          <button type="button" className="text" onClick={async () => {
+            try {
+              const {error}=await supabase.auth.signOut({scope:"local"});
+              if(error)throw error;
+              clearPasswordProof();
+              setSection("");
+              await refresh();
+            } catch {notify("Non riesco a uscire dall’account. Riprova.");}
+          }}>Esci</button>
+        </header>
+        {!online && <p className="offline" role="status">Sei offline. Collegati per aggiornare l’agenda.</p>}
+        <main className="shop-workspace">
+          {loading ? <p role="status">Caricamento agenda…</p> : !verified
+            ? <StaffGate email={user.email!} done={refresh} notify={notify}/>
+            : <ShopAgenda onAccessChanged={refresh}/>}
+        </main>
+        {message && <div className="toast" role="status"><span>{message}</span><button onClick={()=>setMessage("")} aria-label="Chiudi messaggio">×</button></div>}
+        {resetDialog}
+      </div>
+    );
   return (
     <div className="app">
       <header className="topbar">
@@ -966,35 +1023,7 @@ export default function App() {
           <p className="legal">{terms?.body}</p>
         </Modal>
       )}
-      {reset && (
-        <Modal title="Scegli una nuova password" close={() => setReset(false)}>
-          <form
-            onSubmit={async (e) => {
-              e.preventDefault();
-              try {
-                await result(supabase.auth.updateUser({ password }));
-                setReset(false);
-                notify("Password aggiornata.");
-              } catch (e) {
-                notify(friendly(e));
-              }
-            }}
-          >
-            <label>
-              Nuova password
-              <input
-                type="password"
-                minLength={8}
-                autoComplete="new-password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </label>
-            <button className="primary">Salva password</button>
-          </form>
-        </Modal>
-      )}
+      {resetDialog}
     </div>
   );
 }
