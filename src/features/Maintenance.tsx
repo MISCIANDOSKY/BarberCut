@@ -107,8 +107,9 @@ export default function Maintenance({
         </div>
         <p className="muted">
           Solo account clienti, considerando anche l’uso di sessioni già aperte.
-          Admin, barbieri e clienti con appuntamenti futuri sono esclusi. I dati
-          degli account disattivati restano conservati.
+          Gli account Admin, Barbiere, Barbiere Admin e Barberia sono sempre esclusi,
+          così come i clienti con appuntamenti futuri. I dati degli account
+          disattivati restano conservati.
         </p>
         <p className="muted">
           Prima della disattivazione vengono inviati avvisi email a 30, 15 e 7

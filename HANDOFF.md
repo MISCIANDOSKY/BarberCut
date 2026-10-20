@@ -120,7 +120,7 @@ Le prenotazioni disabilitate sono un'impostazione corrente: non riaprirle automa
 ## Manutenzione, inattività e automazioni
 
 - Manutenzione giornaliera alle 03:15 UTC; soglie numeriche modificabili e salvate tramite save_maintenance_settings, senza modificare la politica iscrizioni ora gestita in Configurazione.
-- Disattiva solo clienti inattivi: admin e barbieri sono esclusi, come gli account associati ad agende e quelli con appuntamenti futuri confermati.
+- Disattiva solo clienti inattivi: Admin, Barbiere, Barbiere Admin e Barberia sono esclusi, come gli account associati ad agende e quelli con appuntamenti futuri confermati.
 - Login/sessione attiva e prenotazioni del cliente aggiornano l'attività. Disattivazione con ban Auth e revoca sessioni; non elimina il profilo. Admin può riattivare.
 - Avvisi email 30, 15 e 7 giorni prima: invito a prenotare oppure accedere dal link per mantenere attivo il profilo. Leggere l'email da solo non rinnova l'attività.
 - Primo ciclo concede il preavviso completo; niente disattivazione senza avviso finale inviato da almeno 7 giorni. Se l'invio fallisce, la disattivazione viene rinviata.
@@ -548,3 +548,10 @@ Test personal_reminder_settings.sql superato prima/dopo migrazione con rollback:
 - Template Supabase Recovery salvato via dashboard: oggetto «BarberUp — Reimposta la tua password», codice dinamico `{{ .Token }}`, pulsante `{{ .ConfirmationURL }}`, istruzioni italiane per inserire il codice nella PWA aperta da Home. Template versionato in `supabase/templates/recovery.html`. Il link su iOS può aprire Safari; il codice consente di proseguire nella PWA installata.
 - Su successiva richiesta, campo mesi spostato da Configurazione a **Manutenzione per Admin**; per **Barbiere Admin resta Configurazione**. Campo condiviso iniziale 6, periodiche escluse.
 - Template verificato in anteprima dopo ricaricamento dashboard. Nessuna email inviata ad account reali e nessuna password reale modificata per prova. Test helper con mock, TypeScript, build e deploy GitHub Pages riusciti nella pipeline `39491763491`. Verificato sul sito pubblico il percorso Password dimenticata > Ho già un codice con campo OTP e reinvio, senza inviare email o modificare password. Regression SQL ricorrenze PASS con rollback dopo la migrazione dell’orizzonte.
+
+## 20 ottobre 2026 — Esclusione Barberia dalla disattivazione per inattività
+
+- Verificata la logica remota: `private.inactivity_candidates` e `private.run_daily_maintenance` selezionano esclusivamente il ruolo `client`. Il ruolo `shop` (Barberia) è già escluso, insieme ad Admin e barbieri, anche dagli avvisi email. Nessuna migrazione o modifica a cron/soglie necessaria.
+- Esplicitato il ruolo Barberia nel testo di Manutenzione. Nuovo test SQL `inactivity_exempt_roles.sql`: account di tutti e quattro i ruoli con 180 giorni di inattività, avvisi storici già scaduti, cliente di controllo disattivabile e promozione Cliente → Barberia dopo accodamento avviso.
+- Test remoto PASS con rollback: nessun account esente selezionato/disattivato/bannato, nessun avviso creato o inviabile per Barberia; cliente di controllo disattivato solo nella transazione di prova dopo il preavviso. Nessun account reale modificato né email inviata. Controllo aggregato: zero account Barberia già disattivati per inattività.
+- Pubblicazione del testo aggiornato in verifica GitHub Actions.
