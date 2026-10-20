@@ -1,3 +1,4 @@
+import { confirmInApp } from "../components/AppDialogs";
 import { useEffect, useState } from "react";
 import { supabase, result } from "../lib/api";
 import type { Row } from "../lib/api";
@@ -33,7 +34,7 @@ export default function BarberAddress({
     const confirmed = current.revision > 0;
     if (
       confirmed &&
-      !confirm("Sei sicuro che vuoi modificare l’indirizzo della barberia?")
+      !(await confirmInApp("Sei sicuro che vuoi modificare l’indirizzo della barberia?"))
     )
       return;
     setBusy(true);

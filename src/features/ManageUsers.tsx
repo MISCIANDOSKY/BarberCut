@@ -1,3 +1,4 @@
+import { confirmInApp } from "../components/AppDialogs";
 import { useEffect, useRef, useState } from "react";
 import { Empty } from "../components/UI";
 import { supabase, result, friendly } from "../lib/api";
@@ -111,13 +112,13 @@ export default function ManageUsers({
       account.phone ||
       "questo cliente";
     if (
-      !confirm(
+      !(await confirmInApp(
         decision === "approved"
           ? "Approvare " +
               name +
               "? Riceverà un’email per iniziare a prenotare."
           : "Rifiutare la richiesta di " + name + "? Non potrà prenotare.",
-      )
+      ))
     )
       return;
     setBusy(true);

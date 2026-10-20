@@ -1,3 +1,4 @@
+import { AppPicker } from "../components/AppPicker";
 import { useEffect, useRef, useState } from "react";
 import { Modal, Empty } from "../components/UI";
 import { createLatestRequest } from "../lib/latestRequest.mjs";
@@ -177,7 +178,7 @@ export default function RescheduleAppointment({
           <label className="booking-date-field">
             Nuovo giorno
             <span className="booking-date-control">
-              <input
+              <AppPicker
                 type="date"
                 min={today()}
                 max={recurring ? undefined : maxBookingDate()}

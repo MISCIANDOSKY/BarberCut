@@ -1,3 +1,5 @@
+import { AppPicker } from "../components/AppPicker";
+import { AppSelect } from "../components/AppSelect";
 import { useEffect, useRef, useState } from "react";
 import { createLatestRequest } from "../lib/latestRequest.mjs";
 import { maxBookingDate } from "../lib/dates.mjs";
@@ -340,7 +342,7 @@ export default function Booking({
               {eligibleBarbers.length > 1 && (
                 <label>
                   Barbiere
-                  <select
+                  <AppSelect
                     value={chosenBarber}
                     disabled={busy}
                     onChange={(e) => setBarber(e.target.value)}
@@ -351,13 +353,13 @@ export default function Booking({
                         {b.name}
                       </option>
                     ))}
-                  </select>
+                  </AppSelect>
                 </label>
               )}
               <label className="booking-date-field">
                 Giorno
                 <span className="booking-date-control">
-                  <input
+                  <AppPicker
                     type="date"
                     disabled={busy}
                     min={today()}

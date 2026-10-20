@@ -1,3 +1,6 @@
+import { AppPicker } from "../components/AppPicker";
+import { AppSelect } from "../components/AppSelect";
+import { confirmInApp } from "../components/AppDialogs";
 import { useEffect, useState } from "react";
 import { Empty, Modal } from "../components/UI";
 import { createLatestRequest } from "../lib/latestRequest.mjs";
@@ -164,7 +167,7 @@ export default function ShopAgenda({
         <label className="booking-date-field">
           Giorno
           <span className="booking-date-control">
-            <input
+            <AppPicker
               type="date"
               value={day}
               onChange={(e) => {
@@ -186,10 +189,10 @@ export default function ShopAgenda({
       </div>
       <label>
         Ordine appuntamenti
-        <select value={order} onChange={(e) => setOrder(e.target.value)}>
+        <AppSelect value={order} onChange={(e) => setOrder(e.target.value)}>
           <option value="asc">Orario crescente</option>
           <option value="desc">Orario decrescente</option>
-        </select>
+        </AppSelect>
       </label>
       {error && (
         <p className="form-error" role="alert">
@@ -270,7 +273,7 @@ export default function ShopAgenda({
             onClick={async () => {
               if (
                 busy ||
-                !confirm("Confermi la cancellazione dell’appuntamento?")
+                !(await confirmInApp("Confermi la cancellazione dell’appuntamento?"))
               )
                 return;
               setBusy(true);

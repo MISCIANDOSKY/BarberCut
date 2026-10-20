@@ -1649,3 +1649,145 @@ dialog h2,
   opacity: 0.3;
   cursor: default;
 }
+
+
+/* Controls remain inside the PWA rather than opening platform pickers. */
+.app-control {
+  display: block;
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+.app-validation-field {
+  position: absolute !important;
+  width: 1px !important;
+  min-width: 0 !important;
+  height: 1px !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  opacity: 0;
+  pointer-events: none;
+}
+.app-select-trigger,
+.app-picker-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: var(--bg);
+  color: var(--text);
+  text-align: left;
+  font-size: 16px;
+}
+.app-select-trigger > span:first-child,
+.app-picker-trigger > span:first-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.app-options-dialog,
+.app-message-dialog,
+.app-picker-dialog {
+  width: min(540px, calc(100% - 28px));
+  max-width: calc(100% - 28px);
+  max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 28px);
+}
+.app-options {
+  display: grid;
+  gap: 8px;
+  max-height: 55dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 5px;
+}
+.app-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  min-height: 48px;
+  text-align: left;
+  padding: 12px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+.app-option.selected,
+.app-calendar-grid button.selected {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+}
+.app-calendar-heading {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) 76px 40px;
+  gap: 8px;
+  align-items: end;
+}
+.app-calendar-heading > button {
+  min-width: 0;
+  padding: 8px;
+  min-height: 48px;
+}
+.app-calendar-year {
+  margin: 0;
+  font-size: 12px;
+}
+.app-calendar-year input {
+  width: 100%;
+  min-width: 0;
+  padding: 10px 6px;
+  text-align: center;
+  font-size: 16px;
+}
+.app-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 5px;
+}
+.app-calendar-weekday {
+  text-align: center;
+  color: var(--muted);
+  padding: 8px 0;
+}
+.app-calendar-grid button {
+  min-width: 0;
+  min-height: 40px;
+  padding: 8px 0;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text);
+  background: var(--bg);
+}
+.app-calendar-grid button:disabled {
+  opacity: .25;
+  cursor: default;
+}
+.app-color-options {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+.app-color-options button {
+  min-height: 48px;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  color: #111;
+}
+.app-color-options button[aria-pressed="true"] { border-color: var(--text); }
+.app-color-preview { display: block; width: 24px; height: 24px; border: 1px solid var(--border); border-radius: 4px; }
+@media (max-width: 380px) {
+  .app-calendar-heading { grid-template-columns: 32px minmax(0, 1fr) 66px 32px; gap: 4px; }
+  .app-calendar-heading .app-select-trigger { padding: 10px 6px; gap: 4px; font-size: 14px; }
+  .app-calendar-grid { gap: 3px; }
+}

@@ -1,3 +1,4 @@
+import { confirmInApp } from "../components/AppDialogs";
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { clearPasswordProof } from "../lib/passwordProof";
@@ -437,7 +438,7 @@ function DeleteAccount({
                     if (busy || !confirmed || (!usingLink && !code.trim()))
                       return;
                     if (
-                      !confirm("Eliminare definitivamente account e profilo?")
+                      !(await confirmInApp("Eliminare definitivamente account e profilo?"))
                     )
                       return;
                     setBusy(true);

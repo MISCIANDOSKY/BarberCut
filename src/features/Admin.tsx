@@ -1,3 +1,6 @@
+import { AppPicker } from "../components/AppPicker";
+import { AppSelect } from "../components/AppSelect";
+import { confirmInApp } from "../components/AppDialogs";
 import { useEffect, useState } from "react";
 import { Empty, Modal } from "../components/UI";
 import { supabase, result } from "../lib/api";
@@ -136,7 +139,7 @@ export default function Admin({
           </label>
           <label>
             Colore principale
-            <input type="color" name="accent" defaultValue={settings.accent} />
+            <AppPicker type="color" name="accent" defaultValue={settings.accent} />
           </label>
           <label>
             Cancellazione: ore minime prima dell’appuntamento
@@ -322,14 +325,14 @@ export default function Admin({
               ) : (
                 <label>
                   Account
-                  <select name="user" defaultValue={editing.user_id || ""}>
+                  <AppSelect name="user" defaultValue={editing.user_id || ""}>
                     <option value="">Nessuno</option>
                     {availableUsers(editing.id).map((u) => (
                       <option key={u.id} value={u.id}>
                         {u.first_name} {u.last_name}
                       </option>
                     ))}
-                  </select>
+                  </AppSelect>
                 </label>
               )}
               <button className="primary" disabled={busy}>
@@ -366,11 +369,11 @@ export default function Admin({
                   {p?.first_name || "Account"} {p?.last_name}
                   <small>{currentRoleLabel}</small>
                 </span>
-                <select
+                <AppSelect
                   aria-label={"Ruolo di " + (p?.first_name || r.user_id)}
                   value={r.role}
                   disabled={busy}
-                  onChange={(e) => {
+                  onChange={async (e) => {
                     const role = e.target.value;
                     const roleLabel =
                       role === "barber_admin"
@@ -383,7 +386,7 @@ export default function Admin({
                               ? "Barberia"
                               : "Cliente";
                     if (
-                      confirm(
+                      await confirmInApp(
                         "Confermi il ruolo " +
                           roleLabel +
                           " per questo account?",
@@ -404,7 +407,7 @@ export default function Admin({
                   <option value="barber_admin">Barbiere Admin</option>
                   <option value="shop">Barberia</option>
                   <option value="admin">Admin</option>
-                </select>
+                </AppSelect>
               </article>
             );
           })
@@ -431,9 +434,9 @@ export default function Admin({
                 <button
                   className="secondary"
                   disabled={busy || r.published}
-                  onClick={() => {
+                  onClick={async () => {
                     if (
-                      confirm(
+                      await confirmInApp(
                         "Confermi che questo testo è approvato e pronto per essere pubblicato?",
                       )
                     )
@@ -482,14 +485,14 @@ export default function Admin({
                   <button
                     className="text danger-text"
                     disabled={busy}
-                    onClick={() => {
+                    onClick={async () => {
                       const kind = section === "Servizi" ? "service" : "barber";
                       if (
-                        !confirm(
+                        !(await confirmInApp(
                           "Eliminare " +
                             r.name +
                             "? La voce verrà rimossa dagli elenchi; i dati degli appuntamenti saranno conservati.",
-                        )
+                        ))
                       )
                         return;
                       run(() =>
@@ -532,14 +535,14 @@ export default function Admin({
           </label>
           <label>
             Account associato
-            <select name="user" required>
+            <AppSelect name="user" required>
               <option value="">Scegli un account registrato</option>
               {availableUsers().map((u) => (
                 <option key={u.id} value={u.id}>
                   {u.first_name} {u.last_name} · {u.id.slice(0, 8)}
                 </option>
               ))}
-            </select>
+            </AppSelect>
           </label>
           <p className="muted">
             Il ruolo Barbiere viene assegnato automaticamente all’account
@@ -631,23 +634,23 @@ export default function Admin({
             <h3>Associa servizio al barbiere</h3>
             <label>
               Barbiere
-              <select name="barber" required>
+              <AppSelect name="barber" required>
                 {barbers.map((b) => (
                   <option key={b.id} value={b.id}>
                     {b.name}
                   </option>
                 ))}
-              </select>
+              </AppSelect>
             </label>
             <label>
               Servizio
-              <select name="service" required>
+              <AppSelect name="service" required>
                 {services.map((s) => (
                   <option key={s.id} value={s.id}>
                     {s.name}
                   </option>
                 ))}
-              </select>
+              </AppSelect>
             </label>
             <button className="secondary" disabled={busy}>
               Associa

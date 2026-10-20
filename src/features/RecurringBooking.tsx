@@ -1,3 +1,5 @@
+import { AppPicker } from "../components/AppPicker";
+import { AppSelect } from "../components/AppSelect";
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { Modal, Empty } from "../components/UI";
@@ -264,7 +266,7 @@ export default function RecurringBooking({
           </p>
           <label>
             Ripeti ogni
-            <select
+            <AppSelect
               value={every}
               disabled={busy}
               onChange={(e) => setEvery(Number(e.target.value))}
@@ -274,7 +276,7 @@ export default function RecurringBooking({
                   {n} giorni
                 </option>
               ))}
-            </select>
+            </AppSelect>
           </label>
           <label>
             Numero di appuntamenti aggiuntivi
@@ -499,7 +501,7 @@ function RecurringTime({
           <label className="booking-date-field">
             Giorno
             <span className="booking-date-control">
-              <input
+              <AppPicker
                 type="date"
                 min={today()}
                 value={day}

@@ -1,3 +1,4 @@
+import { confirmInApp } from "../components/AppDialogs";
 import { useEffect, useState } from "react";
 import { Empty, Modal } from "../components/UI";
 import { supabase, result, euro, friendly } from "../lib/api";
@@ -207,11 +208,11 @@ export default function BarberServices({
                     disabled={busy}
                     onClick={async () => {
                       if (
-                        !confirm(
+                        !(await confirmInApp(
                           "Eliminare " +
                             service.name +
                             " dai tuoi servizi? Gli appuntamenti già presenti saranno conservati.",
-                        )
+                        ))
                       )
                         return;
                       setBusy(true);

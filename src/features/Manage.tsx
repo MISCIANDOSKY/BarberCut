@@ -1,3 +1,6 @@
+import { AppPicker } from "../components/AppPicker";
+import { AppSelect } from "../components/AppSelect";
+import { confirmInApp } from "../components/AppDialogs";
 import { useEffect, useRef, useState } from "react";
 import { romeLocalToISO, romeDay } from "../lib/dates.mjs";
 import RescheduleAppointment from "./RescheduleAppointment";
@@ -181,7 +184,7 @@ export default function Manage({
       {scopedBarbers.length > 1 && (
         <label>
           Agenda
-          <select
+          <AppSelect
             value={b}
             onChange={(e) => {
               setB(e.target.value);
@@ -193,7 +196,7 @@ export default function Manage({
                 {x.name}
               </option>
             ))}
-          </select>
+          </AppSelect>
         </label>
       )}
       {section === "Appuntamenti" && (
@@ -211,7 +214,7 @@ export default function Manage({
             <label className="booking-date-field">
               Giorno
               <span className="booking-date-control">
-                <input
+                <AppPicker
                   type="date"
                   value={day}
                   onChange={(event) => {
@@ -233,7 +236,7 @@ export default function Manage({
           </div>
           <label>
             Ordine appuntamenti
-            <select
+            <AppSelect
               value={agendaOrder}
               onChange={(event) =>
                 setAgendaOrder(event.target.value === "desc" ? "desc" : "asc")
@@ -241,7 +244,7 @@ export default function Manage({
             >
               <option value="asc">Orario crescente</option>
               <option value="desc">Orario decrescente</option>
-            </select>
+            </AppSelect>
           </label>
           <div className="agenda">
             {orderedRows.map((e) => (
@@ -391,10 +394,10 @@ export default function Manage({
           <p className="muted">Tutti gli orari sono nel fuso Europe/Rome.</p>
           <label>
             Da
-            <input name="start" type="datetime-local" required />
+            <AppPicker name="start" type="datetime-local" required />
           </label>
           <label>
-            A<input name="end" type="datetime-local" required />
+            A<AppPicker name="end" type="datetime-local" required />
           </label>
           <label>
             Nota
@@ -502,7 +505,7 @@ export default function Manage({
           >
             <label>
               Giorno
-              <select
+              <AppSelect
                 name="weekday"
                 value={weekday}
                 disabled={busy || hoursBarber !== b}
@@ -513,12 +516,12 @@ export default function Manage({
                     {weekdays[i]}
                   </option>
                 ))}
-              </select>
+              </AppSelect>
             </label>
             <div className="two">
               <label>
                 Apertura
-                <input
+                <AppPicker
                   type="time"
                   name="opens"
                   required={!closed}
@@ -528,7 +531,7 @@ export default function Manage({
               </label>
               <label>
                 Chiusura
-                <input
+                <AppPicker
                   type="time"
                   name="closes"
                   required={!closed}
@@ -601,7 +604,7 @@ export default function Manage({
           >
             <label>
               Data
-              <input type="date" name="day" required />
+              <AppPicker type="date" name="day" required />
             </label>
             <label className="check">
               <input
@@ -615,7 +618,7 @@ export default function Manage({
             <div className="two">
               <label>
                 Apertura
-                <input
+                <AppPicker
                   type="time"
                   name="opens"
                   disabled={exceptionClosed}
@@ -625,7 +628,7 @@ export default function Manage({
               </label>
               <label>
                 Chiusura
-                <input
+                <AppPicker
                   type="time"
                   name="closes"
                   disabled={exceptionClosed}
@@ -693,7 +696,7 @@ export default function Manage({
             className="danger"
             disabled={busy}
             onClick={async () => {
-              if (!confirm("Confermi la cancellazione?")) return;
+              if (!(await confirmInApp("Confermi la cancellazione?"))) return;
               setBusy(true);
               try {
                 await result(
