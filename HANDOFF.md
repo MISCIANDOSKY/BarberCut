@@ -560,4 +560,4 @@ Test personal_reminder_settings.sql superato prima/dopo migrazione con rollback:
 
 - Nel componente condiviso da Admin e Barbiere Admin, attivando «Prenotazioni periodiche senza limite di numero» il campo del numero massimo scompare immediatamente; togliendo la spunta ricompare con il valore conservato.
 - Anche la spiegazione sul limite 0 viene mostrata solo quando il limite numerico è attivo. Salvataggio e logica delle prenotazioni invariati.
-- Verifica compilazione e pubblicazione affidata alla pipeline GitHub Actions; nessuna modifica al database o alle impostazioni correnti.
+- TypeScript, build, test e pubblicazione GitHub Pages riusciti nella pipeline `39492739746`; nessuna modifica al database o alle impostazioni correnti.
