@@ -555,3 +555,9 @@ Test personal_reminder_settings.sql superato prima/dopo migrazione con rollback:
 - Esplicitato il ruolo Barberia nel testo di Manutenzione. Nuovo test SQL `inactivity_exempt_roles.sql`: account di tutti e quattro i ruoli con 180 giorni di inattività, avvisi storici già scaduti, cliente di controllo disattivabile e promozione Cliente → Barberia dopo accodamento avviso.
 - Test remoto PASS con rollback: nessun account esente selezionato/disattivato/bannato, nessun avviso creato o inviabile per Barberia; cliente di controllo disattivato solo nella transazione di prova dopo il preavviso. Nessun account reale modificato né email inviata. Controllo aggregato: zero account Barberia già disattivati per inattività.
 - TypeScript, build, test frontend e pubblicazione del testo aggiornato riusciti nella pipeline GitHub Actions `39492254281`.
+
+## 20 ottobre 2026 — Nascondi massimo con periodiche illimitate
+
+- Nel componente condiviso da Admin e Barbiere Admin, attivando «Prenotazioni periodiche senza limite di numero» il campo del numero massimo scompare immediatamente; togliendo la spunta ricompare con il valore conservato.
+- Anche la spiegazione sul limite 0 viene mostrata solo quando il limite numerico è attivo. Salvataggio e logica delle prenotazioni invariati.
+- Verifica compilazione e pubblicazione affidata alla pipeline GitHub Actions; nessuna modifica al database o alle impostazioni correnti.

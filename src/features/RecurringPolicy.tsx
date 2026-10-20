@@ -48,6 +48,7 @@ export default function RecurringPolicy({
           }
         }}
       >
+        {!unlimited && (
         <label>
           Numero massimo di appuntamenti periodici futuri
           <input
@@ -55,11 +56,12 @@ export default function RecurringPolicy({
             min="0"
             step="1"
             value={maximum}
-            disabled={busy || unlimited}
+            disabled={busy}
             required
             onChange={(e) => setMaximum(e.target.value)}
           />
         </label>
+        )}
         <label className="check">
           <input
             type="checkbox"
@@ -71,8 +73,8 @@ export default function RecurringPolicy({
         </label>
         <p className="muted">
           Ogni pianificazione richiede comunque un numero di ripetizioni: non
-          vengono aggiunti nuovi appuntamenti all’infinito. Con limite 0 le
-          nuove ricorrenze sono disabilitate.
+          vengono aggiunti nuovi appuntamenti all’infinito.
+          {!unlimited && " Con limite 0 le nuove ricorrenze sono disabilitate."}
         </p>
         {error && (
           <p className="form-error" role="alert">
