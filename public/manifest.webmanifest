@@ -1,7 +1,7 @@
 {
   "id": "./",
-  "name": "BarberCut",
-  "short_name": "BarberCut",
+  "name": "BarberUp",
+  "short_name": "BarberUp",
   "description": "Il tuo barbiere, a portata di mano.",
   "lang": "it",
   "start_url": "./",

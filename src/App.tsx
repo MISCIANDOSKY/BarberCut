@@ -26,7 +26,7 @@ export default function App() {
     [verified, setVerified] = useState(false),
     [reviewAllowed, setReviewAllowed] = useState(false),
     [settings, setSettings] = useState<Row>({
-      shop_name: "BarberCut",
+      shop_name: "BarberUp",
       accent: "#c6a66b",
       bookings_enabled: false,
       cancellation_hours: null,
@@ -683,7 +683,7 @@ export default function App() {
         <button
           className="brand"
           onClick={() => setSection("")}
-          aria-label="BarberCut Home"
+          aria-label="BarberUp Home"
         >
           <img src={import.meta.env.BASE_URL + "icon.svg"} alt="" />
           <span>
@@ -763,7 +763,7 @@ export default function App() {
               <br />
               <em>per te.</em>
             </span>
-            <span className="art-caption">BARBERCUT / IL TUO STILE</span>
+            <span className="art-caption">BARBERUP / IL TUO STILE</span>
           </div>
         </div>
         <div className="workspace">

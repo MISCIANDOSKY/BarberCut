@@ -24,7 +24,7 @@ Deno.serve(async (req: Request) => {
     // Requesting an email does not sign in the user or reset their inactivity.
     const { error: mailError } = await mailer.auth.signInWithOtp({
       email: data.email,
-      options: { shouldCreateUser: false, emailRedirectTo: "https://misciandosky.github.io/BarberCut/?keep-active=1" },
+      options: { shouldCreateUser: false, emailRedirectTo: "https://misciandosky.github.io/BarberUp/?keep-active=1" },
     });
     if (mailError) return new Response("Email delivery failed", { status: 503 });
     sent = true;

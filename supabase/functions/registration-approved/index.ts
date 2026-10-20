@@ -24,7 +24,7 @@ Deno.serve(async (req: Request) => {
     // Requesting an email does not sign in the user or change their approval status.
     const { error: mailError } = await mailer.auth.signInWithOtp({
       email: data.email,
-      options: { shouldCreateUser: false, emailRedirectTo: "https://misciandosky.github.io/BarberCut/?book=1" },
+      options: { shouldCreateUser: false, emailRedirectTo: "https://misciandosky.github.io/BarberUp/?book=1" },
     });
     if (mailError) return new Response("Email delivery failed", { status: 503 });
     sent = true;

@@ -28,7 +28,7 @@ Il test barber_admin_permissions.sql verifica limiti dei due ruoli, assegnazione
 
 ## Assumi Barbiere dalla home
 
-Solo il Barbiere Admin verificato con agenda attiva vede il pulsante Assumi Barbiere nella home, subito dopo Notifiche e prima di Profilo. Il pulsante apre direttamente il form a schermata completa, con freccia indietro. Apre una schermata dedicata con l’avviso: “Prima di procedere, assicurati che il nuovo collaboratore sia già registrato a BarberCut come cliente. Inserisci l’email e il numero di telefono presenti nel suo profilo.” Nessun riferimento alla conferma email in questo avviso.
+Solo il Barbiere Admin verificato con agenda attiva vede il pulsante Assumi Barbiere nella home, subito dopo Notifiche e prima di Profilo. Il pulsante apre direttamente il form a schermata completa, con freccia indietro. Apre una schermata dedicata con l’avviso: “Prima di procedere, assicurati che il nuovo collaboratore sia già registrato a BarberUp come cliente. Inserisci l’email e il numero di telefono presenti nel suo profilo.” Nessun riferimento alla conferma email in questo avviso.
 
 Il primo passaggio confronta l’email Auth (ignorando maiuscole e spazi esterni) e il telefono del profilo, normalizzato sul numero completo con la logica delle prenotazioni. Devono appartenere allo stesso account Cliente disponibile, non bloccato, non in eliminazione e non già associato a un’agenda non eliminata. Non vengono restituiti nome, email o identificativo del candidato. Una risposta positiva sblocca il campo Nome da mostrare in agenda.
 

@@ -1,4 +1,4 @@
-name: Build, test and publish BarberCut
+name: Build, test and publish BarberUp
 on:
   push:
     branches: [main]

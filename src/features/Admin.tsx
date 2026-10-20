@@ -211,7 +211,7 @@ export default function Admin({
               const a = document.createElement("a");
               a.href = u;
               a.download =
-                "barbercut-export-" +
+                "barberup-export-" +
                 new Date().toISOString().slice(0, 10) +
                 ".json";
               a.click();

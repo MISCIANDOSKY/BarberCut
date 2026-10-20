@@ -1,8 +1,8 @@
-# BarberCut
+# BarberUp
 
 PWA per una barberia con più barbieri, realizzata con React, TypeScript e Supabase e pubblicata su GitHub Pages.
 
-**[Apri BarberCut](https://misciandosky.github.io/BarberCut/)** · **[Handoff e stato del progetto](HANDOFF.md)**
+**[Apri BarberUp](https://misciandosky.github.io/BarberUp/)** · **[Handoff e stato del progetto](HANDOFF.md)**
 
 ## Prima di intervenire
 

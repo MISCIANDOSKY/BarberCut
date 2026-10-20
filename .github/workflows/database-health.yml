@@ -25,5 +25,5 @@ jobs:
           node-version: '22'
       - name: Test availability checker
         run: node --test tests/database-health.test.mjs
-      - name: Query live BarberCut database
+      - name: Query live BarberUp database
         run: node scripts/check-database.mjs

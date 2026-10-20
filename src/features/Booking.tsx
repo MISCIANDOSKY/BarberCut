@@ -474,9 +474,9 @@ export function downloadCalendar(e: Row) {
   const text = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//BarberCut//Appuntamenti//IT",
+    "PRODID:-//BarberUp//Appuntamenti//IT",
     "BEGIN:VEVENT",
-    "UID:" + crypto.randomUUID() + "@barbercut",
+    "UID:" + crypto.randomUUID() + "@barberup",
     "DTSTAMP:" + stamp(new Date().toISOString()),
     "DTSTART:" + stamp(e.start_at),
     "DTEND:" + stamp(e.end_at),
@@ -495,7 +495,7 @@ export function downloadCalendar(e: Row) {
     ),
     a = document.createElement("a");
   a.href = u;
-  a.download = "BarberCut.ics";
+  a.download = "BarberUp.ics";
   a.click();
   setTimeout(() => URL.revokeObjectURL(u), 1000);
 }

@@ -25,7 +25,7 @@ export async function checkDatabase(fetcher = fetch) {
     throw new Error("Risposta database non valida");
   }
   if (!Array.isArray(rows) || rows.length !== 1 || rows[0].id !== true) {
-    throw new Error("Configurazione pubblica BarberCut non disponibile");
+    throw new Error("Configurazione pubblica BarberUp non disponibile");
   }
   return true;
 }
@@ -37,7 +37,7 @@ if (
   try {
     await checkDatabase();
     console.log(
-      new Date().toISOString() + " — Database BarberCut raggiungibile.",
+      new Date().toISOString() + " — Database BarberUp raggiungibile.",
     );
   } catch (error) {
     console.error(

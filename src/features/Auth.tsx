@@ -187,7 +187,7 @@ export default function Auth({
               notify(
                 verifyingLogin
                   ? "Accesso effettuato. Bentornato!"
-                  : "Email verificata. Puoi consultare lo stato della tua iscrizione su BarberCut.",
+                  : "Email verificata. Puoi consultare lo stato della tua iscrizione su BarberUp.",
               );
               onDone();
               close();

@@ -1,1 +1,1 @@
-BarberCut — {{ if eq .RedirectTo (print .SiteURL "?delete-account=1") }}Codice eliminazione account{{ else if .Data.barbercut_approved }}Iscrizione approvata{{ else if .Data.barbercut_warning_days }}Avviso di inattività{{ else }}Codice di accesso{{ end }}
+BarberUp — {{ if eq .RedirectTo (print .SiteURL "?delete-account=1") }}Codice eliminazione account{{ else if .Data.barbercut_approved }}Iscrizione approvata{{ else if .Data.barbercut_warning_days }}Avviso di inattività{{ else }}Codice di accesso{{ end }}

@@ -66,7 +66,7 @@ export default function PWA() {
             } else setHelp(true);
           }}
         >
-          ＋ Installa BarberCut
+          ＋ Installa BarberUp
         </button>
       )}
       {help && (
