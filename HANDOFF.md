@@ -454,3 +454,8 @@ Eseguita eliminazione dell’account Cliente indicato esplicitamente dal titolar
 ### 20 ottobre 2026 — Telefono chiamabile nell’elenco clienti
 
 Nelle schede di Utenti/Gestisci utenti rimossi l’indirizzo email del cliente e la riga Approvato con relativo autore. Numero di telefono sotto il nome come collegamento tel: per aprire la chiamata, anche su smartphone; destinazione ripulita dai caratteri di formattazione mantenendo cifre e prefisso. Conservati ordine A–Z, indice, paginazione, data di registrazione e gestione delle richieste in attesa/rifiutate. Conferme senza ripiego sull’indirizzo email. Nessuna modifica a dati, RPC o permessi. Controllato il sorgente; build e pubblicazione in corso. Interfaccia autenticata e chiamata su dispositivo fisico non provate.
+
+
+### 20 ottobre 2026 — Scheda Approvati e modalità ingresso clienti
+
+Su rettifica del titolare, mantenuta la riga Approvato con autore per le approvazioni manuali. Per i clienti approvati automaticamente alla registrazione (status approved e reviewed_at assente, come impostato dal trigger iscrizione quando require_user_approval è disattivato), mostrato Entrato senza approvazione. Gli utenti storici con reviewed_at valorizzato non vengono etichettati automaticamente in base alla sola assenza del nome autore. Rimossa soltanto la scheda Approvati dei barbieri, già compresa in Tutti; Admin mantiene il filtro poiché nella sua gestione richieste non ha Tutti. Email nascosta e telefono chiamabile mantenuti. Nessuna modifica a dati o permessi. Verificata la distinzione nel trigger e nel flusso review_registration versionati; build e pubblicazione in corso.

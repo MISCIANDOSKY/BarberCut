@@ -159,7 +159,7 @@ export default function ManageUsers({
         {[
           ...(!isAdmin ? [["all", "Tutti"]] : []),
           ["pending", "In attesa"],
-          ["approved", "Approvati"],
+          ...(isAdmin ? [["approved", "Approvati"]] : []),
           ["rejected", "Rifiutati"],
         ].map(([value, label]) => (
           <button
@@ -270,6 +270,15 @@ export default function ManageUsers({
                           {account.reviewed_by_name
                             ? " da " + account.reviewed_by_name
                             : " · Autore non disponibile"}
+                        </small>
+                      ) : account.status === "approved" ? (
+                        <small>
+                          {!account.reviewed_at
+                            ? "Entrato senza approvazione"
+                            : "Approvato" +
+                              (account.reviewed_by_name
+                                ? " da " + account.reviewed_by_name
+                                : " · Autore non disponibile")}
                         </small>
                       ) : null}
                       {!account.email_verified && (
