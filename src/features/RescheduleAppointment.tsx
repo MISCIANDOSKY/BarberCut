@@ -16,10 +16,12 @@ import type { Row } from "../lib/api";
 
 export default function RescheduleAppointment({
   appointment,
+  bookingHorizonMonths,
   close,
   onSaved,
 }: {
   appointment: Row;
+  bookingHorizonMonths: number;
   close: () => void;
   onSaved: (start: string) => void;
 }) {
@@ -181,7 +183,7 @@ export default function RescheduleAppointment({
               <AppPicker
                 type="date"
                 min={today()}
-                max={recurring ? undefined : maxBookingDate()}
+                max={recurring ? undefined : maxBookingDate(new Date(), bookingHorizonMonths)}
                 value={day}
                 disabled={busy}
                 onChange={(event) => {

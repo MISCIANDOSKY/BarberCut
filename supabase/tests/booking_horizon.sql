@@ -1,0 +1,75 @@
+begin;
+update public.app_settings set require_user_approval=false,bookings_enabled=false,recurring_max=5,recurring_unlimited=false where id;
+update public.terms_versions set published=false where published;
+do $test$
+declare ad uuid:=gen_random_uuid();worker uuid:=gen_random_uuid();u uuid:=gen_random_uuid();b uuid;s uuid;term uuid;anchor uuid;plan uuid;recurring uuid;manual uuid;
+ d date:=(now() at time zone 'Europe/Rome')::date+2; boundary date;far date; t timestamptz;
+begin
+ if (select booking_horizon_months from public.app_settings where id)<>6 then raise exception 'Initial default not six';end if;
+ insert into auth.users(id,email,email_confirmed_at,raw_user_meta_data) values
+ (ad,'horizon-admin@example.invalid',now(),'{}'),
+ (worker,'horizon-worker@example.invalid',now(),'{}'),
+ (u,'horizon-client@example.invalid',now(),'{"first_name":"Test","last_name":"Horizon","phone":"000"}');
+ update public.user_roles set role='admin' where user_id=ad;
+ insert into public.barbers(name,user_id)values('TEST horizon worker',worker)returning id into b;
+ delete from public.working_hours where barber_id=b;
+ insert into public.working_hours(barber_id,weekday,opens,closes)select b,i,'08:00','20:00'from generate_series(0,6)i;
+ insert into public.services(name,duration_minutes,price)values('TEST horizon',30,20)returning id into s;
+ insert into public.barber_services(barber_id,service_id)values(b,s);
+ insert into public.terms_versions(version,body,published)values('TEST horizon','Termini test',true)returning id into term;
+ insert into public.terms_acceptances(user_id,terms_id)values(u,term);
+ update public.app_settings set bookings_enabled=true where id;
+ perform public.staff_authorize_session(ad,'horizon-admin');
+ perform public.staff_authorize_session(worker,'horizon-worker');
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',u,'role','authenticated')::text,true);
+ set local role authenticated;
+ begin perform public.set_booking_horizon(1);raise exception 'Client changed horizon';exception when raise_exception then if sqlerrm<>'ACCESS_DENIED'then raise;end if;end;
+ reset role;
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',worker,'role','authenticated','session_id','horizon-worker')::text,true);
+ set local role authenticated;
+ begin perform public.set_booking_horizon(1);raise exception 'Normal barber changed horizon';exception when raise_exception then if sqlerrm<>'ACCESS_DENIED'then raise;end if;end;
+ reset role;
+ update public.user_roles set role='barber_admin'where user_id=worker;
+ set local role authenticated;
+ perform public.set_booking_horizon(1);
+ begin perform public.set_booking_horizon(0);raise exception 'Zero allowed';exception when raise_exception then if sqlerrm<>'INVALID_BOOKING_HORIZON'then raise;end if;end;
+ begin perform public.set_booking_horizon(null);raise exception 'Null allowed';exception when raise_exception then if sqlerrm<>'INVALID_BOOKING_HORIZON'then raise;end if;end;
+ begin perform public.set_booking_horizon(121);raise exception 'Overflow allowed';exception when raise_exception then if sqlerrm<>'INVALID_BOOKING_HORIZON'then raise;end if;end;
+ reset role;
+ boundary:=private.booking_max_day();far:=boundary+1;
+ insert into public.schedule_exceptions(barber_id,day,closed,opens,closes)values
+ (b,d,false,'08:00','20:00'),(b,boundary,false,'08:00','20:00'),(b,far,false,'08:00','20:00');
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',u,'role','authenticated')::text,true);
+ set local role authenticated;
+ if not exists(select 1 from public.get_available_slots(b,s,boundary))then raise exception 'Inclusive boundary missing';end if;
+ if exists(select 1 from public.get_available_slots(b,s,far))then raise exception 'Beyond boundary offered';end if;
+ begin perform public.book_appointment(b,s,(far+time '10:00')at time zone 'Europe/Rome');raise exception 'Beyond boundary saved';exception when raise_exception then if sqlerrm<>'SLOT_TAKEN'then raise;end if;end;
+ anchor:=public.book_appointment(b,s,(d+time '10:00')at time zone 'Europe/Rome');
+ plan:=public.create_recurring_plan(anchor,28,1);
+ select start_at into t from public.get_recurring_slots(plan,far)where start_at=(far+time '10:00')at time zone 'Europe/Rome';
+ if t is null then raise exception 'Recurring horizon restricted';end if;
+ recurring:=public.save_recurring_date(plan,1,t);
+ reset role;
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',worker,'role','authenticated','session_id','horizon-worker')::text,true);
+ set local role authenticated;
+ if exists(select 1 from public.get_manual_booking_slots(b,s,far))then raise exception 'Manual beyond boundary offered';end if;
+ begin perform public.book_manual_appointment(b,s,(far+time '12:00')at time zone 'Europe/Rome','Test','Guest','',true);raise exception 'Manual beyond boundary saved';exception when raise_exception then if sqlerrm<>'SLOT_TAKEN'then raise;end if;end;
+ manual:=public.book_manual_appointment(b,s,(d+time '12:00')at time zone 'Europe/Rome','Test','Guest','',true);
+ if exists(select 1 from public.get_reschedule_slots(manual,far))then raise exception 'Standard reschedule beyond boundary';end if;
+ begin perform public.reschedule_appointment(manual,(far+time '12:00')at time zone 'Europe/Rome',true);raise exception 'Reschedule beyond boundary saved';exception when raise_exception then if sqlerrm<>'SLOT_TAKEN'then raise;end if;end;
+ if not exists(select 1 from public.get_reschedule_slots(recurring,far))then raise exception 'Recurring reschedule restricted';end if;
+ reset role;
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',ad,'role','authenticated','session_id','horizon-admin')::text,true);
+ set local role authenticated;
+ perform public.set_booking_horizon(12);
+ if not exists(select 1 from public.get_available_slots(b,s,far))then raise exception 'Extended horizon not effective';end if;
+ perform public.set_booking_horizon(1);
+ reset role;
+ if not exists(select 1 from public.calendar_entries where id=recurring and status='confirmed')then raise exception 'Existing record changed';end if;
+ perform set_config('request.jwt.claims','{"role":"anon"}',true);
+ set local role anon;
+ begin perform public.set_booking_horizon(2);raise exception 'Anonymous write allowed';exception when insufficient_privilege then null;end;
+ reset role;
+end $test$;
+select 'PASS horizon permissions, defaults, bounds, booking/manual/reschedule enforcement and recurring exemption' as result;
+rollback;

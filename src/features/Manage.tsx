@@ -681,6 +681,7 @@ export default function Manage({
           {detail.kind === "appointment" && moving && (
             <RescheduleAppointment
               appointment={detail}
+              bookingHorizonMonths={settings.booking_horizon_months ?? 6}
               close={() => setMoving(false)}
               onSaved={(start) => {
                 const nextDay = romeDay(new Date(start));

@@ -1,3 +1,4 @@
+import BookingHorizon from "./BookingHorizon";
 import BarberAddress from "./BarberAddress";
 import { AppPicker } from "../components/AppPicker";
 import { AppSelect } from "../components/AppSelect";
@@ -113,6 +114,7 @@ export default function Admin({
             refresh();
           }}
         />
+        <BookingHorizon settings={settings} refresh={() => {void load();refresh();}} />
         <RecurringPolicy
           settings={settings}
           refresh={() => {

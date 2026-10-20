@@ -1,3 +1,4 @@
+import BookingHorizon from "./features/BookingHorizon";
 import { PushOnboarding } from "./features/PushSettings";
 import { detachPushDevice } from "./lib/push";
 import { confirmInApp } from "./components/AppDialogs";
@@ -532,6 +533,7 @@ export default function App() {
             revision={settings.address_revision || 0}
             refresh={refresh}
           />
+          <BookingHorizon settings={settings} refresh={refresh} />
           <RecurringPolicy settings={settings} refresh={refresh} />
           <RegistrationPolicy
             required={settings.require_user_approval !== false}
@@ -784,7 +786,7 @@ export default function App() {
           ) : !verified ? (
             <StaffGate email={user.email!} done={refresh} notify={notify} />
           ) : (
-            <ShopAgenda onAccessChanged={refresh} />
+            <ShopAgenda bookingHorizonMonths={settings.booking_horizon_months ?? 6} onAccessChanged={refresh} />
           )}
         </main>
         {message && (

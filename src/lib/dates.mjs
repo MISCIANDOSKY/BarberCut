@@ -6,10 +6,11 @@ export function romeDay(date = new Date()) {
     day: "2-digit",
   }).format(date);
 }
-export function maxBookingDate(date = new Date()) {
+export function maxBookingDate(date = new Date(), months = 6) {
+  if (!Number.isInteger(months) || months < 1 || months > 120) throw new Error("INVALID_BOOKING_HORIZON");
   const [y, m, d] = romeDay(date).split("-").map(Number);
-  const maxDay = new Date(Date.UTC(y, m + 6, 0)).getUTCDate();
-  return new Date(Date.UTC(y, m + 5, Math.min(d, maxDay)))
+  const maxDay = new Date(Date.UTC(y, m + months, 0)).getUTCDate();
+  return new Date(Date.UTC(y, m + months - 1, Math.min(d, maxDay)))
     .toISOString()
     .slice(0, 10);
 }

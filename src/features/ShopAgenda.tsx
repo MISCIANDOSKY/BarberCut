@@ -19,8 +19,10 @@ import RescheduleAppointment from "./RescheduleAppointment";
 
 export default function ShopAgenda({
   onAccessChanged,
+  bookingHorizonMonths,
 }: {
   onAccessChanged: () => void;
+  bookingHorizonMonths: number;
 }) {
   const [barbers, setBarbers] = useState<Row[]>([]),
     [selectedBarber, setSelectedBarber] = useState("");
@@ -299,6 +301,7 @@ export default function ShopAgenda({
           {moving && (
             <RescheduleAppointment
               appointment={detail}
+              bookingHorizonMonths={bookingHorizonMonths}
               close={() => setMoving(false)}
               onSaved={(start) => {
                 setMoving(false);
