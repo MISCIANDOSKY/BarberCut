@@ -464,9 +464,7 @@ export default function App() {
           ["⊘", "Blocca orario", "Una pausa, una giornata"],
           ["◷", "Orari di lavoro", "La tua settimana"],
           ["✂", "Servizi e prezzi", "Il catalogo"],
-          ...(canReview
-            ? [["✓", "Utenti", "Clienti della barberia"]]
-            : []),
+          ...(canReview ? [["✓", "Utenti", "Clienti della barberia"]] : []),
           ["♧", "Notifiche", "Tutte le novità"],
           ...(role === "barber_admin" && canConfigureShop
             ? [["＋", "Assumi Barbiere", "Aggiungi un collaboratore"]]
@@ -495,7 +493,10 @@ export default function App() {
           ))}
         </nav>
       );
-    if (section === "Gestisci utenti" || (section === "Utenti" && role !== "admin"))
+    if (
+      section === "Gestisci utenti" ||
+      (section === "Utenti" && role !== "admin")
+    )
       return canReview ? (
         <ManageUsers isAdmin={role === "admin"} />
       ) : (
