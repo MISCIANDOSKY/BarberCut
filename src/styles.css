@@ -1856,3 +1856,7 @@ dialog h2,
     gap: 8px;
   }
 }
+
+.reminder-settings { border-top: 1px solid var(--border); padding-top: 20px; }
+.reminder-standard { display: grid; gap: 12px; }
+.reminder-custom-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; min-height: 44px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }

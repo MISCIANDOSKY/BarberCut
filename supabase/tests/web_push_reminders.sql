@@ -41,9 +41,9 @@ begin
  insert into public.barbers(name,user_id) values('Push test worker',worker) returning id into b;
  insert into public.services(name,duration_minutes,price) values('Push test service',15,10) returning id into svc;
  insert into public.calendar_entries(barber_id,kind,service_id,client_id,start_at,end_at,service_name,price)
- values(b,'appointment',svc,customer,now()+interval '55 minutes',now()+interval '70 minutes','Push test service',10) returning id into ap;
+ values(b,'appointment',svc,customer,now()+interval '59 minutes',now()+interval '74 minutes','Push test service',10) returning id into ap;
  insert into public.calendar_entries(barber_id,kind,service_id,client_id,start_at,end_at,service_name,price)
- values(b,'appointment',svc,customer,now()+interval '23 hours 55 minutes',now()+interval '24 hours 10 minutes','Push daily test',10) returning id into daily;
+ values(b,'appointment',svc,customer,now()+interval '23 hours 59 minutes',now()+interval '24 hours 14 minutes','Push daily test',10) returning id into daily;
  perform private.appointment_reminders();
  perform private.appointment_reminders();
  if (select count(*) from private.push_deliveries d join private.push_subscriptions s on s.id=d.subscription_id where s.user_id=customer)<>2 then raise exception 'Reminder delivery or dedup failed';end if;

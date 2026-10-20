@@ -1,3 +1,4 @@
+import ReminderSettings from "./ReminderSettings";
 import { useEffect, useState } from "react";
 import { Modal } from "../components/UI";
 import {
@@ -100,9 +101,8 @@ export function PushSettingsPanel({ userId }: { userId: string }) {
     <div className="push-settings">
       <div className="content-stack">
         <p>
-          Ricevi un promemoria push circa 24 ore e 1 ora prima dei tuoi
-          appuntamenti. Le notifiche nel quadrifoglio restano disponibili anche
-          se disattivi le push.
+          Ricevi i promemoria dei tuoi appuntamenti anche sul telefono.
+          Le notifiche nel quadrifoglio restano disponibili anche se disattivi le push.
         </p>
         <label className="check">
           <input
@@ -136,6 +136,7 @@ export function PushSettingsPanel({ userId }: { userId: string }) {
             Disattiva le push per il mio account
           </button>
         )}
+        <ReminderSettings userId={userId} />
         <PushHelp />
         {busy && <p role="status">Aggiornamento notifiche…</p>}
         {error && (
@@ -181,8 +182,8 @@ export function PushOnboarding({ userId }: { userId: string }) {
   return (
     <Modal title="Ricordati del tuo appuntamento" close={close}>
       <p>
-        Vuoi ricevere un promemoria sul telefono 24 ore e 1 ora prima del tuo
-        appuntamento? Puoi cambiare scelta da Profilo → Notifiche.
+        Vuoi ricevere i promemoria dei tuoi appuntamenti anche sul telefono?
+        Puoi scegliere quando riceverli da Profilo → Notifiche.
       </p>
       <PushHelp />
       {error && (
