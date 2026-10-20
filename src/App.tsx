@@ -687,7 +687,7 @@ export default function App() {
         >
           <img src={import.meta.env.BASE_URL + "icon.svg"} alt="" />
           <span>
-            Barber<span className="gold">Cut</span>
+            Barber<span className="gold">Up</span>
             <small>IL TUO TEMPO. IL TUO STILE.</small>
           </span>
         </button>
