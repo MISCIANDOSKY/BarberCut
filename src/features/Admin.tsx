@@ -206,7 +206,17 @@ export default function Admin({
   if (section === "Manutenzione")
     return (
       <>
-        {settings ? <BookingHorizon settings={settings} refresh={()=>{void load();refresh();}} /> : <Empty>Caricamento impostazioni prenotazioni…</Empty>}
+        {settings ? (
+          <BookingHorizon
+            settings={settings}
+            refresh={() => {
+              void load();
+              refresh();
+            }}
+          />
+        ) : (
+          <Empty>Caricamento impostazioni prenotazioni…</Empty>
+        )}
         <Maintenance notify={notify} />
         <h3>Esportazione dati</h3>
         <button

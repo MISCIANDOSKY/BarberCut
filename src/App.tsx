@@ -576,7 +576,7 @@ export default function App() {
           profile={profile}
           notify={notify}
           reload={refresh}
-          onRecovery={()=>setReset(true)}
+          onRecovery={() => setReset(true)}
           deletionEnabled={!!settings.account_deletion_enabled}
           deletionFromEmail={deletionFromEmail}
         />
@@ -717,7 +717,17 @@ export default function App() {
       return <Admin section={section} notify={notify} refresh={refresh} />;
     return null;
   }
-  const resetDialog = reset && <ResetPasswordDialog close={()=>setReset(false)} done={()=>{setReset(false);clearPasswordProof();notify("Password aggiornata.");void refresh();}} />;
+  const resetDialog = reset && (
+    <ResetPasswordDialog
+      close={() => setReset(false)}
+      done={() => {
+        setReset(false);
+        clearPasswordProof();
+        notify("Password aggiornata.");
+        void refresh();
+      }}
+    />
+  );
   if (user && role === "shop")
     return (
       <div className="app shop-app">
@@ -1018,7 +1028,7 @@ export default function App() {
           requiresApproval={settings.require_user_approval !== false}
           close={() => setAuth(false)}
           notify={notify}
-          onRecovery={()=>setReset(true)}
+          onRecovery={() => setReset(true)}
           onDone={refresh}
         />
       )}

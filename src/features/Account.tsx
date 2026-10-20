@@ -112,14 +112,26 @@ export function Profile({
     setNotice(text);
     outerNotify(text);
   };
-  const [recovering,setRecovering] = useState(false);
+  const [recovering, setRecovering] = useState(false);
   const [page, setPage] = useState(deletionFromEmail ? "Elimina account" : "");
   useEffect(() => {
     if (deletionFromEmail) setPage("Elimina account");
   }, [deletionFromEmail]);
   return (
     <>
-      {recovering && <PasswordRecovery initialEmail={user.email || ""} lockEmail close={()=>setRecovering(false)} verified={()=>{clearPasswordProof();setRecovering(false);onRecovery();reload();}} />}
+      {recovering && (
+        <PasswordRecovery
+          initialEmail={user.email || ""}
+          lockEmail
+          close={() => setRecovering(false)}
+          verified={() => {
+            clearPasswordProof();
+            setRecovering(false);
+            onRecovery();
+            reload();
+          }}
+        />
+      )}
       <nav className="profile-menu" aria-label="Impostazioni del profilo">
         {[
           "Informazioni personali",
@@ -257,10 +269,7 @@ export function Profile({
                   {loggingOut ? "Uscita in corso…" : "Esci dal tuo account"}
                 </button>
               </div>
-              <button
-                className="text"
-                onClick={() => setRecovering(true)}
-              >
+              <button className="text" onClick={() => setRecovering(true)}>
                 Cambia password
               </button>
             </>

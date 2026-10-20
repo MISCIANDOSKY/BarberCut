@@ -159,7 +159,19 @@ export default function Auth({
       setBusy(false);
     }
   }
-  if (mode === "reset") return <PasswordRecovery initialEmail={email} close={()=>setMode("login")} verified={()=>{clearPasswordProof();onRecovery();onDone();close();}} />;
+  if (mode === "reset")
+    return (
+      <PasswordRecovery
+        initialEmail={email}
+        close={() => setMode("login")}
+        verified={() => {
+          clearPasswordProof();
+          onRecovery();
+          onDone();
+          close();
+        }}
+      />
+    );
   const verifyingLogin = mode === "otpVerify";
   if (mode === "verify" || verifyingLogin)
     return (
