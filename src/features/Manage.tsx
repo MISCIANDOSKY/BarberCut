@@ -68,8 +68,10 @@ export default function Manage({
       return agendaOrder === "future"
         ? Number(aPast) - Number(bPast)
         : Number(bPast) - Number(aPast);
-    return new Date(a.start_at).getTime() - new Date(b.start_at).getTime()
-      || String(a.id).localeCompare(String(b.id));
+    return (
+      new Date(a.start_at).getTime() - new Date(b.start_at).getTime() ||
+      String(a.id).localeCompare(String(b.id))
+    );
   });
   const b = scopedBarbers.some((item) => item.id === selectedBarber)
     ? selectedBarber
@@ -199,7 +201,9 @@ export default function Manage({
             <select
               value={agendaOrder}
               onChange={(event) =>
-                setAgendaOrder(event.target.value === "past" ? "past" : "future")
+                setAgendaOrder(
+                  event.target.value === "past" ? "past" : "future",
+                )
               }
             >
               <option value="future">Prima i futuri</option>
