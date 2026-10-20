@@ -469,3 +469,8 @@ Esportazione iCalendar ICS su azione esplicita del cliente: nessun collegamento 
 
 
 Verifica intermedia: corretto il controllo TypeScript sul riuso dell’esportazione già presente in Le mie prenotazioni (Account) e sul tipo Row dei dati applicativi. Il generatore continua a validare identificativo e orari prima di creare il file. Primo tentativo CI non pubblicato; correzione verificata e pubblicata dalla CI 39483113221 con esito positivo. Esportazione da Le mie prenotazioni conservata.
+
+
+### 20 ottobre 2026 — Funzione calendario approvata dal titolare
+
+Il titolare ha approvato la funzione Aggiungi al calendario dopo la prova e ha deciso di mantenerla per prenotazioni singole e periodiche. La funzione non è più da considerare provvisoria. Nessuna modifica al codice o ai dati: comportamento pubblicato e verifiche CI già registrati nella voce precedente.
