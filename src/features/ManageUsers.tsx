@@ -108,7 +108,8 @@ export default function ManageUsers({
   async function review(account: Row, decision: string) {
     const name =
       [account.first_name, account.last_name].filter(Boolean).join(" ") ||
-      account.phone || "questo cliente";
+      account.phone ||
+      "questo cliente";
     if (
       !confirm(
         decision === "approved"
@@ -237,8 +238,18 @@ export default function ManageUsers({
                       {account.phone && (
                         <small>
                           <a
-                            href={"tel:" + String(account.phone).replace(/[^+0-9]/g, "")}
-                            aria-label={"Chiama " + account.first_name + " " + account.last_name + " al " + account.phone}
+                            href={
+                              "tel:" +
+                              String(account.phone).replace(/[^+0-9]/g, "")
+                            }
+                            aria-label={
+                              "Chiama " +
+                              account.first_name +
+                              " " +
+                              account.last_name +
+                              " al " +
+                              account.phone
+                            }
                           >
                             {account.phone}
                           </a>
