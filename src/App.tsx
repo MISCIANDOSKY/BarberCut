@@ -531,7 +531,9 @@ export default function App() {
         </>
       ) : (
         <div className="content-stack">
-          <p className="muted">Queste impostazioni sono gestite dal tuo titolare.</p>
+          <p className="muted">
+            Queste impostazioni sono gestite dal tuo titolare.
+          </p>
           <section className="content-stack">
             <h3>Indirizzo della barberia</h3>
             <p>{settings.shop_address || "Indirizzo non ancora inserito."}</p>
@@ -541,7 +543,9 @@ export default function App() {
             <p>
               {settings.recurring_unlimited
                 ? "Nessun limite al numero di appuntamenti periodici futuri."
-                : "Massimo " + (settings.recurring_max ?? 5) + " appuntamenti periodici futuri per cliente."}
+                : "Massimo " +
+                  (settings.recurring_max ?? 5) +
+                  " appuntamenti periodici futuri per cliente."}
             </p>
           </section>
           <section className="content-stack">
@@ -564,7 +568,8 @@ export default function App() {
           deletionEnabled={!!settings.account_deletion_enabled}
           deletionFromEmail={deletionFromEmail}
           addressEditor={
-            ready && role === "admin" && (
+            ready &&
+            role === "admin" && (
               <BarberAddress
                 address={settings.shop_address || ""}
                 revision={settings.address_revision || 0}
