@@ -101,8 +101,9 @@ export function PushSettingsPanel({ userId }: { userId: string }) {
     <div className="push-settings">
       <div className="content-stack">
         <p>
-          Ricevi i promemoria dei tuoi appuntamenti anche sul telefono.
-          Le notifiche nel quadrifoglio restano disponibili anche se disattivi le push.
+          Ricevi i promemoria dei tuoi appuntamenti anche sul telefono. Le
+          notifiche nel quadrifoglio restano disponibili anche se disattivi le
+          push.
         </p>
         <label className="check">
           <input
