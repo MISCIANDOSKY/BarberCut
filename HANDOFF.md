@@ -449,3 +449,8 @@ Migrazione 20261020185954: list_clients privato con wrapper pubblico, grant solo
 ### 20 ottobre 2026 — Eliminazione puntuale richiesta dal titolare
 
 Eseguita eliminazione dell’account Cliente indicato esplicitamente dal titolare dopo confronto esatto dell’indirizzo richiesto. Revocate sessioni e refresh token, rimossi account Auth e dati collegati mediante vincoli di cancellazione, verificata assenza residua di account/profilo/ruolo/approvazione/attività e altri dati applicativi controllati. Il cliente non aveva appuntamenti, associazioni barbiere o file; nessun appuntamento di altri utenti modificato. Nessun indirizzo, identificativo o altro dato personale riportato nel repository.
+
+
+### 20 ottobre 2026 — Telefono chiamabile nell’elenco clienti
+
+Nelle schede di Utenti/Gestisci utenti rimossi l’indirizzo email del cliente e la riga Approvato con relativo autore. Numero di telefono sotto il nome come collegamento tel: per aprire la chiamata, anche su smartphone; destinazione ripulita dai caratteri di formattazione mantenendo cifre e prefisso. Conservati ordine A–Z, indice, paginazione, data di registrazione e gestione delle richieste in attesa/rifiutate. Conferme senza ripiego sull’indirizzo email. Nessuna modifica a dati, RPC o permessi. Controllato il sorgente; build e pubblicazione in corso. Interfaccia autenticata e chiamata su dispositivo fisico non provate.

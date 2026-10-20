@@ -108,7 +108,7 @@ export default function ManageUsers({
   async function review(account: Row, decision: string) {
     const name =
       [account.first_name, account.last_name].filter(Boolean).join(" ") ||
-      account.email;
+      account.phone || "questo cliente";
     if (
       !confirm(
         decision === "approved"
@@ -234,8 +234,16 @@ export default function ManageUsers({
                       <strong>
                         {account.first_name} {account.last_name}
                       </strong>
-                      <small>{account.email}</small>
-                      {account.phone && <small>{account.phone}</small>}
+                      {account.phone && (
+                        <small>
+                          <a
+                            href={"tel:" + String(account.phone).replace(/[^+0-9]/g, "")}
+                            aria-label={"Chiama " + account.first_name + " " + account.last_name + " al " + account.phone}
+                          >
+                            {account.phone}
+                          </a>
+                        </small>
+                      )}
                       <small>
                         Registrato il{" "}
                         {new Date(account.requested_at).toLocaleDateString(
@@ -245,16 +253,14 @@ export default function ManageUsers({
                       </small>
                       {account.status === "pending" ? (
                         <small>In attesa di approvazione</small>
-                      ) : (
+                      ) : account.status === "rejected" ? (
                         <small>
-                          {account.status === "approved"
-                            ? "Approvato"
-                            : "Rifiutato"}
+                          Rifiutato
                           {account.reviewed_by_name
                             ? " da " + account.reviewed_by_name
                             : " · Autore non disponibile"}
                         </small>
-                      )}
+                      ) : null}
                       {!account.email_verified && (
                         <small>
                           Email ancora da verificare: l’approvazione sarà
