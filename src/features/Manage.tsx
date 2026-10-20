@@ -68,8 +68,13 @@ export default function Manage({
       return agendaOrder === "future"
         ? Number(aPast) - Number(bPast)
         : Number(bPast) - Number(aPast);
+    const timeDifference =
+      new Date(a.start_at).getTime() - new Date(b.start_at).getTime();
+    // Reverse the time order too, so a day containing only past or only
+    // future entries still responds visibly to the selected ordering.
+    const ascending = agendaOrder === "future" ? !aPast : aPast;
     return (
-      new Date(a.start_at).getTime() - new Date(b.start_at).getTime() ||
+      (ascending ? timeDifference : -timeDifference) ||
       String(a.id).localeCompare(String(b.id))
     );
   });
