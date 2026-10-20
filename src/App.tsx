@@ -402,7 +402,8 @@ export default function App() {
   async function removeNotification(id?: string) {
     const owner = user?.id;
     if (!owner || notificationDeleteInFlight.current) return;
-    if (!id && !(await confirmInApp("Vuoi cancellare tutte le tue notifiche?"))) return;
+    if (!id && !(await confirmInApp("Vuoi cancellare tutte le tue notifiche?")))
+      return;
     if (notificationAccount.current !== owner) return;
     notificationDeleteInFlight.current = true;
     notificationRevision.current++;

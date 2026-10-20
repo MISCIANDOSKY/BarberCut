@@ -273,7 +273,9 @@ export default function ShopAgenda({
             onClick={async () => {
               if (
                 busy ||
-                !(await confirmInApp("Confermi la cancellazione dell’appuntamento?"))
+                !(await confirmInApp(
+                  "Confermi la cancellazione dell’appuntamento?",
+                ))
               )
                 return;
               setBusy(true);

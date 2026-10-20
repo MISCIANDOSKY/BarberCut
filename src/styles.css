@@ -1650,7 +1650,6 @@ dialog h2,
   cursor: default;
 }
 
-
 /* Controls remain inside the PWA rather than opening platform pickers. */
 .app-control {
   display: block;
@@ -1697,7 +1696,9 @@ dialog h2,
 .app-picker-dialog {
   width: min(540px, calc(100% - 28px));
   max-width: calc(100% - 28px);
-  max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 28px);
+  max-height: calc(
+    100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 28px
+  );
 }
 .app-options {
   display: grid;
@@ -1770,7 +1771,7 @@ dialog h2,
   background: var(--bg);
 }
 .app-calendar-grid button:disabled {
-  opacity: .25;
+  opacity: 0.25;
   cursor: default;
 }
 .app-color-options {
@@ -1784,10 +1785,27 @@ dialog h2,
   border-radius: 4px;
   color: #111;
 }
-.app-color-options button[aria-pressed="true"] { border-color: var(--text); }
-.app-color-preview { display: block; width: 24px; height: 24px; border: 1px solid var(--border); border-radius: 4px; }
+.app-color-options button[aria-pressed="true"] {
+  border-color: var(--text);
+}
+.app-color-preview {
+  display: block;
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
 @media (max-width: 380px) {
-  .app-calendar-heading { grid-template-columns: 32px minmax(0, 1fr) 66px 32px; gap: 4px; }
-  .app-calendar-heading .app-select-trigger { padding: 10px 6px; gap: 4px; font-size: 14px; }
-  .app-calendar-grid { gap: 3px; }
+  .app-calendar-heading {
+    grid-template-columns: 32px minmax(0, 1fr) 66px 32px;
+    gap: 4px;
+  }
+  .app-calendar-heading .app-select-trigger {
+    padding: 10px 6px;
+    gap: 4px;
+    font-size: 14px;
+  }
+  .app-calendar-grid {
+    gap: 3px;
+  }
 }

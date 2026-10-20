@@ -139,7 +139,11 @@ export default function Admin({
           </label>
           <label>
             Colore principale
-            <AppPicker type="color" name="accent" defaultValue={settings.accent} />
+            <AppPicker
+              type="color"
+              name="accent"
+              defaultValue={settings.accent}
+            />
           </label>
           <label>
             Cancellazione: ore minime prima dell’appuntamento

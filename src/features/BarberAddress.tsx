@@ -34,7 +34,9 @@ export default function BarberAddress({
     const confirmed = current.revision > 0;
     if (
       confirmed &&
-      !(await confirmInApp("Sei sicuro che vuoi modificare l’indirizzo della barberia?"))
+      !(await confirmInApp(
+        "Sei sicuro che vuoi modificare l’indirizzo della barberia?",
+      ))
     )
       return;
     setBusy(true);

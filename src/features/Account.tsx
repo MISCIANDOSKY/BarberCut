@@ -438,7 +438,9 @@ function DeleteAccount({
                     if (busy || !confirmed || (!usingLink && !code.trim()))
                       return;
                     if (
-                      !(await confirmInApp("Eliminare definitivamente account e profilo?"))
+                      !(await confirmInApp(
+                        "Eliminare definitivamente account e profilo?",
+                      ))
                     )
                       return;
                     setBusy(true);
