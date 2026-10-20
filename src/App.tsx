@@ -524,11 +524,11 @@ export default function App() {
             canConfigureShop &&
             role === "barber_admin" && (
               <>
-              <RecurringPolicy settings={settings} refresh={refresh} />
-              <RegistrationPolicy
-                required={settings.require_user_approval !== false}
-                refresh={refresh}
-              />
+                <RecurringPolicy settings={settings} refresh={refresh} />
+                <RegistrationPolicy
+                  required={settings.require_user_approval !== false}
+                  refresh={refresh}
+                />
               </>
             )
           }

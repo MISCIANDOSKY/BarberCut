@@ -250,7 +250,9 @@ export default function Booking({
     }
   }
   if (confirmed && !guest && !clientId)
-    return <RecurringBooking booking={confirmed} done={() => onBooked(confirmed)} />;
+    return (
+      <RecurringBooking booking={confirmed} done={() => onBooked(confirmed)} />
+    );
   if (confirmed)
     return (
       <div className="success">

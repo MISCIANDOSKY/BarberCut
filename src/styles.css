@@ -1543,4 +1543,10 @@ dialog h2,
   }
 }
 
-.recurring-date { border: 1px solid var(--line, #343b32); padding: 1rem; border-radius: 6px; min-width: 0; overflow-wrap: anywhere; }
+.recurring-date {
+  border: 1px solid var(--line, #343b32);
+  padding: 1rem;
+  border-radius: 6px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}

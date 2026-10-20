@@ -20,9 +20,12 @@ export async function result<T = any>(
 export function friendly(e: unknown) {
   let m = e instanceof Error ? e.message : String(e);
   for (const [k, v] of Object.entries({
-    INVALID_RECURRENCE: "Inserisci una frequenza e un numero di ripetizioni validi.",
-    RECURRENCE_LIMIT: "Hai raggiunto il limite di appuntamenti periodici futuri. Riduci le ripetizioni o cancella un appuntamento periodico.",
-    RECURRENCE_LOCKED: "Questa pianificazione è già stata avviata. Completa le date rimaste.",
+    INVALID_RECURRENCE:
+      "Inserisci una frequenza e un numero di ripetizioni validi.",
+    RECURRENCE_LIMIT:
+      "Hai raggiunto il limite di appuntamenti periodici futuri. Riduci le ripetizioni o cancella un appuntamento periodico.",
+    RECURRENCE_LOCKED:
+      "Questa pianificazione è già stata avviata. Completa le date rimaste.",
     SERVICE_REACTIVATION_BLOCKED:
       "Chiedi al tuo titolare di riattivare il servizio.",
     HIRE_ACCOUNT_UNAVAILABLE:

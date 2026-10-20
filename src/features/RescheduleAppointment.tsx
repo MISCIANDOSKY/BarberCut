@@ -24,12 +24,22 @@ export default function RescheduleAppointment({
 }) {
   const [day, setDay] = useState(() => {
     const bookedDay = romeDay(new Date(appointment.start_at));
-    return bookedDay >= today()
-      ? bookedDay
-      : today();
+    return bookedDay >= today() ? bookedDay : today();
   });
   const [recurring, setRecurring] = useState(false);
-  useEffect(() => {let active=true;result<boolean>(supabase.rpc("appointment_is_recurring",{p_id:appointment.id})).then(value=>{if(active)setRecurring(value);}).catch(()=>{});return()=>{active=false;};},[appointment.id]);
+  useEffect(() => {
+    let active = true;
+    result<boolean>(
+      supabase.rpc("appointment_is_recurring", { p_id: appointment.id }),
+    )
+      .then((value) => {
+        if (active) setRecurring(value);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [appointment.id]);
   const [slots, setSlots] = useState<Row[]>([]);
   const [selected, setSelected] = useState("");
   const [loading, setLoading] = useState(true);

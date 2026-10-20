@@ -101,81 +101,87 @@ export default function Admin({
   if (section === "Configurazione")
     return settings ? (
       <>
-      <RecurringPolicy settings={settings} refresh={() => {void load();refresh();}} />
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          const v = new FormData(e.currentTarget);
-          run(() =>
-            result(
-              supabase
-                .from("app_settings")
-                .update({
-                  shop_name: v.get("name"),
-                  accent: v.get("accent"),
-                  cancellation_hours:
-                    v.get("hours") === "" ? null : Number(v.get("hours")),
-                  require_user_approval: requireApproval,
-                  bookings_enabled: v.get("enabled") === "on",
-                  account_deletion_enabled: v.get("deletion") === "on",
-                })
-                .eq("id", true),
-            ),
-          );
-        }}
-      >
-        <label>
-          Nome attività
-          <input name="name" defaultValue={settings.shop_name} required />
-        </label>
-        <label>
-          Colore principale
-          <input type="color" name="accent" defaultValue={settings.accent} />
-        </label>
-        <label>
-          Cancellazione: ore minime prima dell’appuntamento
-          <input
-            type="number"
-            min="0"
-            step="1"
-            name="hours"
-            defaultValue={settings.cancellation_hours ?? ""}
-          />
-        </label>
-        <RegistrationChoice
-          required={requireApproval}
-          disabled={busy}
-          onChange={setRequireApproval}
+        <RecurringPolicy
+          settings={settings}
+          refresh={() => {
+            void load();
+            refresh();
+          }}
         />
-        <label className="check">
-          <input
-            type="checkbox"
-            name="enabled"
-            defaultChecked={settings.bookings_enabled}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            const v = new FormData(e.currentTarget);
+            run(() =>
+              result(
+                supabase
+                  .from("app_settings")
+                  .update({
+                    shop_name: v.get("name"),
+                    accent: v.get("accent"),
+                    cancellation_hours:
+                      v.get("hours") === "" ? null : Number(v.get("hours")),
+                    require_user_approval: requireApproval,
+                    bookings_enabled: v.get("enabled") === "on",
+                    account_deletion_enabled: v.get("deletion") === "on",
+                  })
+                  .eq("id", true),
+              ),
+            );
+          }}
+        >
+          <label>
+            Nome attività
+            <input name="name" defaultValue={settings.shop_name} required />
+          </label>
+          <label>
+            Colore principale
+            <input type="color" name="accent" defaultValue={settings.accent} />
+          </label>
+          <label>
+            Cancellazione: ore minime prima dell’appuntamento
+            <input
+              type="number"
+              min="0"
+              step="1"
+              name="hours"
+              defaultValue={settings.cancellation_hours ?? ""}
+            />
+          </label>
+          <RegistrationChoice
+            required={requireApproval}
+            disabled={busy}
+            onChange={setRequireApproval}
           />
-          Apri le prenotazioni online
-        </label>
-        <p className="notice">
-          Prima di aprire: configura barbieri, servizi, associazioni, orari e
-          pubblica i termini approvati. Fuso orario: Europe/Rome.
-        </p>
-        <label className="check">
-          <input
-            type="checkbox"
-            name="deletion"
-            defaultChecked={settings.account_deletion_enabled}
-          />
-          Abilita eliminazione account verificata via email
-        </label>
-        <p className="muted">
-          Attiva solo dopo aver definito la politica di conservazione: profilo
-          eliminato, appuntamenti futuri cancellati e storico anonimizzato.
-          L’ultimo admin non può eliminarsi.
-        </p>
-        <button className="primary" disabled={busy}>
-          Salva configurazione
-        </button>
-      </form>
+          <label className="check">
+            <input
+              type="checkbox"
+              name="enabled"
+              defaultChecked={settings.bookings_enabled}
+            />
+            Apri le prenotazioni online
+          </label>
+          <p className="notice">
+            Prima di aprire: configura barbieri, servizi, associazioni, orari e
+            pubblica i termini approvati. Fuso orario: Europe/Rome.
+          </p>
+          <label className="check">
+            <input
+              type="checkbox"
+              name="deletion"
+              defaultChecked={settings.account_deletion_enabled}
+            />
+            Abilita eliminazione account verificata via email
+          </label>
+          <p className="muted">
+            Attiva solo dopo aver definito la politica di conservazione: profilo
+            eliminato, appuntamenti futuri cancellati e storico anonimizzato.
+            L’ultimo admin non può eliminarsi.
+          </p>
+          <button className="primary" disabled={busy}>
+            Salva configurazione
+          </button>
+        </form>
       </>
     ) : (
       <Empty>Caricamento…</Empty>
