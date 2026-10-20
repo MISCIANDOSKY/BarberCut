@@ -3,6 +3,7 @@ import { Empty, Modal } from "../components/UI";
 import { supabase, result } from "../lib/api";
 import type { Row } from "../lib/api";
 import Maintenance from "./Maintenance";
+import RecurringPolicy from "./RecurringPolicy";
 import { RegistrationChoice } from "./RegistrationPolicy";
 export default function Admin({
   section,
@@ -99,6 +100,8 @@ export default function Admin({
   }
   if (section === "Configurazione")
     return settings ? (
+      <>
+      <RecurringPolicy settings={settings} refresh={() => {void load();refresh();}} />
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -173,6 +176,7 @@ export default function Admin({
           Salva configurazione
         </button>
       </form>
+      </>
     ) : (
       <Empty>Caricamento…</Empty>
     );

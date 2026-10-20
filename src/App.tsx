@@ -16,6 +16,7 @@ import Information from "./features/Information";
 import ManageUsers from "./features/ManageUsers";
 import BarberAddress from "./features/BarberAddress";
 import RegistrationPolicy from "./features/RegistrationPolicy";
+import RecurringPolicy from "./features/RecurringPolicy";
 import { supabase, result, friendly } from "./lib/api";
 import type { Row } from "./lib/api";
 export default function App() {
@@ -522,10 +523,13 @@ export default function App() {
           registrationEditor={
             canConfigureShop &&
             role === "barber_admin" && (
+              <>
+              <RecurringPolicy settings={settings} refresh={refresh} />
               <RegistrationPolicy
                 required={settings.require_user_approval !== false}
                 refresh={refresh}
               />
+              </>
             )
           }
           addressEditor={

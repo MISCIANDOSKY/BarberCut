@@ -8,8 +8,8 @@ export function romeDay(date = new Date()) {
 }
 export function maxBookingDate(date = new Date()) {
   const [y, m, d] = romeDay(date).split("-").map(Number);
-  const maxDay = new Date(Date.UTC(y, m + 3, 0)).getUTCDate();
-  return new Date(Date.UTC(y, m + 2, Math.min(d, maxDay)))
+  const maxDay = new Date(Date.UTC(y, m + 6, 0)).getUTCDate();
+  return new Date(Date.UTC(y, m + 5, Math.min(d, maxDay)))
     .toISOString()
     .slice(0, 10);
 }

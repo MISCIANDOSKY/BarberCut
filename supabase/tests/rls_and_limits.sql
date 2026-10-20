@@ -2,11 +2,13 @@
 begin;
 -- These fixtures model clients already admitted to the barber shop.
 update public.app_settings set require_user_approval=false where id;
+update public.terms_versions set published=false where published;
 do $test$
 declare u uuid:=gen_random_uuid(); v uuid:=gen_random_uuid(); b uuid; s uuid; term uuid; d date:=current_date+8; n int; victim uuid; x int;
 begin
 insert into auth.users(id,email,raw_user_meta_data) values(u,'barbercut-role-a@example.invalid','{"first_name":"Test","last_name":"A","phone":"000"}'),(v,'barbercut-role-b@example.invalid','{"first_name":"Test","last_name":"B","phone":"000"}');
 insert into public.barbers(name) values('TEST rollback roles') returning id into b;
+delete from public.working_hours where barber_id=b;
 insert into public.services(name,duration_minutes,price) values('TEST',15,1) returning id into s;
 insert into public.barber_services values(b,s);
 insert into public.working_hours(barber_id,weekday,opens,closes) select b,i,'09:00','18:00' from generate_series(0,6) i;

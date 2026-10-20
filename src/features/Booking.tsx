@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createLatestRequest } from "../lib/latestRequest.mjs";
 import { maxBookingDate } from "../lib/dates.mjs";
+import RecurringBooking from "./RecurringBooking";
 import { Empty, Modal } from "../components/UI";
 import {
   supabase,
@@ -184,7 +185,7 @@ export default function Booking({
     setBusy(true);
     setBookingError("");
     try {
-      await result(
+      const bookingId = await result<string>(
         guest
           ? supabase.rpc("book_manual_appointment", {
               p_barber: chosenBarber,
@@ -203,6 +204,7 @@ export default function Booking({
             }),
       );
       const savedBooking = {
+        id: bookingId,
         start_at: selected,
         end_at: new Date(
           new Date(selected).getTime() + svc!.duration_minutes * 60000,
@@ -210,7 +212,7 @@ export default function Booking({
         service_name: svc!.name,
       };
       setConfirmed(savedBooking);
-      onBooked(savedBooking);
+      if (guest || clientId) onBooked(savedBooking);
     } catch (e) {
       if (
         manualBooking &&
@@ -247,6 +249,8 @@ export default function Booking({
       setBusy(false);
     }
   }
+  if (confirmed && !guest && !clientId)
+    return <RecurringBooking booking={confirmed} done={() => onBooked(confirmed)} />;
   if (confirmed)
     return (
       <div className="success">

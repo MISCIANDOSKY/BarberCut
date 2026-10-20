@@ -2,11 +2,13 @@
 begin;
 -- These fixtures model clients already admitted to the barber shop.
 update public.app_settings set require_user_approval=false where id;
+update public.terms_versions set published=false where published;
 do $test$
 declare u uuid:=gen_random_uuid(); other uuid:=gen_random_uuid(); b uuid; s15 uuid; s30 uuid; s45 uuid; d date:=current_date+7; n int; created uuid; t timestamptz;
 begin
 insert into auth.users(id,email,raw_user_meta_data) values(u,'barbercut-test-a@example.invalid','{"first_name":"Test","last_name":"A","phone":"000"}'),(other,'barbercut-test-b@example.invalid','{"first_name":"Test","last_name":"B","phone":"000"}');
 insert into public.barbers(name) values('TEST rollback') returning id into b;
+delete from public.working_hours where barber_id=b;
 insert into public.services(name,duration_minutes,price) values('TEST 15',15,1) returning id into s15;
 insert into public.services(name,duration_minutes,price) values('TEST 30',30,1) returning id into s30;
 insert into public.services(name,duration_minutes,price) values('TEST 45',45,1) returning id into s45;
@@ -30,7 +32,7 @@ if not private.is_holiday(make_date(extract(year from now())::int,12,25)) then r
 if not private.is_holiday(date '2027-03-29') then raise exception 'Easter Monday incorrect';end if;
 insert into public.schedule_exceptions(barber_id,day,opens,closes) values(b,d,'15:00','16:00');
 select count(*) into n from public.get_available_slots(b,s15,d);if n<>4 then raise exception 'special opening incorrect';end if;
-if exists(select 1 from public.get_available_slots(b,s15,(current_date+interval '4 months')::date)) then raise exception 'three month limit incorrect';end if;
+if exists(select 1 from public.get_available_slots(b,s15,(current_date+interval '7 months')::date)) then raise exception 'six month limit incorrect';end if;
 insert into public.terms_versions(version,body,published) values('TEST availability','Termini di test non pubblici',true);
 insert into public.terms_acceptances(user_id,terms_id) select u,id from public.terms_versions where version='TEST availability';
 update public.app_settings set bookings_enabled=true,cancellation_hours=0;

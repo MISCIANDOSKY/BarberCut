@@ -1,5 +1,6 @@
 begin;
 update public.app_settings set require_user_approval=false where id;
+update public.terms_versions set published=false where published;
 do $test$
 declare
  staff_user uuid:=gen_random_uuid(); other_staff uuid:=gen_random_uuid(); client_user uuid:=gen_random_uuid();
@@ -13,6 +14,7 @@ begin
  (client_user,'closed-client@example.invalid',now(),'{}');
  insert into public.barbers(name,user_id) values('Closed day test',staff_user) returning id into own_barber;
  insert into public.barbers(name,user_id) values('Other closed test',other_staff) returning id into other_barber;
+ delete from public.working_hours where barber_id in(own_barber,other_barber);
  insert into public.services(name,duration_minutes,price) values('Closed day test service',30,10) returning id into service_id;
  insert into public.barber_services values(own_barber,service_id),(other_barber,service_id);
  insert into public.working_hours(barber_id,weekday,opens,closes) select own_barber,i,'09:00','18:00' from generate_series(0,6)i;
@@ -58,7 +60,7 @@ begin
  raise exception 'other agenda manual slots exposed';
  exception when raise_exception then if sqlerrm<>'ACCESS_DENIED' then raise;end if;end;
  if exists(select 1 from public.get_manual_booking_slots(own_barber,service_id,current_date-1))
- or exists(select 1 from public.get_manual_booking_slots(own_barber,service_id,current_date+120)) then raise exception 'date horizon bypassed';end if;
+ or exists(select 1 from public.get_manual_booking_slots(own_barber,service_id,current_date+220)) then raise exception 'date horizon bypassed';end if;
  reset role;
  no_hours:=normal_day+7;
  while private.is_holiday(no_hours) loop no_hours:=no_hours+1;end loop;
