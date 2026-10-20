@@ -116,8 +116,8 @@ export function RegistrationChoice({
       </label>
       <p className="muted">
         Spunta attiva: i nuovi clienti sono accettati automaticamente dopo la
-        verifica email. Spunta disattiva: devono essere approvati da Gestisci
-        utenti. La scelta vale per tutta la barberia; gli utenti già in attesa
+        verifica email. Spunta disattiva: devono essere approvati dalla
+        barberia. La scelta vale per tutta la barberia; gli utenti già in attesa
         mantengono il proprio stato.
       </p>
     </>
