@@ -474,3 +474,10 @@ Verifica intermedia: corretto il controllo TypeScript sul riuso dell’esportazi
 ### 20 ottobre 2026 — Funzione calendario approvata dal titolare
 
 Il titolare ha approvato la funzione Aggiungi al calendario dopo la prova e ha deciso di mantenerla per prenotazioni singole e periodiche. La funzione non è più da considerare provvisoria. Nessuna modifica al codice o ai dati: comportamento pubblicato e verifiche CI già registrati nella voce precedente.
+
+
+### 20 ottobre 2026 — Nessuna notifica Appuntamento cancellato al cliente
+
+Su richiesta del titolare, migrazione remota 20261020193110: private.notify_entry non inserisce più notifiche cliente quando l’appuntamento ha status cancelled, compresi eventuali aggiornamenti successivi sulla riga già cancellata. Conservate conferma a schermo, aggiornamento agenda al barbiere, notifiche di spostamento/aggiornamento per appuntamenti confermati e promemoria esistenti. Nessuna notifica storica cancellata. Nessuna modifica a RLS, grant, controlli cancellazione, calendario esterno o dati degli appuntamenti.
+
+Test cancellation_notifications.sql eseguito con rollback, utente sintetico .invalid e tabella temporanea che invoca la funzione trigger effettiva: cancellazione e successivo aggiornamento non creano messaggi cliente; aggiornamento confermato e spostamento continuano a notificarlo. Nessun account/appuntamento reale modificato né messaggio reale inviato. Advisor sicurezza invariati: 11 INFO sulle tabelle private intenzionalmente senza policy dirette e WARN preesistente protezione password compromesse. Modifica attiva nel database, nessuna distribuzione frontend necessaria.
