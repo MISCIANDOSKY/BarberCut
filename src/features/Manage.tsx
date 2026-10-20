@@ -236,9 +236,7 @@ export default function Manage({
             <select
               value={agendaOrder}
               onChange={(event) =>
-                setAgendaOrder(
-                  event.target.value === "desc" ? "desc" : "asc",
-                )
+                setAgendaOrder(event.target.value === "desc" ? "desc" : "asc")
               }
             >
               <option value="asc">Orario crescente</option>
