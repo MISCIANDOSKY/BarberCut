@@ -105,7 +105,14 @@ export default function Admin({
   if (section === "Configurazione")
     return settings ? (
       <>
-        <BarberAddress address={settings.shop_address || ""} revision={settings.address_revision || 0} refresh={() => { void load(); refresh(); }} />
+        <BarberAddress
+          address={settings.shop_address || ""}
+          revision={settings.address_revision || 0}
+          refresh={() => {
+            void load();
+            refresh();
+          }}
+        />
         <RecurringPolicy
           settings={settings}
           refresh={() => {
