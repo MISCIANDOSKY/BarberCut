@@ -145,7 +145,9 @@ export default function Manage({
   }
   useEffect(() => {
     load();
-    return () => { agendaRequest.current++; };
+    return () => {
+      agendaRequest.current++;
+    };
   }, [b, day, section]);
   useEffect(() => {
     if (section !== "Appuntamenti") return;
