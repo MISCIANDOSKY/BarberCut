@@ -85,10 +85,19 @@ export function Appointments({
   );
 }
 export function Profile({
-  user, profile, notify: outerNotify, reload, deletionEnabled, deletionFromEmail = false,
+  user,
+  profile,
+  notify: outerNotify,
+  reload,
+  deletionEnabled,
+  deletionFromEmail = false,
 }: {
-  user: Row; profile: Row; notify: (s: string) => void; reload: () => void;
-  deletionEnabled: boolean; deletionFromEmail?: boolean;
+  user: Row;
+  profile: Row;
+  notify: (s: string) => void;
+  reload: () => void;
+  deletionEnabled: boolean;
+  deletionFromEmail?: boolean;
 }) {
   const [first, setFirst] = useState(profile.first_name),
     [last, setLast] = useState(profile.last_name),
@@ -96,15 +105,36 @@ export function Profile({
     [busy, setBusy] = useState(false),
     [loggingOut, setLoggingOut] = useState(false);
   const [notice, setNotice] = useState("");
-  const notify = (text: string) => { setNotice(text); outerNotify(text); };
+  const notify = (text: string) => {
+    setNotice(text);
+    outerNotify(text);
+  };
   const [page, setPage] = useState(deletionFromEmail ? "Elimina account" : "");
-  useEffect(() => { if (deletionFromEmail) setPage("Elimina account"); }, [deletionFromEmail]);
+  useEffect(() => {
+    if (deletionFromEmail) setPage("Elimina account");
+  }, [deletionFromEmail]);
   return (
     <>
       <nav className="profile-menu" aria-label="Impostazioni del profilo">
-        {["Informazioni personali", "Termini e condizioni", "Notifiche", "Elimina account"].map((label) => (
-          <button key={label} type="button" className={"secondary " + (label === "Elimina account" ? "danger-text" : "")} onClick={() => { setNotice(""); setPage(label); }}>
-            <span>{label}</span><span aria-hidden="true">→</span>
+        {[
+          "Informazioni personali",
+          "Termini e condizioni",
+          "Notifiche",
+          "Elimina account",
+        ].map((label) => (
+          <button
+            key={label}
+            type="button"
+            className={
+              "secondary " + (label === "Elimina account" ? "danger-text" : "")
+            }
+            onClick={() => {
+              setNotice("");
+              setPage(label);
+            }}
+          >
+            <span>{label}</span>
+            <span aria-hidden="true">→</span>
           </button>
         ))}
       </nav>
@@ -137,104 +167,119 @@ export function Profile({
 
       {page && (
         <Modal title={page} wide close={() => setPage("")}>
-          {notice && <p className="notice" role="status">{notice}</p>}
+          {notice && (
+            <p className="notice" role="status">
+              {notice}
+            </p>
+          )}
           {page === "Informazioni personali" && (
             <>
-      <form
-        onSubmit={async (e) => {
-          e.preventDefault();
-          setBusy(true);
-          try {
-            await result(
-              supabase
-                .from("profiles")
-                .update({ first_name: first, last_name: last, phone })
-                .eq("id", user.id),
-            );
-            notify("Profilo aggiornato.");
-            setPage("");
-            reload();
-          } catch {
-            notify("Impossibile salvare il profilo.");
-          } finally {
-            setBusy(false);
-          }
-        }}
-      >
-        <div className="two">
-          <Field
-            label="Nome"
-            name="given-name"
-            value={first}
-            onChange={setFirst}
-          />
-          <Field
-            label="Cognome"
-            name="family-name"
-            value={last}
-            onChange={setLast}
-          />
-        </div>
-        <Field
-          label="Telefono"
-          type="tel"
-          name="tel"
-          value={phone}
-          onChange={setPhone}
-        />
-        <label>
-          Email
-          <input value={user.email || ""} readOnly />
-        </label>
-        <button className="primary" disabled={busy}>
-          {busy ? "Salvataggio…" : "Salva profilo"}
-        </button>
-      </form>
-      <div>
-        <button
-          type="button"
-          className="secondary"
-          disabled={busy || loggingOut}
-          style={{ width: "100%" }}
-          onClick={async () => {
-            if (loggingOut) return;
-            setLoggingOut(true);
-            try {
-              await detachPushDevice();
-              const { error } = await supabase.auth.signOut({ scope: "local" });
-              if (error) throw error;
-              clearPasswordProof();
-              notify("Hai effettuato l’uscita dal tuo account.");
-              reload();
-            } catch {
-              notify("Non riesco a uscire dall’account. Riprova.");
-            } finally {
-              setLoggingOut(false);
-            }
-          }}
-        >
-          {loggingOut ? "Uscita in corso…" : "Esci dal tuo account"}
-        </button>
-      </div>
-      <button
-        className="text"
-        onClick={async () => {
-          await supabase.auth.resetPasswordForEmail(user.email, {
-            redirectTo: location.origin + import.meta.env.BASE_URL,
-          });
-          notify(
-            "Controlla l’email per cambiare la password. Controlla anche le cartelle Spam e Posta indesiderata.",
-          );
-        }}
-      >
-        Cambia password
-      </button>
-
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  setBusy(true);
+                  try {
+                    await result(
+                      supabase
+                        .from("profiles")
+                        .update({ first_name: first, last_name: last, phone })
+                        .eq("id", user.id),
+                    );
+                    notify("Profilo aggiornato.");
+                    setPage("");
+                    reload();
+                  } catch {
+                    notify("Impossibile salvare il profilo.");
+                  } finally {
+                    setBusy(false);
+                  }
+                }}
+              >
+                <div className="two">
+                  <Field
+                    label="Nome"
+                    name="given-name"
+                    value={first}
+                    onChange={setFirst}
+                  />
+                  <Field
+                    label="Cognome"
+                    name="family-name"
+                    value={last}
+                    onChange={setLast}
+                  />
+                </div>
+                <Field
+                  label="Telefono"
+                  type="tel"
+                  name="tel"
+                  value={phone}
+                  onChange={setPhone}
+                />
+                <label>
+                  Email
+                  <input value={user.email || ""} readOnly />
+                </label>
+                <button className="primary" disabled={busy}>
+                  {busy ? "Salvataggio…" : "Salva profilo"}
+                </button>
+              </form>
+              <div>
+                <button
+                  type="button"
+                  className="secondary"
+                  disabled={busy || loggingOut}
+                  style={{ width: "100%" }}
+                  onClick={async () => {
+                    if (loggingOut) return;
+                    setLoggingOut(true);
+                    try {
+                      await detachPushDevice();
+                      const { error } = await supabase.auth.signOut({
+                        scope: "local",
+                      });
+                      if (error) throw error;
+                      clearPasswordProof();
+                      notify("Hai effettuato l’uscita dal tuo account.");
+                      reload();
+                    } catch {
+                      notify("Non riesco a uscire dall’account. Riprova.");
+                    } finally {
+                      setLoggingOut(false);
+                    }
+                  }}
+                >
+                  {loggingOut ? "Uscita in corso…" : "Esci dal tuo account"}
+                </button>
+              </div>
+              <button
+                className="text"
+                onClick={async () => {
+                  await supabase.auth.resetPasswordForEmail(user.email, {
+                    redirectTo: location.origin + import.meta.env.BASE_URL,
+                  });
+                  notify(
+                    "Controlla l’email per cambiare la password. Controlla anche le cartelle Spam e Posta indesiderata.",
+                  );
+                }}
+              >
+                Cambia password
+              </button>
             </>
           )}
-          {page === "Termini e condizioni" && <ProfileTerms userId={user.id} refresh={reload} />}
+          {page === "Termini e condizioni" && (
+            <ProfileTerms userId={user.id} refresh={reload} />
+          )}
           {page === "Notifiche" && <PushSettingsPanel userId={user.id} />}
-          {page === "Elimina account" && <DeleteAccount fromEmailLink={deletionFromEmail} email={user.email} enabled={deletionEnabled} notify={notify} reload={reload} />}
+          {page === "Elimina account" && (
+            <DeleteAccount
+              fromEmailLink={deletionFromEmail}
+              email={user.email}
+              enabled={deletionEnabled}
+              notify={notify}
+              reload={reload}
+            />
+          )}
         </Modal>
       )}
     </>
