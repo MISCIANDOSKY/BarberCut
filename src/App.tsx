@@ -470,7 +470,7 @@ export default function App() {
           ...(role === "barber_admin" && canConfigureShop
             ? [["＋", "Assumi Barbiere", "Aggiungi un collaboratore"]]
             : []),
-          ["◉", "Profilo", "Il tuo account"],
+          ["⚙", "Configurazione", "Impostazioni della barberia"],
         ]
     : clientChoices;
   const manageSections = [
@@ -511,6 +511,49 @@ export default function App() {
       canConfigureShop
     )
       return <HireBarber refresh={refresh} notify={notify} />;
+    if (
+      section === "Configurazione" &&
+      ready &&
+      (role === "barber" || role === "barber_admin")
+    )
+      return canConfigureShop ? (
+        <>
+          <BarberAddress
+            address={settings.shop_address || ""}
+            revision={settings.address_revision || 0}
+            refresh={refresh}
+          />
+          <RecurringPolicy settings={settings} refresh={refresh} />
+          <RegistrationPolicy
+            required={settings.require_user_approval !== false}
+            refresh={refresh}
+          />
+        </>
+      ) : (
+        <div className="content-stack">
+          <p className="muted">Queste impostazioni sono gestite dal tuo titolare.</p>
+          <section className="content-stack">
+            <h3>Indirizzo della barberia</h3>
+            <p>{settings.shop_address || "Indirizzo non ancora inserito."}</p>
+          </section>
+          <section className="content-stack">
+            <h3>Prenotazioni periodiche</h3>
+            <p>
+              {settings.recurring_unlimited
+                ? "Nessun limite al numero di appuntamenti periodici futuri."
+                : "Massimo " + (settings.recurring_max ?? 5) + " appuntamenti periodici futuri per cliente."}
+            </p>
+          </section>
+          <section className="content-stack">
+            <h3>Iscrizione nuovi clienti</h3>
+            <p>
+              {settings.require_user_approval !== false
+                ? "I nuovi clienti devono essere approvati."
+                : "I nuovi clienti sono accettati senza approvazione."}
+            </p>
+          </section>
+        </div>
+      );
     if (section === "Profilo")
       return user && profile ? (
         <Profile
@@ -520,22 +563,8 @@ export default function App() {
           reload={refresh}
           deletionEnabled={!!settings.account_deletion_enabled}
           deletionFromEmail={deletionFromEmail}
-          registrationEditor={
-            canConfigureShop &&
-            role === "barber_admin" && (
-              <>
-                <RecurringPolicy settings={settings} refresh={refresh} />
-                <RegistrationPolicy
-                  required={settings.require_user_approval !== false}
-                  refresh={refresh}
-                />
-              </>
-            )
-          }
           addressEditor={
-            ready &&
-            (role === "admin" ||
-              (role === "barber_admin" && canConfigureShop)) && (
+            ready && role === "admin" && (
               <BarberAddress
                 address={settings.shop_address || ""}
                 revision={settings.address_revision || 0}
