@@ -49,18 +49,18 @@ export default function RecurringPolicy({
         }}
       >
         {!unlimited && (
-        <label>
-          Numero massimo di appuntamenti periodici futuri
-          <input
-            type="number"
-            min="0"
-            step="1"
-            value={maximum}
-            disabled={busy}
-            required
-            onChange={(e) => setMaximum(e.target.value)}
-          />
-        </label>
+          <label>
+            Numero massimo di appuntamenti periodici futuri
+            <input
+              type="number"
+              min="0"
+              step="1"
+              value={maximum}
+              disabled={busy}
+              required
+              onChange={(e) => setMaximum(e.target.value)}
+            />
+          </label>
         )}
         <label className="check">
           <input
