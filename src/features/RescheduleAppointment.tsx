@@ -183,7 +183,11 @@ export default function RescheduleAppointment({
               <AppPicker
                 type="date"
                 min={today()}
-                max={recurring ? undefined : maxBookingDate(new Date(), bookingHorizonMonths)}
+                max={
+                  recurring
+                    ? undefined
+                    : maxBookingDate(new Date(), bookingHorizonMonths)
+                }
                 value={day}
                 disabled={busy}
                 onChange={(event) => {

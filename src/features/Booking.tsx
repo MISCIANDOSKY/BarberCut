@@ -86,7 +86,10 @@ export default function Booking({
     slots.some(
       (slot) => slot.start_at === selected && slot.requires_confirmation,
     );
-  const maxDate = maxBookingDate(new Date(), settings.booking_horizon_months ?? 6);
+  const maxDate = maxBookingDate(
+    new Date(),
+    settings.booking_horizon_months ?? 6,
+  );
   useEffect(() => {
     result(supabase.from("barber_services").select("*"))
       .then(setLinks)

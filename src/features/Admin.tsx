@@ -114,7 +114,13 @@ export default function Admin({
             refresh();
           }}
         />
-        <BookingHorizon settings={settings} refresh={() => {void load();refresh();}} />
+        <BookingHorizon
+          settings={settings}
+          refresh={() => {
+            void load();
+            refresh();
+          }}
+        />
         <RecurringPolicy
           settings={settings}
           refresh={() => {

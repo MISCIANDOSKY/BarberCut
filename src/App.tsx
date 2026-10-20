@@ -786,7 +786,10 @@ export default function App() {
           ) : !verified ? (
             <StaffGate email={user.email!} done={refresh} notify={notify} />
           ) : (
-            <ShopAgenda bookingHorizonMonths={settings.booking_horizon_months ?? 6} onAccessChanged={refresh} />
+            <ShopAgenda
+              bookingHorizonMonths={settings.booking_horizon_months ?? 6}
+              onAccessChanged={refresh}
+            />
           )}
         </main>
         {message && (
