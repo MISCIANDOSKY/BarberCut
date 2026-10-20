@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { createLatestRequest } from "../lib/latestRequest.mjs";
 import { maxBookingDate } from "../lib/dates.mjs";
 import RecurringBooking from "./RecurringBooking";
+import { downloadCalendar } from "../lib/downloadCalendar";
 import { Empty, Modal } from "../components/UI";
 import {
   supabase,
@@ -210,6 +211,7 @@ export default function Booking({
           new Date(selected).getTime() + svc!.duration_minutes * 60000,
         ).toISOString(),
         service_name: svc!.name,
+        barber_name: barbers.find((b) => b.id === chosenBarber)?.name || "",
       };
       setConfirmed(savedBooking);
       if (guest || clientId) onBooked(savedBooking);
@@ -464,44 +466,4 @@ export default function Booking({
       )}
     </>
   );
-}
-export function downloadCalendar(e: Row) {
-  const stamp = (s: string) =>
-    new Date(s)
-      .toISOString()
-      .replace(/[-:]/g, "")
-      .replace(/\.\d{3}/, "");
-  const escape = (s: string) =>
-    s
-      .replace(/\\/g, "\\\\")
-      .replace(/\n/g, "\\n")
-      .replace(/,/g, "\\,")
-      .replace(/;/g, "\\;");
-  const text = [
-    "BEGIN:VCALENDAR",
-    "VERSION:2.0",
-    "PRODID:-//BarberUp//Appuntamenti//IT",
-    "BEGIN:VEVENT",
-    "UID:" + crypto.randomUUID() + "@barberup",
-    "DTSTAMP:" + stamp(new Date().toISOString()),
-    "DTSTART:" + stamp(e.start_at),
-    "DTEND:" + stamp(e.end_at),
-    "SUMMARY:Appuntamento Barbiere",
-    "DESCRIPTION:" + escape(e.service_name || ""),
-    "BEGIN:VALARM",
-    "TRIGGER:-PT1H",
-    "ACTION:DISPLAY",
-    "DESCRIPTION:Appuntamento Barbiere",
-    "END:VALARM",
-    "END:VEVENT",
-    "END:VCALENDAR",
-  ].join("\r\n");
-  const u = URL.createObjectURL(
-      new Blob([text], { type: "text/calendar;charset=utf-8" }),
-    ),
-    a = document.createElement("a");
-  a.href = u;
-  a.download = "BarberUp.ics";
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(u), 1000);
 }
