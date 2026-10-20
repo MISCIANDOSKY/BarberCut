@@ -1840,3 +1840,7 @@ dialog h2,
   padding-top: 20px;
   border-top: 1px solid var(--border);
 }
+
+.registration-phone { display: grid; grid-template-columns: 105px minmax(0, 1fr); gap: 12px; align-items: start; }
+.registration-phone > label { min-width: 0; }
+@media (max-width: 380px) { .registration-phone { grid-template-columns: 90px minmax(0, 1fr); gap: 8px; } }
