@@ -1,3 +1,5 @@
+import { PushSettingsPanel } from "./PushSettings";
+import { detachPushDevice } from "../lib/push";
 import { confirmInApp } from "../components/AppDialogs";
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
@@ -167,6 +169,7 @@ export function Profile({
             if (loggingOut) return;
             setLoggingOut(true);
             try {
+              await detachPushDevice();
               const { error } = await supabase.auth.signOut({ scope: "local" });
               if (error) throw error;
               clearPasswordProof();
@@ -195,6 +198,7 @@ export function Profile({
       >
         Cambia password
       </button>
+      <PushSettingsPanel userId={user.id} />
       {registrationEditor}
       {addressEditor}
       <DeleteAccount
@@ -475,6 +479,7 @@ function DeleteAccount({
                         }
                         return;
                       }
+                      await detachPushDevice();
                       await supabase.auth.signOut({ scope: "local" });
                       notify("Account eliminato. Arrivederci!");
                       reload();

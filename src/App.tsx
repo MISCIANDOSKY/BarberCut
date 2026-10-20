@@ -1,3 +1,5 @@
+import { PushOnboarding } from "./features/PushSettings";
+import { detachPushDevice } from "./lib/push";
 import { confirmInApp } from "./components/AppDialogs";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createLatestRequest } from "./lib/latestRequest.mjs";
@@ -53,7 +55,9 @@ export default function App() {
         ? "Profilo"
         : new URLSearchParams(location.search).get("book") === "1"
           ? "Prenota"
-          : "",
+          : new URLSearchParams(location.search).get("appointments") === "1"
+            ? "Le mie prenotazioni"
+            : "",
     ),
     [auth, setAuth] = useState(
       () => new URLSearchParams(location.search).get("keep-active") === "1",
@@ -572,16 +576,6 @@ export default function App() {
           reload={refresh}
           deletionEnabled={!!settings.account_deletion_enabled}
           deletionFromEmail={deletionFromEmail}
-          addressEditor={
-            ready &&
-            role === "admin" && (
-              <BarberAddress
-                address={settings.shop_address || ""}
-                revision={settings.address_revision || 0}
-                refresh={refresh}
-              />
-            )
-          }
         />
       ) : (
         <div className="content-stack">
@@ -763,6 +757,7 @@ export default function App() {
             className="text"
             onClick={async () => {
               try {
+                await detachPushDevice();
                 const { error } = await supabase.auth.signOut({
                   scope: "local",
                 });
@@ -1056,6 +1051,9 @@ export default function App() {
         <Modal title="Termini e condizioni" close={() => setLegal(false)}>
           <p className="legal">{terms?.body}</p>
         </Modal>
+      )}
+      {user && !loading && !auth && !reset && (!staff || verified) && (
+        <PushOnboarding key={user.id} userId={user.id} />
       )}
       {resetDialog}
     </div>

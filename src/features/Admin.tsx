@@ -1,3 +1,4 @@
+import BarberAddress from "./BarberAddress";
 import { AppPicker } from "../components/AppPicker";
 import { AppSelect } from "../components/AppSelect";
 import { confirmInApp } from "../components/AppDialogs";
@@ -104,6 +105,7 @@ export default function Admin({
   if (section === "Configurazione")
     return settings ? (
       <>
+        <BarberAddress address={settings.shop_address || ""} revision={settings.address_revision || 0} refresh={() => { void load(); refresh(); }} />
         <RecurringPolicy
           settings={settings}
           refresh={() => {
