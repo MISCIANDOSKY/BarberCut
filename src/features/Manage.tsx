@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { romeLocalToISO, romeDay } from "../lib/dates.mjs";
 import RescheduleAppointment from "./RescheduleAppointment";
 import { Empty, Modal } from "../components/UI";
@@ -60,6 +60,15 @@ export default function Manage({
     [exceptions, setExceptions] = useState<Row[]>([]),
     [busy, setBusy] = useState(false);
   const [now, setNow] = useState(Date.now);
+  const agendaRequest = useRef(0);
+  function shiftAgendaDay(offset: number) {
+    setRows([]);
+    setDay((current) => {
+      const date = new Date((current || today()) + "T12:00:00Z");
+      date.setUTCDate(date.getUTCDate() + offset);
+      return date.toISOString().slice(0, 10);
+    });
+  }
   const [agendaOrder, setAgendaOrder] = useState<"future" | "past">("future");
   const orderedRows = [...rows].sort((a, b) => {
     const aPast = new Date(a.end_at).getTime() <= now;
@@ -85,6 +94,7 @@ export default function Manage({
     if (!b) return;
     try {
       if (section === "Appuntamenti") {
+        const request = ++agendaRequest.current;
         const data = await result(
           supabase
             .from("calendar_entries")
@@ -93,6 +103,7 @@ export default function Manage({
             .eq("status", "confirmed")
             .order("start_at"),
         );
+        if (request !== agendaRequest.current) return;
         setRows(
           (data as Row[]).filter(
             (x) =>
@@ -134,6 +145,7 @@ export default function Manage({
   }
   useEffect(() => {
     load();
+    return () => { agendaRequest.current++; };
   }, [b, day, section]);
   useEffect(() => {
     if (section !== "Appuntamenti") return;
@@ -193,14 +205,39 @@ export default function Manage({
       )}
       {section === "Appuntamenti" && (
         <>
-          <label>
-            Giorno
-            <input
-              type="date"
-              value={day}
-              onChange={(e) => setDay(e.target.value)}
-            />
-          </label>
+          <div className="agenda-day-navigation">
+            <button
+              type="button"
+              className="secondary"
+              aria-label="Giorno precedente"
+              title="Giorno precedente"
+              onClick={() => shiftAgendaDay(-1)}
+            >
+              ←
+            </button>
+            <label className="booking-date-field">
+              Giorno
+              <span className="booking-date-control">
+                <input
+                  type="date"
+                  value={day}
+                  onChange={(event) => {
+                    setRows([]);
+                    setDay(event.target.value);
+                  }}
+                />
+              </span>
+            </label>
+            <button
+              type="button"
+              className="secondary"
+              aria-label="Giorno successivo"
+              title="Giorno successivo"
+              onClick={() => shiftAgendaDay(1)}
+            >
+              →
+            </button>
+          </div>
           <label>
             Ordine appuntamenti
             <select
