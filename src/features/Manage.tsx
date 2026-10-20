@@ -60,6 +60,17 @@ export default function Manage({
     [exceptions, setExceptions] = useState<Row[]>([]),
     [busy, setBusy] = useState(false);
   const [now, setNow] = useState(Date.now);
+  const [agendaOrder, setAgendaOrder] = useState<"future" | "past">("future");
+  const orderedRows = [...rows].sort((a, b) => {
+    const aPast = new Date(a.end_at).getTime() <= now;
+    const bPast = new Date(b.end_at).getTime() <= now;
+    if (aPast !== bPast)
+      return agendaOrder === "future"
+        ? Number(aPast) - Number(bPast)
+        : Number(bPast) - Number(aPast);
+    return new Date(a.start_at).getTime() - new Date(b.start_at).getTime()
+      || String(a.id).localeCompare(String(b.id));
+  });
   const b = scopedBarbers.some((item) => item.id === selectedBarber)
     ? selectedBarber
     : scopedBarbers[0]?.id || "";
@@ -183,8 +194,20 @@ export default function Manage({
               onChange={(e) => setDay(e.target.value)}
             />
           </label>
+          <label>
+            Ordine appuntamenti
+            <select
+              value={agendaOrder}
+              onChange={(event) =>
+                setAgendaOrder(event.target.value === "past" ? "past" : "future")
+              }
+            >
+              <option value="future">Prima i futuri</option>
+              <option value="past">Prima i passati</option>
+            </select>
+          </label>
           <div className="agenda">
-            {rows.map((e) => (
+            {orderedRows.map((e) => (
               <button
                 className={
                   "agenda-row" +

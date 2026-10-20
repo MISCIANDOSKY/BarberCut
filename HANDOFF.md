@@ -393,3 +393,8 @@ Controlli finali: test esteso superato anche per modalità senza limite numerico
 ### 20 ottobre 2026 — Pulsante Annulla nelle prenotazioni periodiche
 
 Sostituito Termina e vai alle mie prenotazioni con Annulla e vai alle mie prenotazioni, come pulsante secondario subito sotto Conferma prenotazioni periodiche (o conferma della pagina corrente). Conservata la disabilitazione durante il salvataggio e la navigazione esistente: chiude la pianificazione senza prenotare le date pendenti, mantenendo il primo appuntamento e quelli già confermati. Nessuna modifica a database, regole o prenotazioni reali. Controllati testo e ordine nel sorgente; pubblicazione in corso.
+
+
+### 20 ottobre 2026 — Ordine futuri/passati nell’agenda
+
+Aggiunto selettore Ordine appuntamenti sotto Giorno: Prima i futuri (predefinito) oppure Prima i passati. Riordina soltanto gli elementi della giornata già selezionata, mantenendo l’ordine orario crescente all’interno dei gruppi e tutti i dettagli/apertura/cancellazione/spostamento. Gli appuntamenti in corso restano con quelli futuri; passati quando end_at è raggiunto, come per la barra e il colore grigio esistenti. Anche i blocchi rimangono visibili. Aggiornamento automatico dei gruppi con il timer/focus/visibilità esistente; nessuna modifica al database o ai permessi. Funzione condivisa dai ruoli Barbiere e Barbiere Admin (anche strumenti agenda Admin). Verificati nel sorgente ordine del selettore, copia non mutante dell’elenco e classificazione coerente con la marcatura conclusi; build/pubblicazione in corso.
