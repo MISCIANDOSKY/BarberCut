@@ -1,9 +1,9 @@
 import { createCalendar } from "./calendar.mjs";
-import type { CalendarEvent } from "./calendar.mjs";
-export function downloadCalendar(event: CalendarEvent | CalendarEvent[]) {
+import type { Row } from "./api";
+export function downloadCalendar(event: Row | Row[]) {
   const events = Array.isArray(event) ? event : [event];
   const url = URL.createObjectURL(
-    new Blob([createCalendar(events)], { type: "text/calendar;charset=utf-8" }),
+    new Blob([createCalendar(events.map((item) => ({ id: item.id, start_at: item.start_at, end_at: item.end_at, service_name: item.service_name, barber_name: item.barber_name })))], { type: "text/calendar;charset=utf-8" }),
   );
   const link = document.createElement("a");
   link.href = url;

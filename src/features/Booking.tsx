@@ -3,6 +3,7 @@ import { createLatestRequest } from "../lib/latestRequest.mjs";
 import { maxBookingDate } from "../lib/dates.mjs";
 import RecurringBooking from "./RecurringBooking";
 import { downloadCalendar } from "../lib/downloadCalendar";
+export { downloadCalendar } from "../lib/downloadCalendar";
 import { Empty, Modal } from "../components/UI";
 import {
   supabase,
