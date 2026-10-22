@@ -38,7 +38,7 @@ Le prenotazioni disabilitate sono un'impostazione corrente: non riaprirle automa
 
 - Interfaccia italiana e responsive; tema scuro originale predefinito, tema chiaro e opzione Auto selezionabili da Profilo > Impostazioni generali > Tema. Preferenza ricordata sul dispositivo.
 - Struttura viewport fissa: home scorre dentro .app, sezioni nei propri dialog; sfondo bloccato con dialog aperti, niente scorrimento laterale/rimbalzo della pagina. PWA installata: gesture limitate al trascinamento verticale e blocco pinch tramite rilevazione standalone (incluso iOS). Zoom del normale browser invariato; campi touch a 16px anche in orizzontale.
-- Home cliente: Prenota, Servizi e prezzi, Le mie prenotazioni, Informazioni.
+- Home cliente autenticato: Prenota, Servizi e prezzi, Le mie prenotazioni, Informazioni. Senza login: soltanto Servizi e prezzi e Informazioni, oltre ai comandi di accesso/registrazione.
 - Catalogo cliente: nome e durata senza descrizione inline; icona informativa color accento giallo accanto al prezzo apre la descrizione a schermata completa, con freccia indietro al catalogo. Disponibile anche nell’area Cliente dell’admin.
 - In fondo alla home admin: tasto Cliente che apre gli stessi quattro comandi cliente, senza cambio ruolo o account. La freccia dalle funzioni personali riporta al menu Cliente; dal menu Cliente torna alla home admin. Le prenotazioni personali usano il client_id dell’admin e rispettano il normale flusso personale.
 - Le funzioni si aprono come schermate complete, mostrando solo la funzione selezionata, con freccia indietro. Non devono tornare a essere riquadri in fondo alla pagina o finestre centrali con la home visibile dietro.
@@ -631,3 +631,9 @@ Test personal_reminder_settings.sql superato prima/dopo migrazione con rollback:
 - Nella home senza sessione, dopo il caricamento, aggiunto riquadro visibile sopra la presentazione: «Non hai effettuato l’accesso», spiegazione e tasto «Accedi o registrati». Il tasto Accedi in alto ora usa lo stile oro evidente.
 - Sottotitoli di Prenota e Le mie prenotazioni spiegano che occorre accedere. Flussi di accesso/registrazione esistenti riutilizzati; catalogo e informazioni restano consultabili. Home degli account autenticati invariata; riquadro impilato su smartphone e adattato ai temi.
 - TypeScript, build, test e pubblicazione GitHub Pages riusciti nella pipeline `39824273677`; nessuna modifica a database, permessi o impostazioni. Controllo visivo su telefono fisico non eseguito.
+
+## 22 ottobre 2026 — Home pubblica con soli servizi e informazioni
+
+- Senza sessione, menu limitato a Servizi e prezzi e Informazioni. Prenota e Le mie prenotazioni compaiono soltanto dopo il login; accesso/registrazione e riquadro Non hai effettuato l’accesso restano disponibili.
+- Anche i collegamenti diretti a prenotazione/prenotazioni personali mostrano prima la richiesta di accesso, senza aprire la funzione da ospite. Flussi di recupero password ed eliminazione tramite email conservati.
+- Menu autenticati e autorizzazioni server invariati. Controlli build/pubblicazione in corso.

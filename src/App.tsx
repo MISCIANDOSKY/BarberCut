@@ -452,21 +452,9 @@ export default function App() {
               !barber.deleted_at,
           )));
   const clientChoices = [
-    [
-      "▦",
-      "Prenota",
-      user
-        ? "Trova il tuo prossimo momento"
-        : "Accedi o registrati per prenotare",
-    ],
+    ["▦", "Prenota", "Trova il tuo prossimo momento"],
     ["✂", "Servizi e prezzi", "Scegli il tuo stile"],
-    [
-      "▤",
-      "Le mie prenotazioni",
-      user
-        ? "Tieni tutto sotto controllo"
-        : "Accedi per vedere i tuoi appuntamenti",
-    ],
+    ["▤", "Le mie prenotazioni", "Tieni tutto sotto controllo"],
     ["ⓘ", "Informazioni", "Indirizzo e orari della barberia"],
   ];
   const choices = ready
@@ -502,7 +490,9 @@ export default function App() {
             : []),
           ...(logAllowed ? [["▤", "Log", "Operazioni sulle agende"]] : []),
         ]
-    : clientChoices;
+    : user
+      ? clientChoices
+      : clientChoices.filter(([, title]) => title === "Servizi e prezzi" || title === "Informazioni");
   const manageSections = [
     "Appuntamenti",
     "Nuova prenotazione",
@@ -510,6 +500,13 @@ export default function App() {
     "Orari di lavoro",
   ];
   function content() {
+    if (!user && (section === "Prenota" || section === "Le mie prenotazioni"))
+      return (
+        <div className="content-stack">
+          <p>Accedi o crea un account per prenotare e visualizzare i tuoi appuntamenti.</p>
+          <button type="button" className="primary" onClick={() => setAuth(true)}>Accedi o registrati</button>
+        </div>
+      );
     if (section === "Log")
       return ready && logAllowed ? (
         <AppointmentLog key={user!.id} />
