@@ -2011,3 +2011,25 @@ dialog h2,
     padding: 7px;
   }
 }
+
+/* iOS standalone keeps light status icons with black-translucent.
+   Preserve a dark safe-area strip while the app content uses the light theme. */
+html.installed-pwa[data-theme="light"] body,
+html.installed-pwa[data-theme="light"] dialog.feature-dialog > header {
+  background: linear-gradient(
+    to bottom,
+    #151815 0,
+    #151815 env(safe-area-inset-top),
+    var(--surface) env(safe-area-inset-top),
+    var(--surface) 100%
+  );
+}
+html.installed-pwa[data-theme="light"] body {
+  background: linear-gradient(
+    to bottom,
+    #151815 0,
+    #151815 env(safe-area-inset-top),
+    var(--bg) env(safe-area-inset-top),
+    var(--bg) 100%
+  );
+}
