@@ -462,12 +462,17 @@ export default function App() {
           ["⊘", "Blocca orario", "Una pausa, una giornata"],
           ["◷", "Orari di lavoro", "La tua settimana"],
           ["✂", "Servizi e prezzi", "Il catalogo"],
+          ...(role === "barber_admin"
+            ? [["⚙", "Configurazione", "Impostazioni della barberia"]]
+            : []),
           ...(canReview ? [["✓", "Utenti", "Clienti della barberia"]] : []),
           ["♧", "Notifiche", "Tutte le novità"],
           ...(role === "barber_admin" && canConfigureShop
             ? [["＋", "Assumi Barbiere", "Aggiungi un collaboratore"]]
             : []),
-          ["⚙", "Configurazione", "Impostazioni della barberia"],
+          ...(role !== "barber_admin"
+            ? [["⚙", "Configurazione", "Impostazioni della barberia"]]
+            : []),
         ]
     : clientChoices;
   const manageSections = [

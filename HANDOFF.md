@@ -602,3 +602,7 @@ Test personal_reminder_settings.sql superato prima/dopo migrazione con rollback:
 - Su richiesta del titolare, soglia live `private.maintenance_settings.appointment_days` portata da 40 a 550 giorni. Eliminazione giornaliera mantenuta attiva; inattività clienti invariata a 120 giorni e relativa operazione attiva.
 - Allineato a 550 il valore iniziale della schermata Manutenzione, che continua a leggere e salvare la configurazione remota. Nessuna esecuzione manuale della pulizia e nessun appuntamento cancellato da questo intervento.
 - UPDATE con RETURNING verificato: 550 giorni, pulizia attiva, impostazioni inattività conservate. Verifica pipeline frontend in corso.
+
+## 22 ottobre 2026 — Ordine menu Barbiere Admin
+
+- Spostata Configurazione subito prima di Utenti nel menu Barbiere Admin. Visibilità e permessi invariati, nessun duplicato; ordine del Barbiere normale e Admin invariato. Verifica pipeline in corso.
