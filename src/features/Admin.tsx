@@ -21,7 +21,7 @@ export default function Admin({
   refresh: () => void;
 }) {
   const [editing, setEditing] = useState<Row | null>(null);
-  const [managingService,setManagingService] = useState<Row|null>(null);
+  const [managingService, setManagingService] = useState<Row | null>(null);
   const [requireApproval, setRequireApproval] = useState(true);
   const [rows, setRows] = useState<Row[]>([]),
     [users, setUsers] = useState<Row[]>([]),
@@ -262,7 +262,16 @@ export default function Admin({
     );
   return (
     <>
-      {section==="Servizi" && managingService && <AdminServiceManagement service={managingService} close={()=>setManagingService(null)} onSaved={()=>{void load();refresh();}} />}
+      {section === "Servizi" && managingService && (
+        <AdminServiceManagement
+          service={managingService}
+          close={() => setManagingService(null)}
+          onSaved={() => {
+            void load();
+            refresh();
+          }}
+        />
+      )}
       {editing && (
         <Modal
           title={
@@ -483,27 +492,32 @@ export default function Admin({
                   >
                     Modifica
                   </button>
-                  {section==="Servizi" ? <button className="text" disabled={busy} onClick={()=>setManagingService(r)}>Gestisci</button> : (
-                  <button
-                    className="text"
-                    disabled={busy}
-                    onClick={() =>
-                      run(() =>
-                        result(
-                          supabase
-                            .from(
-                              "barbers",
-                            )
-                            .update({ active: !r.active })
-                            .eq("id", r.id),
-                        ),
-                      )
-                    }
-                  >
-                    {r.active ? "Disattiva" : "Riattiva"}
-                  </button>
+                  {section === "Servizi" ? (
+                    <button
+                      className="text"
+                      disabled={busy}
+                      onClick={() => setManagingService(r)}
+                    >
+                      Gestisci
+                    </button>
+                  ) : (
+                    <button
+                      className="text"
+                      disabled={busy}
+                      onClick={() =>
+                        run(() =>
+                          result(
+                            supabase
+                              .from("barbers")
+                              .update({ active: !r.active })
+                              .eq("id", r.id),
+                          ),
+                        )
+                      }
+                    >
+                      {r.active ? "Disattiva" : "Riattiva"}
+                    </button>
                   )}
-
 
                   <button
                     className="text danger-text"
@@ -513,8 +527,12 @@ export default function Admin({
                       if (
                         !(await confirmInApp(
                           section === "Servizi"
-                            ? "Sei sicuro di voler eliminare il servizio «" + r.name + "»? Verrà rimosso dal catalogo; gli appuntamenti già presenti saranno conservati."
-                            : "Eliminare " + r.name + "? La voce verrà rimossa dagli elenchi; i dati degli appuntamenti saranno conservati.",
+                            ? "Sei sicuro di voler eliminare il servizio «" +
+                                r.name +
+                                "»? Verrà rimosso dal catalogo; gli appuntamenti già presenti saranno conservati."
+                            : "Eliminare " +
+                                r.name +
+                                "? La voce verrà rimossa dagli elenchi; i dati degli appuntamenti saranno conservati.",
                         ))
                       )
                         return;
@@ -640,7 +658,6 @@ export default function Admin({
               Crea servizio
             </button>
           </form>
-
         </>
       )}
       {section === "Termini" && (
