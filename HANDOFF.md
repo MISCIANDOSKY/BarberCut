@@ -636,4 +636,4 @@ Test personal_reminder_settings.sql superato prima/dopo migrazione con rollback:
 
 - Senza sessione, menu limitato a Servizi e prezzi e Informazioni. Prenota e Le mie prenotazioni compaiono soltanto dopo il login; accesso/registrazione e riquadro Non hai effettuato l’accesso restano disponibili.
 - Anche i collegamenti diretti a prenotazione/prenotazioni personali mostrano prima la richiesta di accesso, senza aprire la funzione da ospite. Flussi di recupero password ed eliminazione tramite email conservati.
-- Menu autenticati e autorizzazioni server invariati. Controlli build/pubblicazione in corso.
+- Menu autenticati e autorizzazioni server invariati. TypeScript, build, test e pubblicazione GitHub Pages riusciti nella pipeline `39824938373`. Verifica su telefono fisico non eseguita.
