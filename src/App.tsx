@@ -452,9 +452,21 @@ export default function App() {
               !barber.deleted_at,
           )));
   const clientChoices = [
-    ["▦", "Prenota", user ? "Trova il tuo prossimo momento" : "Accedi o registrati per prenotare"],
+    [
+      "▦",
+      "Prenota",
+      user
+        ? "Trova il tuo prossimo momento"
+        : "Accedi o registrati per prenotare",
+    ],
     ["✂", "Servizi e prezzi", "Scegli il tuo stile"],
-    ["▤", "Le mie prenotazioni", user ? "Tieni tutto sotto controllo" : "Accedi per vedere i tuoi appuntamenti"],
+    [
+      "▤",
+      "Le mie prenotazioni",
+      user
+        ? "Tieni tutto sotto controllo"
+        : "Accedi per vedere i tuoi appuntamenti",
+    ],
     ["ⓘ", "Informazioni", "Indirizzo e orari della barberia"],
   ];
   const choices = ready
@@ -881,12 +893,22 @@ export default function App() {
       )}
       <main>
         {!loading && !user && (
-          <section className="guest-access" aria-labelledby="guest-access-title">
+          <section
+            className="guest-access"
+            aria-labelledby="guest-access-title"
+          >
             <div>
               <h2 id="guest-access-title">Non hai effettuato l’accesso</h2>
-              <p>Accedi o crea un account per prenotare e ritrovare i tuoi appuntamenti.</p>
+              <p>
+                Accedi o crea un account per prenotare e ritrovare i tuoi
+                appuntamenti.
+              </p>
             </div>
-            <button type="button" className="primary" onClick={() => setAuth(true)}>
+            <button
+              type="button"
+              className="primary"
+              onClick={() => setAuth(true)}
+            >
               Accedi o registrati
             </button>
           </section>

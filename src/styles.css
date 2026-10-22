@@ -2117,10 +2117,23 @@ html.installed-pwa[data-theme="light"] body {
   border-radius: 8px;
   background: var(--surface);
 }
-.guest-access > div { min-width: 0; }
-.guest-access h2 { margin: 0 0 8px; font-size: 21px; overflow-wrap: anywhere; }
-.guest-access p { margin: 0; color: var(--muted); line-height: 1.5; }
-.guest-access > button { flex-shrink: 0; margin: 0; }
+.guest-access > div {
+  min-width: 0;
+}
+.guest-access h2 {
+  margin: 0 0 8px;
+  font-size: 21px;
+  overflow-wrap: anywhere;
+}
+.guest-access p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.guest-access > button {
+  flex-shrink: 0;
+  margin: 0;
+}
 .account.guest-account {
   padding: 10px 14px;
   border: 1px solid var(--accent);
@@ -2129,9 +2142,20 @@ html.installed-pwa[data-theme="light"] body {
   color: #151815;
   font-weight: 700;
 }
-.account.guest-account span { color: inherit; }
+.account.guest-account span {
+  color: inherit;
+}
 @media (max-width: 600px) {
-  .guest-access { flex-direction: column; align-items: stretch; gap: 16px; padding: 18px; }
-  .guest-access h2 { font-size: 20px; }
-  .guest-access > button { width: 100%; }
+  .guest-access {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    padding: 18px;
+  }
+  .guest-access h2 {
+    font-size: 20px;
+  }
+  .guest-access > button {
+    width: 100%;
+  }
 }
