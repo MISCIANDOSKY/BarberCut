@@ -9,7 +9,9 @@ import { initializeTheme } from "./lib/theme.mjs";
 initializeTheme();
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <BrandProvider><App /></BrandProvider>
+    <BrandProvider>
+      <App />
+    </BrandProvider>
     <AppDialogs />
   </React.StrictMode>,
 );

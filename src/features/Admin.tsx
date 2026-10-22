@@ -243,7 +243,8 @@ export default function Admin({
               const a = document.createElement("a");
               a.href = u;
               a.download =
-                getBrandName().replace(/[^\p{L}\p{N} _-]/gu,"_") + "-export-" +
+                getBrandName().replace(/[^\p{L}\p{N} _-]/gu, "_") +
+                "-export-" +
                 new Date().toISOString().slice(0, 10) +
                 ".json";
               a.click();

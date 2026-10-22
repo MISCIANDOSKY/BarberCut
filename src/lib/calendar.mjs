@@ -30,7 +30,11 @@ function fold(line) {
   parts.push(part);
   return parts.join("\r\n");
 }
-export function createCalendar(events, now = new Date(), brandName = "Prenotazioni") {
+export function createCalendar(
+  events,
+  now = new Date(),
+  brandName = "Prenotazioni",
+) {
   const unique = [
     ...new Map(events.map((event) => [event.id, event])).values(),
   ];

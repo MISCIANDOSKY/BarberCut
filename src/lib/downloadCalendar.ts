@@ -24,7 +24,8 @@ export function downloadCalendar(event: Row | Row[]) {
   const link = document.createElement("a");
   link.href = url;
   link.download =
-    getBrandName().replace(/[^\p{L}\p{N} _-]/gu,"_") + (events.length > 1 ? "-appuntamenti.ics" : ".ics");
+    getBrandName().replace(/[^\p{L}\p{N} _-]/gu, "_") +
+    (events.length > 1 ? "-appuntamenti.ics" : ".ics");
   document.body.appendChild(link);
   link.click();
   link.remove();

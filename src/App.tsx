@@ -872,7 +872,13 @@ export default function App() {
         >
           <img src={import.meta.env.BASE_URL + "icon.svg"} alt="" />
           <span>
-            {brandName === "BarberUp" ? <>Barber<span className="gold">Up</span></> : brandName}
+            {brandName === "BarberUp" ? (
+              <>
+                Barber<span className="gold">Up</span>
+              </>
+            ) : (
+              brandName
+            )}
             <small>IL TUO TEMPO. IL TUO STILE.</small>
           </span>
         </button>

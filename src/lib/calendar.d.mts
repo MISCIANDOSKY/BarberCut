@@ -5,4 +5,8 @@ export type CalendarEvent = {
   service_name?: string;
   barber_name?: string;
 };
-export function createCalendar(events: CalendarEvent[], now?: Date, brandName?: string): string;
+export function createCalendar(
+  events: CalendarEvent[],
+  now?: Date,
+  brandName?: string,
+): string;
