@@ -1,3 +1,5 @@
+import TermsGate from "./features/TermsGate";
+import { useTermsConsent } from "./lib/useTermsConsent";
 import { ResetPasswordDialog } from "./features/PasswordRecovery";
 import BookingHorizon from "./features/BookingHorizon";
 import { PushOnboarding } from "./features/PushSettings";
@@ -41,7 +43,6 @@ export default function App() {
     [services, setServices] = useState<Row[]>([]),
     [barbers, setBarbers] = useState<Row[]>([]),
     [terms, setTerms] = useState<Row | null>(null),
-    [accepted, setAccepted] = useState(true),
     [legal, setLegal] = useState(false),
     [appointments, setAppointments] = useState<Row[]>([]),
     [notifications, setNotifications] = useState<Row[]>([]),
@@ -91,6 +92,7 @@ export default function App() {
   const keepActiveRequested = useRef(
     new URLSearchParams(location.search).get("keep-active") === "1",
   );
+  const consent = useTermsConsent(user?.id ?? null);
   const notify = useCallback((s: string) => setMessage(s), []);
   const refresh = useCallback(async () => {
     const version = ++refreshVersion.current;
@@ -192,17 +194,6 @@ export default function App() {
         if (notificationReadRevision === notificationRevision.current)
           setNotifications(ns as Row[]);
         setAppointments(ap as Row[]);
-        if (ts) {
-          const a = await result(
-            supabase
-              .from("terms_acceptances")
-              .select("terms_id")
-              .eq("user_id", u.id)
-              .eq("terms_id", (ts as Row).id)
-              .maybeSingle(),
-          );
-          if (version === refreshVersion.current) setAccepted(!!a);
-        }
       } else {
         setProfile(null);
         setRole("client");
@@ -239,7 +230,6 @@ export default function App() {
         setDeletingNotification(null);
         notificationRevision.current++;
         setAppointments([]);
-        setAccepted(true);
         setLoading(false);
         setSection("");
         clearPasswordProof();
@@ -728,6 +718,13 @@ export default function App() {
       }}
     />
   );
+  if (user && !auth && !reset && (!consent.ready || !consent.accepted))
+    return <TermsGate key={user.id+":"+(consent.terms?.id??"checking")} terms={consent.terms} ready={consent.ready} error={consent.error} reload={consent.reload} onAccepted={()=>{void refresh();}} logout={async()=>{
+      await detachPushDevice();
+      const {error}=await supabase.auth.signOut({scope:"local"});
+      if(error)throw error;
+      clearPasswordProof();setSection("");await refresh();
+    }}/>;
   if (user && role === "shop")
     return (
       <div className="app shop-app">
@@ -915,34 +912,7 @@ export default function App() {
               </nav>
             </>
           )}
-          {user && terms && !accepted && (
-            <div className="notice">
-              <p>
-                Abbiamo aggiornato i{" "}
-                <button className="text" onClick={() => setLegal(true)}>
-                  Termini e condizioni
-                </button>
-                . Leggili prima di prenotare.
-              </p>
-              <button
-                className="secondary"
-                onClick={async () => {
-                  try {
-                    await result(
-                      supabase
-                        .from("terms_acceptances")
-                        .insert({ user_id: user.id, terms_id: terms.id }),
-                    );
-                    setAccepted(true);
-                  } catch (e) {
-                    notify(friendly(e));
-                  }
-                }}
-              >
-                Ho letto e accetto
-              </button>
-            </div>
-          )}
+
         </div>
       </main>
       <footer>

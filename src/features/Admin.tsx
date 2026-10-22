@@ -462,7 +462,7 @@ export default function Admin({
                   onClick={async () => {
                     if (
                       await confirmInApp(
-                        "Confermi che questo testo è approvato e pronto per essere pubblicato?",
+                        "Confermi che questo testo è approvato e pronto per essere pubblicato? Tutti gli utenti, compresi gli amministratori e i barbieri, dovranno accettare la nuova versione per continuare a usare l’app.",
                       )
                     )
                       run(() =>
