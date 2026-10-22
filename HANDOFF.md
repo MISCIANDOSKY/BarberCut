@@ -625,3 +625,9 @@ Test personal_reminder_settings.sql superato prima/dopo migrazione con rollback:
 
 - Migrazione `20261022173219_skip_self_agenda_notification_when_barbers_reschedule`: il trigger notifiche non invia «Aggiornamento agenda» al Barbiere/Barbiere Admin che sposta un appuntamento della propria agenda. Invariati avviso di aggiornamento al cliente, log dell’operazione, promemoria e notifiche per appuntamenti in arrivo. Nessuna notifica storica cancellata.
 - Test SQL remoto `barber_reschedule_self_notification.sql` PASS con rollback, chiamando la RPC reale di spostamento per entrambi i ruoli: appuntamento spostato, nessuna auto-notifica, notifica cliente e log presenti, nuova prenotazione continua a notificare il barbiere. Nessun dato reale o invio email/push di prova.
+
+## 22 ottobre 2026 — Accesso non effettuato evidente nella home
+
+- Nella home senza sessione, dopo il caricamento, aggiunto riquadro visibile sopra la presentazione: «Non hai effettuato l’accesso», spiegazione e tasto «Accedi o registrati». Il tasto Accedi in alto ora usa lo stile oro evidente.
+- Sottotitoli di Prenota e Le mie prenotazioni spiegano che occorre accedere. Flussi di accesso/registrazione esistenti riutilizzati; catalogo e informazioni restano consultabili. Home degli account autenticati invariata; riquadro impilato su smartphone e adattato ai temi.
+- Controlli build/pubblicazione in corso; nessuna modifica a database, permessi o impostazioni.

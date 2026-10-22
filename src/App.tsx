@@ -452,9 +452,9 @@ export default function App() {
               !barber.deleted_at,
           )));
   const clientChoices = [
-    ["▦", "Prenota", "Trova il tuo prossimo momento"],
+    ["▦", "Prenota", user ? "Trova il tuo prossimo momento" : "Accedi o registrati per prenotare"],
     ["✂", "Servizi e prezzi", "Scegli il tuo stile"],
-    ["▤", "Le mie prenotazioni", "Tieni tutto sotto controllo"],
+    ["▤", "Le mie prenotazioni", user ? "Tieni tutto sotto controllo" : "Accedi per vedere i tuoi appuntamenti"],
     ["ⓘ", "Informazioni", "Indirizzo e orari della barberia"],
   ];
   const choices = ready
@@ -867,7 +867,7 @@ export default function App() {
             </button>
           )}
           <button
-            className="account"
+            className={"account" + (!user && !loading ? " guest-account" : "")}
             onClick={() => (user ? setSection("Profilo") : setAuth(true))}
           >
             {user ? "Profilo" : "Accedi"} <span>↗</span>
@@ -880,6 +880,17 @@ export default function App() {
         </div>
       )}
       <main>
+        {!loading && !user && (
+          <section className="guest-access" aria-labelledby="guest-access-title">
+            <div>
+              <h2 id="guest-access-title">Non hai effettuato l’accesso</h2>
+              <p>Accedi o crea un account per prenotare e ritrovare i tuoi appuntamenti.</p>
+            </div>
+            <button type="button" className="primary" onClick={() => setAuth(true)}>
+              Accedi o registrati
+            </button>
+          </section>
+        )}
         <div className="hero">
           <div className="hero-copy">
             <span className="eyebrow">
