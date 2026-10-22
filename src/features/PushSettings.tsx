@@ -16,7 +16,7 @@ function PushHelp() {
   const capability = pushCapability();
   return capability.needsHome ? (
     <p className="notice">
-      Su iPhone o iPad con iOS 16.4 o successivo: apri BarberUp in Safari, tocca
+      Su iPhone o iPad con iOS 16.4 o successivo: apri l’app in Safari, tocca
       Condividi, scegli Aggiungi alla schermata Home e riapri l’app dalla sua
       icona. Poi attiva le notifiche dal Profilo.
     </p>
@@ -28,7 +28,7 @@ function PushHelp() {
   ) : capability.permission === "denied" ? (
     <p className="notice">
       Il dispositivo ha bloccato le notifiche. Abilitale nelle impostazioni di
-      BarberUp o del browser, poi torna qui.
+      dell’app o del browser, poi torna qui.
     </p>
   ) : null;
 }

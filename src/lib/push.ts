@@ -93,14 +93,14 @@ export async function enablePush(userId: string, publicKey: string) {
   if (!capability.supported)
     throw new Error(
       capability.needsHome
-        ? "Su iPhone aggiungi BarberUp alla schermata Home e aprila dalla sua icona. Serve iOS 16.4 o successivo."
+        ? "Su iPhone aggiungi l’app alla schermata Home e aprila dalla sua icona. Serve iOS 16.4 o successivo."
         : "Questo browser non supporta le notifiche push. Prova una versione aggiornata di Safari, Chrome o Edge.",
     );
   // Called directly by the user's click, before any network request.
   const permission = await Notification.requestPermission();
   if (permission !== "granted")
     throw new Error(
-      "Le notifiche non sono consentite dal dispositivo. Puoi abilitarle nelle impostazioni di BarberUp o del browser.",
+      "Le notifiche non sono consentite dal dispositivo. Puoi abilitarle nelle impostazioni dell’app o del browser.",
     );
   let sub = await currentPushSubscription(userId);
   if (!sub) {

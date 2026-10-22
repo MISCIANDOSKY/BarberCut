@@ -43,3 +43,10 @@ test("calendar rejects absent events and invalid duration", () => {
   assert.throws(() => createCalendar([{ ...first, end_at: first.start_at }]));
   assert.throws(() => createCalendar([{ ...first, start_at: "invalid" }]));
 });
+
+test("calendar preserves the configured brand spelling and case", () => {
+  const output = createCalendar([first], new Date("2026-10-20T12:00:00Z"), "bARber Àlfa");
+  assert.match(output, /SUMMARY:bARber Àlfa · Taglio/);
+  assert.match(output, /PRODID:-\/\/bARber Àlfa\/\/Appuntamenti\/\/IT/);
+  assert.match(output, /UID:test-first@barberup/);
+});

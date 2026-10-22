@@ -32,7 +32,7 @@ export default function GeneralSettings() {
       {themeOpen && (
         <Modal title="Tema" wide close={() => setThemeOpen(false)}>
           <p className="muted">
-            Scegli l’aspetto di BarberUp. La modifica si applica subito e viene
+            Scegli l’aspetto dell’app. La modifica si applica subito e viene
             ricordata su questo dispositivo.
           </p>
           <fieldset className="theme-options">
@@ -52,7 +52,7 @@ export default function GeneralSettings() {
                 {
                   value: "dark",
                   label: "Tema scuro",
-                  description: "L’aspetto originale di BarberUp.",
+                  description: "L’aspetto originale dell’app.",
                 },
               ] as const
             ).map((option) => (

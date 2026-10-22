@@ -2159,3 +2159,9 @@ html.installed-pwa[data-theme="light"] body {
     width: 100%;
   }
 }
+
+/* Preserve configured names and fit narrow screens. */
+.brand { min-width: 0; }
+.brand > span { min-width: 0; max-width: min(54vw, 420px); overflow-wrap: anywhere; }
+.top-actions { flex-shrink: 0; }
+.art-caption { max-width: 100%; overflow-wrap: anywhere; text-transform: none; }

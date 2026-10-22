@@ -26,7 +26,7 @@ export default function HireBarber({
     <>
       <p>
         Prima di procedere, assicurati che il nuovo collaboratore sia già
-        registrato a BarberUp come cliente. Inserisci l’email e il numero di
+        registrato nell’app come cliente. Inserisci l’email e il numero di
         telefono presenti nel suo profilo.
       </p>
       <form

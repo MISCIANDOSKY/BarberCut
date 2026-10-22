@@ -211,7 +211,7 @@ export default function Auth({
               notify(
                 verifyingLogin
                   ? "Accesso effettuato. Bentornato!"
-                  : "Email verificata. Puoi consultare lo stato della tua iscrizione su BarberUp.",
+                  : "Email verificata. Puoi consultare lo stato della tua iscrizione nell’app.",
               );
               onDone();
               close();

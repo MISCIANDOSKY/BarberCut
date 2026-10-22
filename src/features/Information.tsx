@@ -1,3 +1,4 @@
+import { useBrandName } from "../lib/branding";
 import { useEffect, useState } from "react";
 import { Empty } from "../components/UI";
 import { supabase, result, friendly } from "../lib/api";
@@ -15,6 +16,7 @@ const weekdays = [
 const time = (value: string) => value.slice(0, 5);
 
 export default function Information() {
+  const brandName = useBrandName();
   const [data, setData] = useState<Row | null>(null);
   const [error, setError] = useState("");
   async function load() {
@@ -42,7 +44,7 @@ export default function Information() {
   if (!data) return <p role="status">Caricamento informazioni…</p>;
   return (
     <>
-      <h3>{data.shop_name}</h3>
+      <h3>{brandName}</h3>
       <section className="shop-address content-stack">
         <h3>Dove siamo</h3>
         {data.address ? (

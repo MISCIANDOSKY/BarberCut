@@ -1,3 +1,5 @@
+import BrandNameSettings from "./BrandNameSettings";
+import { getBrandName } from "../lib/branding";
 import LogAccess from "./LogAccess";
 import AdminServiceManagement from "./AdminServiceManagement";
 import BookingHorizon from "./BookingHorizon";
@@ -117,6 +119,7 @@ export default function Admin({
           }}
         />
         <LogAccess refresh={refresh} />
+        <BrandNameSettings />
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -126,7 +129,6 @@ export default function Admin({
                 supabase
                   .from("app_settings")
                   .update({
-                    shop_name: v.get("name"),
                     accent: v.get("accent"),
                     cancellation_hours:
                       v.get("hours") === "" ? null : Number(v.get("hours")),
@@ -139,10 +141,6 @@ export default function Admin({
             );
           }}
         >
-          <label>
-            Nome attività
-            <input name="name" defaultValue={settings.shop_name} required />
-          </label>
           <label>
             Colore principale
             <AppPicker
@@ -245,7 +243,7 @@ export default function Admin({
               const a = document.createElement("a");
               a.href = u;
               a.download =
-                "barberup-export-" +
+                getBrandName().replace(/[^\p{L}\p{N} _-]/gu,"_") + "-export-" +
                 new Date().toISOString().slice(0, 10) +
                 ".json";
               a.click();

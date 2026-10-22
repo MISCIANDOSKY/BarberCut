@@ -30,7 +30,7 @@ function fold(line) {
   parts.push(part);
   return parts.join("\r\n");
 }
-export function createCalendar(events, now = new Date()) {
+export function createCalendar(events, now = new Date(), brandName = "Prenotazioni") {
   const unique = [
     ...new Map(events.map((event) => [event.id, event])).values(),
   ];
@@ -38,7 +38,7 @@ export function createCalendar(events, now = new Date()) {
   const lines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//BarberUp//Appuntamenti//IT",
+    "PRODID:-//" + escape(brandName) + "//Appuntamenti//IT",
     "CALSCALE:GREGORIAN",
   ];
   for (const event of unique) {
@@ -56,7 +56,7 @@ export function createCalendar(events, now = new Date()) {
       "DTSTART:" + stamp(event.start_at),
       "DTEND:" + stamp(event.end_at),
       "SUMMARY:" +
-        escape("BarberUp · " + (event.service_name || "Appuntamento")),
+        escape(brandName + " · " + (event.service_name || "Appuntamento")),
       "DESCRIPTION:" +
         escape(
           "Ricordati del tuo appuntamento! " +

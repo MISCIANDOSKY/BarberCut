@@ -3,8 +3,8 @@ export function pushWorkerSource() {
 self.addEventListener('push', event => {
   let payload = {};
   try { payload = event.data ? event.data.json() : {}; } catch {}
-  const title = typeof payload.title === 'string' ? payload.title.slice(0, 150) : 'BarberUp';
-  const body = typeof payload.body === 'string' ? payload.body.slice(0, 1000) : 'Ricordati del tuo appuntamento. Apri BarberUp per vedere i dettagli.';
+  const title = typeof payload.title === 'string' ? payload.title.slice(0, 150) : 'Promemoria appuntamento';
+  const body = typeof payload.body === 'string' ? payload.body.slice(0, 1000) : 'Ricordati del tuo appuntamento. Apri l’app per vedere i dettagli.';
   const target = new URL('./?appointments=1', self.registration.scope);
   event.waitUntil(self.registration.showNotification(title, {
     body, icon: new URL('./icons/icon-192.png', self.registration.scope).href,

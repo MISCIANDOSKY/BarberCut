@@ -1,0 +1,1 @@
+Il tuo codice per completare la registrazione a {{ if .Data.branding_name }}{{ .Data.branding_name }}{{ else }}BarberUp{{ end }}

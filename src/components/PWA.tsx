@@ -1,3 +1,4 @@
+import { useBrandName } from "../lib/branding";
 import { useEffect, useState } from "react";
 import { Modal } from "./UI";
 type InstallEvent = Event & {
@@ -5,6 +6,7 @@ type InstallEvent = Event & {
   userChoice: Promise<{ outcome: string }>;
 };
 export default function PWA() {
+  const brandName = useBrandName();
   const [install, setInstall] = useState<InstallEvent | null>(null),
     [help, setHelp] = useState(false),
     [update, setUpdate] = useState<ServiceWorker | null>(null);
@@ -66,7 +68,7 @@ export default function PWA() {
             } else setHelp(true);
           }}
         >
-          ＋ Installa BarberUp
+          ＋ Installa {brandName}
         </button>
       )}
       {help && (

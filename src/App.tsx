@@ -1,3 +1,4 @@
+import { useBrandName } from "./lib/branding";
 import AppointmentLog from "./features/AppointmentLog";
 import TermsGate from "./features/TermsGate";
 import { useTermsConsent } from "./lib/useTermsConsent";
@@ -29,6 +30,7 @@ import RecurringPolicy from "./features/RecurringPolicy";
 import { supabase, result, friendly } from "./lib/api";
 import type { Row } from "./lib/api";
 export default function App() {
+  const brandName = useBrandName();
   const [user, setUser] = useState<User | null>(null),
     [profile, setProfile] = useState<Row | null>(null),
     [role, setRole] = useState("client"),
@@ -106,7 +108,7 @@ export default function App() {
       if (version !== refreshVersion.current) return;
       setUser(u);
       const [config, svcs, bs, ts] = await Promise.all([
-        result(supabase.from("app_settings").select("*").single()),
+        result(supabase.rpc("public_app_settings")),
         result(
           supabase
             .from("services")
@@ -791,7 +793,7 @@ export default function App() {
     return (
       <div className="app shop-app">
         <header className="topbar shop-topbar">
-          <h1>{settings.shop_name} · Agenda</h1>
+          <h1>{brandName} · Agenda</h1>
           <button
             type="button"
             className="text"
@@ -866,11 +868,11 @@ export default function App() {
         <button
           className="brand"
           onClick={() => setSection("")}
-          aria-label="BarberUp Home"
+          aria-label={brandName + " Home"}
         >
           <img src={import.meta.env.BASE_URL + "icon.svg"} alt="" />
           <span>
-            Barber<span className="gold">Up</span>
+            {brandName === "BarberUp" ? <>Barber<span className="gold">Up</span></> : brandName}
             <small>IL TUO TEMPO. IL TUO STILE.</small>
           </span>
         </button>
@@ -967,7 +969,7 @@ export default function App() {
               <br />
               <em>per te.</em>
             </span>
-            <span className="art-caption">BARBERUP / IL TUO STILE</span>
+            <span className="art-caption">{brandName} / IL TUO STILE</span>
           </div>
         </div>
         <div className="workspace">
@@ -1015,7 +1017,7 @@ export default function App() {
       </main>
       <footer>
         <div>
-          <strong>{settings.shop_name}</strong>
+          <strong>{brandName}</strong>
           <span>Un piccolo gesto. Un grande stile.</span>
           <span>Powered by MISCIANDOSKY</span>
         </div>

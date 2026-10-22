@@ -1,3 +1,4 @@
+import { BrandProvider } from "./lib/branding";
 import React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
@@ -8,7 +9,7 @@ import { initializeTheme } from "./lib/theme.mjs";
 initializeTheme();
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <App />
+    <BrandProvider><App /></BrandProvider>
     <AppDialogs />
   </React.StrictMode>,
 );

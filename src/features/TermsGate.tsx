@@ -1,3 +1,4 @@
+import { useBrandName } from "../lib/branding";
 import { useState } from "react";
 import { Modal } from "../components/UI";
 import { supabase, result } from "../lib/api";
@@ -17,6 +18,7 @@ export default function TermsGate({
   onAccepted: () => void;
   logout: () => Promise<void>;
 }) {
+  const brandName = useBrandName();
   const [review, setReview] = useState(true),
     [busy, setBusy] = useState(false),
     [localError, setLocalError] = useState("");
@@ -52,7 +54,7 @@ export default function TermsGate({
   return (
     <div className="app terms-lock">
       <header className="topbar">
-        <h1>BarberUp</h1>
+        <h1>{brandName}</h1>
         <button className="text" disabled={busy} onClick={() => void leave()}>
           Esci dall’account
         </button>

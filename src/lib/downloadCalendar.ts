@@ -1,3 +1,4 @@
+import { getBrandName } from "./branding";
 import { createCalendar } from "./calendar.mjs";
 import type { Row } from "./api";
 export function downloadCalendar(event: Row | Row[]) {
@@ -13,6 +14,8 @@ export function downloadCalendar(event: Row | Row[]) {
             service_name: item.service_name,
             barber_name: item.barber_name,
           })),
+          new Date(),
+          getBrandName(),
         ),
       ],
       { type: "text/calendar;charset=utf-8" },
@@ -21,7 +24,7 @@ export function downloadCalendar(event: Row | Row[]) {
   const link = document.createElement("a");
   link.href = url;
   link.download =
-    events.length > 1 ? "BarberUp-appuntamenti.ics" : "BarberUp.ics";
+    getBrandName().replace(/[^\p{L}\p{N} _-]/gu,"_") + (events.length > 1 ? "-appuntamenti.ics" : ".ics");
   document.body.appendChild(link);
   link.click();
   link.remove();
