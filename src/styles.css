@@ -2035,24 +2035,24 @@ html.installed-pwa[data-theme="light"] body {
 }
 
 .terms-lock .topbar {
- gap: 16px;
+  gap: 16px;
 }
 .terms-lock .topbar h1 {
- margin: 0;
- font-size: clamp(22px,4vw,30px);
+  margin: 0;
+  font-size: clamp(22px, 4vw, 30px);
 }
 .terms-lock-content {
- max-width: 960px;
- margin: 0 auto;
- padding: 32px 0;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 32px 0;
 }
 .terms-consent-actions {
- display: grid;
- grid-template-columns: repeat(2,minmax(0,1fr));
- gap: 12px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
 }
 @media (max-width: 380px) {
- .terms-consent-actions {
-  grid-template-columns: 1fr;
- }
+  .terms-consent-actions {
+    grid-template-columns: 1fr;
+  }
 }

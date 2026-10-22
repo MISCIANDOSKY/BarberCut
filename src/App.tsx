@@ -719,12 +719,26 @@ export default function App() {
     />
   );
   if (user && !auth && !reset && (!consent.ready || !consent.accepted))
-    return <TermsGate key={user.id+":"+(consent.terms?.id??"checking")} terms={consent.terms} ready={consent.ready} error={consent.error} reload={consent.reload} onAccepted={()=>{void refresh();}} logout={async()=>{
-      await detachPushDevice();
-      const {error}=await supabase.auth.signOut({scope:"local"});
-      if(error)throw error;
-      clearPasswordProof();setSection("");await refresh();
-    }}/>;
+    return (
+      <TermsGate
+        key={user.id + ":" + (consent.terms?.id ?? "checking")}
+        terms={consent.terms}
+        ready={consent.ready}
+        error={consent.error}
+        reload={consent.reload}
+        onAccepted={() => {
+          void refresh();
+        }}
+        logout={async () => {
+          await detachPushDevice();
+          const { error } = await supabase.auth.signOut({ scope: "local" });
+          if (error) throw error;
+          clearPasswordProof();
+          setSection("");
+          await refresh();
+        }}
+      />
+    );
   if (user && role === "shop")
     return (
       <div className="app shop-app">
@@ -912,7 +926,6 @@ export default function App() {
               </nav>
             </>
           )}
-
         </div>
       </main>
       <footer>
