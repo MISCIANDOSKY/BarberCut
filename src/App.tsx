@@ -1,3 +1,4 @@
+import AppointmentLog from "./features/AppointmentLog";
 import TermsGate from "./features/TermsGate";
 import { useTermsConsent } from "./lib/useTermsConsent";
 import { ResetPasswordDialog } from "./features/PasswordRecovery";
@@ -34,6 +35,7 @@ export default function App() {
     [membership, setMembership] = useState("approved"),
     [verified, setVerified] = useState(false),
     [reviewAllowed, setReviewAllowed] = useState(false),
+    [logAllowed, setLogAllowed] = useState(false),
     [settings, setSettings] = useState<Row>({
       shop_name: "BarberUp",
       accent: "#c6a66b",
@@ -153,7 +155,7 @@ export default function App() {
             "Il tuo account è attivo. Il conteggio dell’inattività è ripartito da oggi.",
           );
         }
-        const [p, r, v, ns, ap, member, reviewPermission] = await Promise.all([
+        const [p, r, v, ns, ap, member, reviewPermission, logPermission] = await Promise.all([
           result(supabase.from("profiles").select("*").eq("id", u.id).single()),
           result(
             supabase
@@ -184,6 +186,7 @@ export default function App() {
           ),
           result(supabase.rpc("membership_status")),
           result(supabase.rpc("can_review_registrations")),
+          result(supabase.rpc("can_view_appointment_log")),
         ]);
         if (version !== refreshVersion.current) return;
         setMembership(String(member));
@@ -191,6 +194,7 @@ export default function App() {
         setRole((r as Row).role);
         setVerified(!!v);
         setReviewAllowed(reviewPermission === true);
+        setLogAllowed(logPermission === true);
         if (notificationReadRevision === notificationRevision.current)
           setNotifications(ns as Row[]);
         setAppointments(ap as Row[]);
@@ -200,6 +204,7 @@ export default function App() {
         setMembership("approved");
         setVerified(false);
         setReviewAllowed(false);
+        setLogAllowed(false);
         setNotifications([]);
         setDeletingNotification(null);
         notificationRevision.current++;
@@ -226,6 +231,7 @@ export default function App() {
         setMembership("approved");
         setVerified(false);
         setReviewAllowed(false);
+        setLogAllowed(false);
         setNotifications([]);
         setDeletingNotification(null);
         notificationRevision.current++;
@@ -277,9 +283,14 @@ export default function App() {
     const check = async () => {
       if (document.hidden) return;
       const version = ++request;
-      const { data, error } = await supabase.rpc("can_review_registrations");
-      if (!stopped && version === request)
-        setReviewAllowed(!error && data === true);
+      const [review, log] = await Promise.all([
+        supabase.rpc("can_review_registrations"),
+        supabase.rpc("can_view_appointment_log"),
+      ]);
+      if (!stopped && version === request) {
+        setReviewAllowed(!review.error && review.data === true);
+        setLogAllowed(!log.error && log.data === true);
+      }
     };
     void check();
     const timer = window.setInterval(check, 30000);
@@ -455,6 +466,7 @@ export default function App() {
           ["⌘", "Manutenzione", "Dati e conservazione"],
           ["↗", "Agenda", "Apri strumenti barbiere"],
           ["◉", "Cliente", "Prenota un appuntamento per te"],
+          ...(logAllowed ? [["▤", "Log", "Operazioni sulle agende"]] : []),
         ]
       : [
           ["▦", "Appuntamenti", "La tua agenda"],
@@ -473,6 +485,7 @@ export default function App() {
           ...(role !== "barber_admin"
             ? [["⚙", "Configurazione", "Impostazioni della barberia"]]
             : []),
+          ...(logAllowed ? [["▤", "Log", "Operazioni sulle agende"]] : []),
         ]
     : clientChoices;
   const manageSections = [
@@ -482,6 +495,7 @@ export default function App() {
     "Orari di lavoro",
   ];
   function content() {
+    if (section === "Log") return ready && logAllowed ? <AppointmentLog key={user!.id} /> : <Empty>Non hai accesso ai log.</Empty>;
     if (section === "Cliente" && ready && role === "admin")
       return (
         <nav className="mini-grid" aria-label="Funzioni cliente">
@@ -781,10 +795,14 @@ export default function App() {
           ) : !verified ? (
             <StaffGate email={user.email!} done={refresh} notify={notify} />
           ) : (
+            <>
             <ShopAgenda
               bookingHorizonMonths={settings.booking_horizon_months ?? 6}
               onAccessChanged={refresh}
             />
+            {logAllowed && <button type="button" className="secondary shop-log-button" onClick={() => setSection("Log")}>Log</button>}
+            {logAllowed && section === "Log" && <Modal wide title="Log" close={() => setSection("")}><AppointmentLog key={user.id} /></Modal>}
+            </>
           )}
         </main>
         {message && (

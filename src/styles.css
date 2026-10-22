@@ -2063,3 +2063,18 @@ html.installed-pwa[data-theme="light"] body {
 .theme-preview-auto > span {
   background: linear-gradient(90deg, #596554 50%, #a5afa4 50%);
 }
+
+.appointment-log-entry {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 18px;
+  overflow-wrap: anywhere;
+}
+.log-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; }
+.log-heading > strong { min-width: 0; }
+.log-heading > time { flex-shrink: 0; color: var(--muted); }
+.log-snapshot { display: grid; gap: 8px; border-left: 3px solid var(--accent); padding-left: 12px; }
+.log-notes { white-space: pre-wrap; }
+.log-access-choice { align-items: flex-start; }
+.log-access-choice small { display: block; color: var(--muted); margin-top: 6px; }
+.shop-log-button { margin-top: 24px; width: 100%; }

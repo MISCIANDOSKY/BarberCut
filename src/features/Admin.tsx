@@ -1,3 +1,4 @@
+import LogAccess from "./LogAccess";
 import AdminServiceManagement from "./AdminServiceManagement";
 import BookingHorizon from "./BookingHorizon";
 import BarberAddress from "./BarberAddress";
@@ -115,6 +116,7 @@ export default function Admin({
             refresh();
           }}
         />
+        <LogAccess refresh={refresh} />
         <form
           onSubmit={(e) => {
             e.preventDefault();
