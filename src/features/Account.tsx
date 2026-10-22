@@ -1,3 +1,4 @@
+import GeneralSettings from "./GeneralSettings";
 import PasswordRecovery from "./PasswordRecovery";
 import ProfileTerms from "./ProfileTerms";
 import { PushSettingsPanel } from "./PushSettings";
@@ -135,6 +136,7 @@ export function Profile({
       <nav className="profile-menu" aria-label="Impostazioni del profilo">
         {[
           "Informazioni personali",
+          "Impostazioni generali",
           "Termini e condizioni",
           "Notifiche",
           "Elimina account",
@@ -274,6 +276,7 @@ export function Profile({
               </button>
             </>
           )}
+          {page === "Impostazioni generali" && <GeneralSettings />}
           {page === "Termini e condizioni" && (
             <ProfileTerms userId={user.id} refresh={reload} />
           )}

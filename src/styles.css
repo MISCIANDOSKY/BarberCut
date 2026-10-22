@@ -8,6 +8,22 @@
   --accent: #c6a66b;
   --border: #363c33;
   --danger: #efa0a0;
+  --accent-ink: var(--accent);
+  --action-active-bg: #293126;
+  --action-active-border: #6f7956;
+  --action-hover-bg: #30372c;
+  --selected-bg: #333a2a;
+  --notice-bg: #313123;
+  --notice-border: #55533a;
+  --error-text: #ffb4b4;
+  --error-bg: #421e1e;
+  --error-border: #b85b5b;
+  --invalid-border: #ff8585;
+  --past-text: #a9afa8;
+  --hero-rule-text: #c1c6b9;
+  --art-border: #454e3d;
+  --art-ring-bg: #1b201a;
+  --art-ring-border: #30372e;
   font-family: "DM Sans", system-ui, sans-serif;
   color: var(--text);
   background: var(--bg);
@@ -77,7 +93,7 @@ summary:focus-visible {
   outline-offset: 4px;
 }
 a {
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 h1,
 h2,
@@ -140,7 +156,7 @@ small {
   color: var(--muted);
 }
 .gold {
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 .top-actions {
   display: flex;
@@ -157,7 +173,7 @@ small {
   font-size: 13px;
 }
 .account span {
-  color: var(--accent);
+  color: var(--accent-ink);
   margin-left: 12px;
 }
 .bell {
@@ -189,7 +205,7 @@ small {
   display: block;
   font-size: 10px;
   letter-spacing: 2.6px;
-  color: var(--accent);
+  color: var(--accent-ink);
   font-weight: 700;
   margin-bottom: 25px;
 }
@@ -211,7 +227,7 @@ small {
 .hero h1 em {
   font-family: Georgia, serif;
   font-weight: 400;
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 .hero p {
   font-size: 14px;
@@ -224,12 +240,12 @@ small {
   gap: 22px;
   font-size: 8px;
   letter-spacing: 2px;
-  color: #c1c6b9;
+  color: var(--hero-rule-text);
 }
 .hero-rule span + span:before {
   content: "·";
   margin-right: 22px;
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 .barber-art {
   height: 320px;
@@ -243,11 +259,11 @@ small {
   width: 280px;
   right: 25px;
   top: 10px;
-  border: 1px solid #454e3d;
+  border: 1px solid var(--art-border);
   border-radius: 50%;
   box-shadow:
-    0 0 0 25px #1b201a,
-    0 0 0 26px #30372e;
+    0 0 0 25px var(--art-ring-bg),
+    0 0 0 26px var(--art-ring-border);
 }
 .pole {
   position: absolute;
@@ -297,11 +313,11 @@ small {
   font-family: Manrope;
   letter-spacing: -2px;
   font-weight: 800;
-  text-shadow: 0 2px 15px #151815;
+  text-shadow: 0 2px 15px var(--bg);
 }
 .art-word em {
   font-family: Georgia;
-  color: var(--accent);
+  color: var(--accent-ink);
   font-weight: 400;
 }
 .art-caption {
@@ -351,17 +367,17 @@ small {
 }
 .action:first-child,
 .action.active {
-  background: #293126;
-  border-color: #6f7956;
+  background: var(--action-active-bg);
+  border-color: var(--action-active-border);
 }
 .action:hover {
-  background: #30372c;
-  border-color: var(--accent);
+  background: var(--action-hover-bg);
+  border-color: var(--accent-ink);
   transform: translateY(-3px);
 }
 .action-icon {
   font-size: 25px;
-  color: var(--accent);
+  color: var(--accent-ink);
   margin-bottom: 22px;
 }
 .action-copy strong {
@@ -378,7 +394,7 @@ small {
   position: absolute;
   right: 24px;
   top: 28px;
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 .action-number {
   position: absolute;
@@ -469,7 +485,7 @@ input[type="color"] {
 input[type="checkbox"] {
   width: 18px;
   min-height: 18px;
-  accent-color: var(--accent);
+  accent-color: var(--accent-ink);
 }
 .check {
   display: flex;
@@ -516,7 +532,7 @@ input[type="checkbox"] {
   padding: 10px 0;
   min-height: 44px;
   background: transparent;
-  color: var(--accent);
+  color: var(--accent-ink);
   font-size: 12px;
   text-align: left;
 }
@@ -529,8 +545,8 @@ input[type="checkbox"] {
 }
 .notice {
   padding: 18px;
-  background: #313123;
-  border: 1px solid #55533a;
+  background: var(--notice-bg);
+  border: 1px solid var(--notice-border);
   border-radius: 3px;
   font-size: 12px;
   margin: 18px 0;
@@ -543,7 +559,7 @@ input[type="checkbox"] {
   display: block;
   font-size: 9px;
   letter-spacing: 2px;
-  color: var(--accent);
+  color: var(--accent-ink);
   margin: 24px 0 14px;
 }
 .service-list {
@@ -573,7 +589,7 @@ input[type="checkbox"] {
 }
 .selected {
   border-color: var(--accent) !important;
-  background: #333a2a !important;
+  background: var(--selected-bg) !important;
 }
 .slots {
   display: grid;
@@ -608,7 +624,7 @@ input[type="checkbox"] {
 .success-mark {
   display: block;
   border: 1px solid var(--accent);
-  color: var(--accent);
+  color: var(--accent-ink);
   width: 65px;
   height: 65px;
   line-height: 65px;
@@ -631,7 +647,7 @@ input[type="checkbox"] {
 }
 .appointment-time {
   font-size: 36px;
-  color: var(--accent);
+  color: var(--accent-ink);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -649,7 +665,7 @@ input[type="checkbox"] {
   border-left: 2px solid transparent;
 }
 .notification.unread {
-  border-left-color: var(--accent);
+  border-left-color: var(--accent-ink);
 }
 .notification p {
   font-size: 13px;
@@ -684,7 +700,7 @@ input[type="checkbox"] {
   text-align: left;
 }
 .agenda-row > strong {
-  color: var(--accent);
+  color: var(--accent-ink);
   font-size: 20px;
 }
 .agenda-row > span:nth-child(2) {
@@ -724,7 +740,7 @@ footer > div > span {
 .install-link {
   background: none;
   border: 0;
-  color: var(--accent);
+  color: var(--accent-ink);
   font-size: 11px;
   min-height: 44px;
 }
@@ -1100,9 +1116,9 @@ dialog.feature-dialog > header {
 }
 
 .form-error {
-  color: #ffb4b4;
-  background: #421e1e;
-  border: 1px solid #b85b5b;
+  color: var(--error-text);
+  background: var(--error-bg);
+  border: 1px solid var(--error-border);
   border-radius: 4px;
   padding: 12px 14px;
   margin: 8px 0;
@@ -1110,7 +1126,7 @@ dialog.feature-dialog > header {
   line-height: 1.5;
 }
 input[aria-invalid="true"] {
-  border-color: #ff8585;
+  border-color: var(--invalid-border);
 }
 
 .maintenance-rule {
@@ -1189,7 +1205,7 @@ input[aria-invalid="true"] {
   width: 44px;
   min-height: 44px;
   padding: 0;
-  color: var(--accent);
+  color: var(--accent-ink);
   background: transparent;
   border: 0;
   font-size: 28px;
@@ -1475,11 +1491,11 @@ dialog h2,
 /* One continuous line marks a finished booking without hiding its data. */
 .agenda-row.is-past {
   position: relative;
-  color: #a9afa8;
+  color: var(--past-text);
 }
 .agenda-row.is-past > strong,
 .agenda-row.is-past small {
-  color: #a9afa8;
+  color: var(--past-text);
 }
 .agenda-row.is-past::after {
   content: "";
@@ -1488,7 +1504,7 @@ dialog h2,
   right: 18px;
   top: 50%;
   height: 1px;
-  background: #a9afa8;
+  background: var(--past-text);
   pointer-events: none;
 }
 
@@ -1531,7 +1547,7 @@ dialog h2,
   border: 1px solid var(--border);
   border-radius: 4px;
   background: transparent;
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 @media (max-width: 380px) {
   .feature-dialog > header.has-actions h2 {
@@ -1544,7 +1560,7 @@ dialog h2,
 }
 
 .recurring-date {
-  border: 1px solid var(--line, #343b32);
+  border: 1px solid var(--border);
   padding: 1rem;
   border-radius: 6px;
   min-width: 0;
@@ -1569,7 +1585,7 @@ dialog h2,
   margin: 0;
   padding: 0;
   font-size: 24px;
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 .shop-topbar {
@@ -1615,7 +1631,7 @@ dialog h2,
   scroll-margin-top: 90px;
 }
 .client-letter-group > h3 {
-  color: var(--accent);
+  color: var(--accent-ink);
   margin: 0;
   padding: 10px 0;
   border-bottom: 1px solid var(--border);
@@ -1637,7 +1653,7 @@ dialog h2,
   border: 0;
   border-radius: 3px;
   background: transparent;
-  color: var(--accent);
+  color: var(--accent-ink);
   font-size: 12px;
   line-height: 1;
 }
@@ -1726,7 +1742,7 @@ dialog h2,
 .app-option.selected,
 .app-calendar-grid button.selected {
   background: var(--accent);
-  border-color: var(--accent);
+  border-color: var(--accent-ink);
   color: var(--bg);
 }
 .app-calendar-heading {
@@ -1816,7 +1832,7 @@ dialog h2,
 }
 .push-settings > summary {
   cursor: pointer;
-  color: var(--accent);
+  color: var(--accent-ink);
   min-height: 44px;
 }
 .push-settings > .content-stack {
@@ -1874,4 +1890,106 @@ dialog h2,
   min-height: 44px;
   border-bottom: 1px solid var(--border);
   padding-bottom: 8px;
+}
+
+/* A user choice overrides the default dark palette across every app screen. */
+:root[data-theme="light"] {
+ --bg: #f7f6f2;
+ --surface: #ffffff;
+ --surface2: #edf0e8;
+ --text: #20271f;
+ --muted: #596554;
+ --border: #c6cec1;
+ --danger: #b32626;
+ --accent-ink: #80612e;
+ --action-active-bg: #eff0e6;
+ --action-active-border: #9b8b63;
+ --action-hover-bg: #e8ebdf;
+ --selected-bg: #eee5d0;
+ --notice-bg: #f5eedc;
+ --notice-border: #c7b789;
+ --error-text: #922b25;
+ --error-bg: #fff0ef;
+ --error-border: #ca8780;
+ --invalid-border: #b32626;
+ --past-text: #677160;
+ --hero-rule-text: #5d6857;
+ --art-border: #bcc5b3;
+ --art-ring-bg: #edf0e8;
+ --art-ring-border: #c6cec1;
+ color-scheme: light;
+}
+:root[data-theme="light"] .app-option.selected,
+:root[data-theme="light"] .app-calendar-grid button.selected,
+:root[data-theme="light"] .clients-alphabet > button.selected {
+ color: var(--text);
+}
+.theme-options {
+ display: grid;
+ gap: 14px;
+ padding: 0;
+ margin: 0;
+ min-width: 0;
+ border: 0;
+}
+.theme-options > legend {
+ padding: 0;
+ margin-bottom: 16px;
+ color: var(--text);
+ font-weight: 700;
+}
+.theme-choice {
+ display: flex;
+ align-items: center;
+ gap: 14px;
+ padding: 18px;
+ min-height: 92px;
+ border: 1px solid var(--border);
+ border-radius: 6px;
+ background: var(--surface);
+ color: var(--text);
+ cursor: pointer;
+}
+.theme-choice.is-selected {
+ border-color: var(--accent-ink);
+ background: var(--surface2);
+}
+.theme-choice > input {
+ flex: 0 0 20px;
+ width: 20px;
+ height: 20px;
+ min-height: 20px;
+ margin: 0;
+ padding: 0;
+ accent-color: var(--accent-ink);
+}
+.theme-choice > span:first-of-type {
+ min-width: 0;
+ flex: 1;
+}
+.theme-choice strong {
+ font-size: 16px;
+}
+.theme-preview {
+ display: grid;
+ gap: 5px;
+ flex: 0 0 64px;
+ width: 64px;
+ padding: 9px;
+ border-radius: 6px;
+ border: 1px solid #9b9f91;
+}
+.theme-preview-light { background: #f7f6f2; }
+.theme-preview-dark { background: #151815; }
+.theme-preview > span {
+ display: block;
+ height: 6px;
+ border-radius: 2px;
+}
+.theme-preview-light > span { background: #596554; }
+.theme-preview-dark > span { background: #a5afa4; }
+.theme-preview > span:last-child { background: #c6a66b; height: 12px; }
+@media (max-width: 380px) {
+ .theme-choice { padding: 14px 12px; gap: 10px; }
+ .theme-preview { flex-basis: 48px; width: 48px; padding: 7px; }
 }

@@ -7,6 +7,15 @@
       content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     />
     <meta name="theme-color" content="#151815" />
+    <script>
+      (() => {
+        let theme = "dark";
+        try { if (localStorage.getItem("barberup-theme") === "light") theme = "light"; } catch {}
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.style.colorScheme = theme;
+        document.querySelector('meta[name="theme-color"]').setAttribute("content", theme === "light" ? "#f7f6f2" : "#151815");
+      })();
+    </script>
     <meta
       name="description"
       content="BarberUp — prenota il tuo prossimo taglio, in pochi gesti."
@@ -27,8 +36,8 @@
         style="
           font-family: system-ui;
           padding: 3rem;
-          background: #151815;
-          color: #f5f2ea;
+          background: var(--bg, #151815);
+          color: var(--text, #f5f2ea);
         "
       >
         BarberUp · Caricamento…

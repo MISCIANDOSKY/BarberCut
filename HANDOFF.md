@@ -1,6 +1,6 @@
 # BarberUp — Handoff
 
-Ultimo aggiornamento: 20 ottobre 2026 (Europe/Rome).
+Ultimo aggiornamento: 22 ottobre 2026 (Europe/Rome).
 
 ## Regola permanente del titolare
 
@@ -34,13 +34,13 @@ Le prenotazioni disabilitate sono un'impostazione corrente: non riaprirle automa
 
 ## Interfaccia e navigazione
 
-- Interfaccia italiana, responsive, tema scuro con accenti oro.
+- Interfaccia italiana e responsive; tema scuro originale predefinito e tema chiaro selezionabile da Profilo > Impostazioni generali > Tema. Preferenza ricordata sul dispositivo.
 - Struttura viewport fissa: home scorre dentro .app, sezioni nei propri dialog; sfondo bloccato con dialog aperti, niente scorrimento laterale/rimbalzo della pagina. PWA installata: gesture limitate al trascinamento verticale e blocco pinch tramite rilevazione standalone (incluso iOS). Zoom del normale browser invariato; campi touch a 16px anche in orizzontale.
 - Home cliente: Prenota, Servizi e prezzi, Le mie prenotazioni, Informazioni.
 - Catalogo cliente: nome e durata senza descrizione inline; icona informativa color accento giallo accanto al prezzo apre la descrizione a schermata completa, con freccia indietro al catalogo. Disponibile anche nell’area Cliente dell’admin.
 - In fondo alla home admin: tasto Cliente che apre gli stessi quattro comandi cliente, senza cambio ruolo o account. La freccia dalle funzioni personali riporta al menu Cliente; dal menu Cliente torna alla home admin. Le prenotazioni personali usano il client_id dell’admin e rispettano il normale flusso personale.
 - Le funzioni si aprono come schermate complete, mostrando solo la funzione selezionata, con freccia indietro. Non devono tornare a essere riquadri in fondo alla pagina o finestre centrali con la home visibile dietro.
-- Profilo a schermata completa con menu Informazioni personali, Termini e condizioni, Notifiche, Elimina account. Ogni voce apre una schermata completa con freccia indietro. Esci disponibile nel menu e sotto Salva profilo nei dati personali.
+- Profilo a schermata completa con menu Informazioni personali, Impostazioni generali, Termini e condizioni, Notifiche, Elimina account. Ogni voce apre una schermata completa con freccia indietro. Esci disponibile nel menu e sotto Salva profilo nei dati personali.
 - Footer: “Un piccolo gesto. Un grande stile.” e “Powered by MISCIANDOSKY”.
 - Errori OTP errato/scaduto visibili in rosso.
 - Errore invio codice: “Errore nell’invio, riprovare fra qualche minuto.”; non mostrare istruzioni tecniche Supabase al cliente.
@@ -561,3 +561,10 @@ Test personal_reminder_settings.sql superato prima/dopo migrazione con rollback:
 - Nel componente condiviso da Admin e Barbiere Admin, attivando «Prenotazioni periodiche senza limite di numero» il campo del numero massimo scompare immediatamente; togliendo la spunta ricompare con il valore conservato.
 - Anche la spiegazione sul limite 0 viene mostrata solo quando il limite numerico è attivo. Salvataggio e logica delle prenotazioni invariati.
 - TypeScript, build, test e pubblicazione GitHub Pages riusciti nella pipeline `39492739746`; nessuna modifica al database o alle impostazioni correnti.
+
+## 22 ottobre 2026 — Impostazioni generali e tema chiaro/scuro
+
+- Aggiunta voce «Impostazioni generali» al Profilo comune a clienti, Admin, Barbiere e Barbiere Admin. Al suo interno «Tema» apre una schermata completa con freccia indietro e scelta Tema chiaro/Tema scuro integrata, senza popup di sistema.
+- Tema scuro originale predefinito, indipendente dal tema del telefono. Scelta immediata e salvata in localStorage sul dispositivo (`barberup-theme`), non su Supabase; lettura prima del rendering per evitare il lampeggio del tema sbagliato. Storage non disponibile/non valido: avvio sicuro scuro. Sincronizzazione delle schede tramite evento storage.
+- Palette chiara per sfondi, dialog, campi, calendario, selezioni, avvisi/errori e appuntamenti passati; oro conservato per i pulsanti, accento testuale più scuro per il contrasto. Aggiornato anche theme-color e color-scheme della PWA.
+- Test mirati per valore predefinito, preferenza salvata/non valida, storage bloccato e aggiornamento coordinato documento/barra PWA. Build/test/pubblicazione in verifica GitHub Actions. Nessuna modifica al database o alle impostazioni operative.
