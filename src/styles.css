@@ -1894,102 +1894,120 @@ dialog h2,
 
 /* A user choice overrides the default dark palette across every app screen. */
 :root[data-theme="light"] {
- --bg: #f7f6f2;
- --surface: #ffffff;
- --surface2: #edf0e8;
- --text: #20271f;
- --muted: #596554;
- --border: #c6cec1;
- --danger: #b32626;
- --accent-ink: #80612e;
- --action-active-bg: #eff0e6;
- --action-active-border: #9b8b63;
- --action-hover-bg: #e8ebdf;
- --selected-bg: #eee5d0;
- --notice-bg: #f5eedc;
- --notice-border: #c7b789;
- --error-text: #922b25;
- --error-bg: #fff0ef;
- --error-border: #ca8780;
- --invalid-border: #b32626;
- --past-text: #677160;
- --hero-rule-text: #5d6857;
- --art-border: #bcc5b3;
- --art-ring-bg: #edf0e8;
- --art-ring-border: #c6cec1;
- color-scheme: light;
+  --bg: #f7f6f2;
+  --surface: #ffffff;
+  --surface2: #edf0e8;
+  --text: #20271f;
+  --muted: #596554;
+  --border: #c6cec1;
+  --danger: #b32626;
+  --accent-ink: #80612e;
+  --action-active-bg: #eff0e6;
+  --action-active-border: #9b8b63;
+  --action-hover-bg: #e8ebdf;
+  --selected-bg: #eee5d0;
+  --notice-bg: #f5eedc;
+  --notice-border: #c7b789;
+  --error-text: #922b25;
+  --error-bg: #fff0ef;
+  --error-border: #ca8780;
+  --invalid-border: #b32626;
+  --past-text: #677160;
+  --hero-rule-text: #5d6857;
+  --art-border: #bcc5b3;
+  --art-ring-bg: #edf0e8;
+  --art-ring-border: #c6cec1;
+  color-scheme: light;
 }
 :root[data-theme="light"] .app-option.selected,
 :root[data-theme="light"] .app-calendar-grid button.selected,
 :root[data-theme="light"] .clients-alphabet > button.selected {
- color: var(--text);
+  color: var(--text);
 }
 .theme-options {
- display: grid;
- gap: 14px;
- padding: 0;
- margin: 0;
- min-width: 0;
- border: 0;
+  display: grid;
+  gap: 14px;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+  border: 0;
 }
 .theme-options > legend {
- padding: 0;
- margin-bottom: 16px;
- color: var(--text);
- font-weight: 700;
+  padding: 0;
+  margin-bottom: 16px;
+  color: var(--text);
+  font-weight: 700;
 }
 .theme-choice {
- display: flex;
- align-items: center;
- gap: 14px;
- padding: 18px;
- min-height: 92px;
- border: 1px solid var(--border);
- border-radius: 6px;
- background: var(--surface);
- color: var(--text);
- cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px;
+  min-height: 92px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
 }
 .theme-choice.is-selected {
- border-color: var(--accent-ink);
- background: var(--surface2);
+  border-color: var(--accent-ink);
+  background: var(--surface2);
 }
 .theme-choice > input {
- flex: 0 0 20px;
- width: 20px;
- height: 20px;
- min-height: 20px;
- margin: 0;
- padding: 0;
- accent-color: var(--accent-ink);
+  flex: 0 0 20px;
+  width: 20px;
+  height: 20px;
+  min-height: 20px;
+  margin: 0;
+  padding: 0;
+  accent-color: var(--accent-ink);
 }
 .theme-choice > span:first-of-type {
- min-width: 0;
- flex: 1;
+  min-width: 0;
+  flex: 1;
 }
 .theme-choice strong {
- font-size: 16px;
+  font-size: 16px;
 }
 .theme-preview {
- display: grid;
- gap: 5px;
- flex: 0 0 64px;
- width: 64px;
- padding: 9px;
- border-radius: 6px;
- border: 1px solid #9b9f91;
+  display: grid;
+  gap: 5px;
+  flex: 0 0 64px;
+  width: 64px;
+  padding: 9px;
+  border-radius: 6px;
+  border: 1px solid #9b9f91;
 }
-.theme-preview-light { background: #f7f6f2; }
-.theme-preview-dark { background: #151815; }
+.theme-preview-light {
+  background: #f7f6f2;
+}
+.theme-preview-dark {
+  background: #151815;
+}
 .theme-preview > span {
- display: block;
- height: 6px;
- border-radius: 2px;
+  display: block;
+  height: 6px;
+  border-radius: 2px;
 }
-.theme-preview-light > span { background: #596554; }
-.theme-preview-dark > span { background: #a5afa4; }
-.theme-preview > span:last-child { background: #c6a66b; height: 12px; }
+.theme-preview-light > span {
+  background: #596554;
+}
+.theme-preview-dark > span {
+  background: #a5afa4;
+}
+.theme-preview > span:last-child {
+  background: #c6a66b;
+  height: 12px;
+}
 @media (max-width: 380px) {
- .theme-choice { padding: 14px 12px; gap: 10px; }
- .theme-preview { flex-basis: 48px; width: 48px; padding: 7px; }
+  .theme-choice {
+    padding: 14px 12px;
+    gap: 10px;
+  }
+  .theme-preview {
+    flex-basis: 48px;
+    width: 48px;
+    padding: 7px;
+  }
 }
