@@ -630,4 +630,4 @@ Test personal_reminder_settings.sql superato prima/dopo migrazione con rollback:
 
 - Nella home senza sessione, dopo il caricamento, aggiunto riquadro visibile sopra la presentazione: «Non hai effettuato l’accesso», spiegazione e tasto «Accedi o registrati». Il tasto Accedi in alto ora usa lo stile oro evidente.
 - Sottotitoli di Prenota e Le mie prenotazioni spiegano che occorre accedere. Flussi di accesso/registrazione esistenti riutilizzati; catalogo e informazioni restano consultabili. Home degli account autenticati invariata; riquadro impilato su smartphone e adattato ai temi.
-- Controlli build/pubblicazione in corso; nessuna modifica a database, permessi o impostazioni.
+- TypeScript, build, test e pubblicazione GitHub Pages riusciti nella pipeline `39824273677`; nessuna modifica a database, permessi o impostazioni. Controllo visivo su telefono fisico non eseguito.
