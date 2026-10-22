@@ -2058,8 +2058,8 @@ html.installed-pwa[data-theme="light"] body {
 }
 
 .theme-preview-auto {
-  background: linear-gradient(90deg,#f7f6f2 50%,#151815 50%);
+  background: linear-gradient(90deg, #f7f6f2 50%, #151815 50%);
 }
 .theme-preview-auto > span {
-  background: linear-gradient(90deg,#596554 50%,#a5afa4 50%);
+  background: linear-gradient(90deg, #596554 50%, #a5afa4 50%);
 }

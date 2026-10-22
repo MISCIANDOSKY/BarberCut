@@ -1,15 +1,19 @@
 import { useEffect, useState } from "react";
 import { Modal } from "../components/UI";
-import { currentTheme, selectTheme, THEME_CHANGE_EVENT } from "../lib/theme.mjs";
+import {
+  currentTheme,
+  selectTheme,
+  THEME_CHANGE_EVENT,
+} from "../lib/theme.mjs";
 import type { Theme } from "../lib/theme.mjs";
 export default function GeneralSettings() {
   const [themeOpen, setThemeOpen] = useState(false);
   const [theme, setTheme] = useState<Theme>(currentTheme);
-  useEffect(()=>{
-    const sync=()=>setTheme(currentTheme());
-    document.addEventListener(THEME_CHANGE_EVENT,sync);
-    return()=>document.removeEventListener(THEME_CHANGE_EVENT,sync);
-  },[]);
+  useEffect(() => {
+    const sync = () => setTheme(currentTheme());
+    document.addEventListener(THEME_CHANGE_EVENT, sync);
+    return () => document.removeEventListener(THEME_CHANGE_EVENT, sync);
+  }, []);
   return (
     <>
       <nav className="profile-menu" aria-label="Impostazioni generali">
