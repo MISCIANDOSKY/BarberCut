@@ -9,16 +9,20 @@
     <meta name="theme-color" content="#151815" />
     <script>
       (() => {
-        let theme = "dark";
+        let preference = "dark";
         try {
-          if (localStorage.getItem("barberup-theme") === "light")
-            theme = "light";
+          const stored = localStorage.getItem("barberup-theme");
+          if (stored === "light" || stored === "auto") preference = stored;
         } catch {}
+        let theme = preference;
+        if (preference === "auto") {
+          theme = "dark";
+          try { if (!window.matchMedia("(prefers-color-scheme: dark)").matches) theme = "light"; } catch {}
+        }
+        document.documentElement.dataset.themePreference = preference;
         document.documentElement.dataset.theme = theme;
         document.documentElement.style.colorScheme = theme;
-        document
-          .querySelector('meta[name="theme-color"]')
-          .setAttribute("content", theme === "light" ? "#f7f6f2" : "#151815");
+        document.querySelector('meta[name="theme-color"]').setAttribute("content", theme === "light" ? "#f7f6f2" : "#151815");
       })();
     </script>
     <meta

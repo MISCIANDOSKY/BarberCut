@@ -34,7 +34,7 @@ Le prenotazioni disabilitate sono un'impostazione corrente: non riaprirle automa
 
 ## Interfaccia e navigazione
 
-- Interfaccia italiana e responsive; tema scuro originale predefinito e tema chiaro selezionabile da Profilo > Impostazioni generali > Tema. Preferenza ricordata sul dispositivo.
+- Interfaccia italiana e responsive; tema scuro originale predefinito, tema chiaro e opzione Auto selezionabili da Profilo > Impostazioni generali > Tema. Preferenza ricordata sul dispositivo.
 - Struttura viewport fissa: home scorre dentro .app, sezioni nei propri dialog; sfondo bloccato con dialog aperti, niente scorrimento laterale/rimbalzo della pagina. PWA installata: gesture limitate al trascinamento verticale e blocco pinch tramite rilevazione standalone (incluso iOS). Zoom del normale browser invariato; campi touch a 16px anche in orizzontale.
 - Home cliente: Prenota, Servizi e prezzi, Le mie prenotazioni, Informazioni.
 - Catalogo cliente: nome e durata senza descrizione inline; icona informativa color accento giallo accanto al prezzo apre la descrizione a schermata completa, con freccia indietro al catalogo. Disponibile anche nell’area Cliente dell’admin.
@@ -579,3 +579,11 @@ Test personal_reminder_settings.sql superato prima/dopo migrazione con rollback:
 - Rimossa la vecchia nota non bloccante della home. L’Admin vede nella conferma di pubblicazione che tutti dovranno accettare; salvare una bozza non richiede un nuovo consenso.
 - Test SQL remoto PASS con rollback: tutti i ruoli, nuovo consenso dopo pubblicazione, bozze e popup superati respinti, rifiuto senza consenso e successiva accettazione, isolamento account, niente duplicati, anonimi esclusi e assenza termini gestita. Nessuna pubblicazione reale/email/account di test persistente. Advisor invariati: 16 INFO private intenzionali, WARN preesistente leaked-password protection.
 - TypeScript, build, test frontend e pubblicazione GitHub Pages riusciti nella pipeline `39737642439`. Verifica su dispositivi/browser e consegna Realtime reale non eseguite in questa sessione, che non dispone di browser; test database remoti eseguiti come sopra. Nessuna revoca di sessioni o modifica globale alle autorizzazioni API: il gate blocca l’interfaccia, mentre il controllo server dei termini già presente sulle prenotazioni normali resta invariato.
+
+## 22 ottobre 2026 — Tema Auto dal sistema del dispositivo
+
+- In Profilo > Impostazioni generali > Tema aggiunta opzione «Auto», oltre a Chiaro/Scuro. Segue `prefers-color-scheme` del cellulare/computer, con aggiornamento al cambio sistema e alla ripresa della PWA; le opzioni manuali restano fisse.
+- Preferenza salvata come `auto`, distinta dal colore effettivo chiaro/scuro: la riapertura conserva Auto. Bootstrap prima del rendering aggiornato e sincronizzazione tra schede conservata. Default resta Scuro per chi non ha una preferenza.
+- Controllo radio Auto resta selezionato quando cambia la palette; anteprima a due colori. Se il browser non espone il tema del sistema, Auto usa Scuro.
+- Test estesi: risoluzione di Auto, eventi cambio tema, ritorno in primo piano, preferenze manuali, persistenza, sincronizzazione storage, rimozione listener e bootstrap iniziale.
+- Build/test/pubblicazione GitHub in corso; nessuna modifica al database.

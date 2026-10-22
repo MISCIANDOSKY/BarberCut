@@ -1,41 +1,61 @@
 export const THEME_STORAGE_KEY = "barberup-theme";
-export function readTheme(storage) {
-  try {
-    return storage?.getItem(THEME_STORAGE_KEY) === "light" ? "light" : "dark";
-  } catch {
-    return "dark";
-  }
+export const THEME_CHANGE_EVENT = "barberup-theme-change";
+function normalizeTheme(value) {
+ return value==="light"||value==="auto"?value:"dark";
 }
-export function applyTheme(theme, doc) {
-  const selected = theme === "light" ? "light" : "dark";
-  doc.documentElement.dataset.theme = selected;
-  doc.documentElement.style.colorScheme = selected;
-  const meta = doc.querySelector('meta[name="theme-color"]');
-  if (meta)
-    meta.setAttribute("content", selected === "light" ? "#f7f6f2" : "#151815");
-  return selected;
+export function readTheme(storage) {
+ try {return normalizeTheme(storage?.getItem(THEME_STORAGE_KEY));}
+ catch{return "dark";}
+}
+export function applyTheme(theme,doc,systemDark=true) {
+ const selected=normalizeTheme(theme);
+ const resolved=selected==="auto"?(systemDark?"dark":"light"):selected;
+ const changed=doc.documentElement.dataset.theme!==resolved||doc.documentElement.dataset.themePreference!==selected;
+ doc.documentElement.dataset.theme=resolved;
+ doc.documentElement.dataset.themePreference=selected;
+ doc.documentElement.style.colorScheme=resolved;
+ const meta=doc.querySelector('meta[name="theme-color"]');
+ if(meta)meta.setAttribute("content",resolved==="light"?"#f7f6f2":"#151815");
+ if(changed)doc.dispatchEvent?.(new Event(THEME_CHANGE_EVENT));
+ return selected;
 }
 function browserStorage() {
-  try {
-    return window.localStorage;
-  } catch {
-    return undefined;
-  }
+ try{return window.localStorage;}catch{return undefined;}
+}
+function systemQuery() {
+ try{return window.matchMedia?.("(prefers-color-scheme: dark)")??null;}catch{return null;}
 }
 export function currentTheme() {
-  return document.documentElement.dataset.theme === "light" ? "light" : "dark";
+ return normalizeTheme(document.documentElement.dataset.themePreference??document.documentElement.dataset.theme);
 }
 export function selectTheme(theme) {
-  const selected = applyTheme(theme, document);
-  try {
-    browserStorage()?.setItem(THEME_STORAGE_KEY, selected);
-  } catch {}
-  return selected;
+ const selected=applyTheme(theme,document,systemQuery()?.matches??true);
+ try{browserStorage()?.setItem(THEME_STORAGE_KEY,selected);}catch{}
+ return selected;
 }
 export function initializeTheme() {
-  applyTheme(readTheme(browserStorage()), document);
-  window.addEventListener("storage", (event) => {
-    if (event.key === THEME_STORAGE_KEY || event.key === null)
-      applyTheme(readTheme(browserStorage()), document);
-  });
+ const media=systemQuery();
+ const applyPreference=()=>applyTheme(readTheme(browserStorage()),document,media?.matches??true);
+ applyPreference();
+ const storageChanged=event=>{
+  if(event.key===THEME_STORAGE_KEY||event.key===null)applyPreference();
+ };
+ const systemChanged=()=>{
+  if(currentTheme()==="auto")applyTheme("auto",document,media?.matches??true);
+ };
+ const resumed=()=>{if(!document.hidden)systemChanged();};
+ window.addEventListener("storage",storageChanged);
+ window.addEventListener("focus",systemChanged);
+ window.addEventListener("pageshow",systemChanged);
+ document.addEventListener("visibilitychange",resumed);
+ if(media?.addEventListener)media.addEventListener("change",systemChanged);
+ else media?.addListener?.(systemChanged);
+ return ()=>{
+  window.removeEventListener("storage",storageChanged);
+  window.removeEventListener("focus",systemChanged);
+  window.removeEventListener("pageshow",systemChanged);
+  document.removeEventListener("visibilitychange",resumed);
+  if(media?.removeEventListener)media.removeEventListener("change",systemChanged);
+  else media?.removeListener?.(systemChanged);
+ };
 }
