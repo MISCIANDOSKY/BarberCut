@@ -9,7 +9,7 @@ export default function Maintenance({
 }) {
   const [status, setStatus] = useState<Row | null>(null);
   const [inactiveDays, setInactiveDays] = useState("120");
-  const [appointmentDays, setAppointmentDays] = useState("40");
+  const [appointmentDays, setAppointmentDays] = useState("550");
   const [disableInactive, setDisableInactive] = useState(true);
   const [deleteOld, setDeleteOld] = useState(true);
   const [busy, setBusy] = useState(false);

@@ -27,7 +27,7 @@ Lavorare direttamente su GitHub e Supabase: il titolare ha chiesto di non svilup
 | Eliminazione account dal profilo | Abilitata |
 | Preavviso minimo cancellazione | 12 ore |
 | Disattivazione automatica clienti inattivi | Abilitata, 120 giorni |
-| Eliminazione automatica appuntamenti vecchi | Abilitata, 40 giorni |
+| Eliminazione automatica appuntamenti vecchi | Abilitata, 550 giorni (aggiornata il 22 ottobre) |
 | Indirizzo barberia | Configurato, revisione 1 |
 
 Le prenotazioni disabilitate sono un'impostazione corrente: non riaprirle automaticamente durante altri interventi.
@@ -127,7 +127,7 @@ Le prenotazioni disabilitate sono un'impostazione corrente: non riaprirle automa
 - Primo ciclo concede il preavviso completo; niente disattivazione senza avviso finale inviato da almeno 7 giorni. Se l'invio fallisce, la disattivazione viene rinviata.
 - Coda avvisi ogni 15 minuti, fino a 20 invii per ciclo, retry e annullamento dei vecchi avvisi al ritorno dell'utente.
 - Edge Function inactivity-warning con token casuale monouso a scadenza; destinatari e operazioni privilegiati controllati dal server.
-- Pulizia appuntamenti: elimina quelli terminati prima della mezzanotte italiana di oggi meno 40 giorni. Preserva appuntamenti recenti/futuri, confine e blocchi orari. Eliminazione effettiva, non semplice archiviazione.
+- Pulizia appuntamenti: elimina quelli terminati prima della mezzanotte italiana di oggi meno 550 giorni. Preserva appuntamenti recenti/futuri, confine e blocchi orari. Eliminazione effettiva, non semplice archiviazione.
 - Cron attivi: barbercut-appointment-reminders (1 minuto), barbercut-daily-maintenance (03:15 UTC), barbercut-inactivity-warning-dispatch (15 minuti), barbercut-registration-approved-email (5 minuti).
 - Workflow GitHub database-health ogni 6 ore: lettura pubblica minima reale su Supabase. Non garantisce disponibilità continua del piano Free; possibili sospensione Supabase per inattività e disabilitazione pianificazioni GitHub dopo prolungata inattività del repository.
 - Chiave SMTP soggetta alle regole/scadenze Brevo: verificare in caso di mancati invii senza copiare segreti nei documenti.
@@ -596,3 +596,9 @@ Test personal_reminder_settings.sql superato prima/dopo migrazione con rollback:
 - Conferma eliminazione resa esplicita in tutti i percorsi Admin e Barbiere Admin: «Sei sicuro di voler eliminare il servizio …?», con nome e chiarimento ambito catalogo/propria agenda. Conferma integrata nell’app, annullamento senza cancellazione. Barbiere normale non acquisisce eliminazione o gestione globale. Gestione personale/collaboratori del Barbiere Admin invariata.
 - Test SQL remoto con rollback PASS: ruoli non Admin esclusi, agenda Admin inclusa, associazione nuova, attivazione/disattivazione isolata, disponibilità corretta, riattivazione autonoma bloccata, appuntamento preservato, legacy, input/target non validi e servizi eliminati. Regression collaborator_service_permissions.sql riuscita. Nessun dato reale modificato e nessuna email inviata. Advisor invariati: 16 INFO private intenzionali e WARN preesistente leaked-password protection.
 - TypeScript, build, test frontend e pubblicazione GitHub Pages riusciti nella pipeline `39741810109`. Test SQL remoti come sopra; verifica UI autenticata su dispositivo fisico non eseguita.
+
+## 22 ottobre 2026 — Conservazione appuntamenti a 550 giorni
+
+- Su richiesta del titolare, soglia live `private.maintenance_settings.appointment_days` portata da 40 a 550 giorni. Eliminazione giornaliera mantenuta attiva; inattività clienti invariata a 120 giorni e relativa operazione attiva.
+- Allineato a 550 il valore iniziale della schermata Manutenzione, che continua a leggere e salvare la configurazione remota. Nessuna esecuzione manuale della pulizia e nessun appuntamento cancellato da questo intervento.
+- UPDATE con RETURNING verificato: 550 giorni, pulizia attiva, impostazioni inattività conservate. Verifica pipeline frontend in corso.
