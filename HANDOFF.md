@@ -586,4 +586,4 @@ Test personal_reminder_settings.sql superato prima/dopo migrazione con rollback:
 - Preferenza salvata come `auto`, distinta dal colore effettivo chiaro/scuro: la riapertura conserva Auto. Bootstrap prima del rendering aggiornato e sincronizzazione tra schede conservata. Default resta Scuro per chi non ha una preferenza.
 - Controllo radio Auto resta selezionato quando cambia la palette; anteprima a due colori. Se il browser non espone il tema del sistema, Auto usa Scuro.
 - Test estesi: risoluzione di Auto, eventi cambio tema, ritorno in primo piano, preferenze manuali, persistenza, sincronizzazione storage, rimozione listener e bootstrap iniziale.
-- Build/test/pubblicazione GitHub in corso; nessuna modifica al database.
+- TypeScript, build, test (compresi i casi Auto) e pubblicazione GitHub Pages riusciti nella pipeline `39738217508`; nessuna modifica al database. Verifica su telefono fisico non eseguita.
