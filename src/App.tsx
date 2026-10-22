@@ -492,7 +492,10 @@ export default function App() {
         ]
     : user
       ? clientChoices
-      : clientChoices.filter(([, title]) => title === "Servizi e prezzi" || title === "Informazioni");
+      : clientChoices.filter(
+          ([, title]) =>
+            title === "Servizi e prezzi" || title === "Informazioni",
+        );
   const manageSections = [
     "Appuntamenti",
     "Nuova prenotazione",
@@ -503,8 +506,17 @@ export default function App() {
     if (!user && (section === "Prenota" || section === "Le mie prenotazioni"))
       return (
         <div className="content-stack">
-          <p>Accedi o crea un account per prenotare e visualizzare i tuoi appuntamenti.</p>
-          <button type="button" className="primary" onClick={() => setAuth(true)}>Accedi o registrati</button>
+          <p>
+            Accedi o crea un account per prenotare e visualizzare i tuoi
+            appuntamenti.
+          </p>
+          <button
+            type="button"
+            className="primary"
+            onClick={() => setAuth(true)}
+          >
+            Accedi o registrati
+          </button>
         </div>
       );
     if (section === "Log")
