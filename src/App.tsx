@@ -155,39 +155,42 @@ export default function App() {
             "Il tuo account è attivo. Il conteggio dell’inattività è ripartito da oggi.",
           );
         }
-        const [p, r, v, ns, ap, member, reviewPermission, logPermission] = await Promise.all([
-          result(supabase.from("profiles").select("*").eq("id", u.id).single()),
-          result(
-            supabase
-              .from("user_roles")
-              .select("role")
-              .eq("user_id", u.id)
-              .single(),
-          ),
-          result(supabase.rpc("staff_session_status")),
-          result(
-            supabase
-              .from("notifications")
-              .select("*")
-              .eq("user_id", u.id)
-              .is("dismissed_at", null)
-              .order("created_at", { ascending: false })
-              .limit(100),
-          ),
-          result(
-            supabase
-              .from("calendar_entries")
-              .select("*")
-              .eq("client_id", u.id)
-              .eq("kind", "appointment")
-              .eq("status", "confirmed")
-              .gte("start_at", new Date().toISOString())
-              .order("start_at"),
-          ),
-          result(supabase.rpc("membership_status")),
-          result(supabase.rpc("can_review_registrations")),
-          result(supabase.rpc("can_view_appointment_log")),
-        ]);
+        const [p, r, v, ns, ap, member, reviewPermission, logPermission] =
+          await Promise.all([
+            result(
+              supabase.from("profiles").select("*").eq("id", u.id).single(),
+            ),
+            result(
+              supabase
+                .from("user_roles")
+                .select("role")
+                .eq("user_id", u.id)
+                .single(),
+            ),
+            result(supabase.rpc("staff_session_status")),
+            result(
+              supabase
+                .from("notifications")
+                .select("*")
+                .eq("user_id", u.id)
+                .is("dismissed_at", null)
+                .order("created_at", { ascending: false })
+                .limit(100),
+            ),
+            result(
+              supabase
+                .from("calendar_entries")
+                .select("*")
+                .eq("client_id", u.id)
+                .eq("kind", "appointment")
+                .eq("status", "confirmed")
+                .gte("start_at", new Date().toISOString())
+                .order("start_at"),
+            ),
+            result(supabase.rpc("membership_status")),
+            result(supabase.rpc("can_review_registrations")),
+            result(supabase.rpc("can_view_appointment_log")),
+          ]);
         if (version !== refreshVersion.current) return;
         setMembership(String(member));
         setProfile(p as Row);
@@ -495,7 +498,12 @@ export default function App() {
     "Orari di lavoro",
   ];
   function content() {
-    if (section === "Log") return ready && logAllowed ? <AppointmentLog key={user!.id} /> : <Empty>Non hai accesso ai log.</Empty>;
+    if (section === "Log")
+      return ready && logAllowed ? (
+        <AppointmentLog key={user!.id} />
+      ) : (
+        <Empty>Non hai accesso ai log.</Empty>
+      );
     if (section === "Cliente" && ready && role === "admin")
       return (
         <nav className="mini-grid" aria-label="Funzioni cliente">
@@ -796,12 +804,24 @@ export default function App() {
             <StaffGate email={user.email!} done={refresh} notify={notify} />
           ) : (
             <>
-            <ShopAgenda
-              bookingHorizonMonths={settings.booking_horizon_months ?? 6}
-              onAccessChanged={refresh}
-            />
-            {logAllowed && <button type="button" className="secondary shop-log-button" onClick={() => setSection("Log")}>Log</button>}
-            {logAllowed && section === "Log" && <Modal wide title="Log" close={() => setSection("")}><AppointmentLog key={user.id} /></Modal>}
+              <ShopAgenda
+                bookingHorizonMonths={settings.booking_horizon_months ?? 6}
+                onAccessChanged={refresh}
+              />
+              {logAllowed && (
+                <button
+                  type="button"
+                  className="secondary shop-log-button"
+                  onClick={() => setSection("Log")}
+                >
+                  Log
+                </button>
+              )}
+              {logAllowed && section === "Log" && (
+                <Modal wide title="Log" close={() => setSection("")}>
+                  <AppointmentLog key={user.id} />
+                </Modal>
+              )}
             </>
           )}
         </main>
