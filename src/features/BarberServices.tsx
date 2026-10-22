@@ -209,9 +209,9 @@ export default function BarberServices({
                     onClick={async () => {
                       if (
                         !(await confirmInApp(
-                          "Eliminare " +
+                          "Sei sicuro di voler eliminare il servizio «" +
                             service.name +
-                            " dai tuoi servizi? Gli appuntamenti già presenti saranno conservati.",
+                            "» dalla tua agenda? Gli appuntamenti già presenti saranno conservati.",
                         ))
                       )
                         return;

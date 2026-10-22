@@ -1,3 +1,4 @@
+import AdminServiceManagement from "./AdminServiceManagement";
 import BookingHorizon from "./BookingHorizon";
 import BarberAddress from "./BarberAddress";
 import { AppPicker } from "../components/AppPicker";
@@ -20,10 +21,10 @@ export default function Admin({
   refresh: () => void;
 }) {
   const [editing, setEditing] = useState<Row | null>(null);
+  const [managingService,setManagingService] = useState<Row|null>(null);
   const [requireApproval, setRequireApproval] = useState(true);
   const [rows, setRows] = useState<Row[]>([]),
     [users, setUsers] = useState<Row[]>([]),
-    [services, setServices] = useState<Row[]>([]),
     [barbers, setBarbers] = useState<Row[]>([]),
     [settings, setSettings] = useState<Row | null>(null),
     [busy, setBusy] = useState(false);
@@ -53,13 +54,6 @@ export default function Admin({
         setUsers(
           (await result(supabase.from("profiles").select("*"))) as Row[],
         );
-      if (section === "Servizi") {
-        setServices(
-          (await result(
-            supabase.from("services").select("*").is("deleted_at", null),
-          )) as Row[],
-        );
-      }
       if (section === "Servizi" || section === "Barbieri") {
         setBarbers(
           (await result(
@@ -268,6 +262,7 @@ export default function Admin({
     );
   return (
     <>
+      {section==="Servizi" && managingService && <AdminServiceManagement service={managingService} close={()=>setManagingService(null)} onSaved={()=>{void load();refresh();}} />}
       {editing && (
         <Modal
           title={
@@ -488,6 +483,7 @@ export default function Admin({
                   >
                     Modifica
                   </button>
+                  {section==="Servizi" ? <button className="text" disabled={busy} onClick={()=>setManagingService(r)}>Gestisci</button> : (
                   <button
                     className="text"
                     disabled={busy}
@@ -496,7 +492,7 @@ export default function Admin({
                         result(
                           supabase
                             .from(
-                              section === "Servizi" ? "services" : "barbers",
+                              "barbers",
                             )
                             .update({ active: !r.active })
                             .eq("id", r.id),
@@ -506,6 +502,8 @@ export default function Admin({
                   >
                     {r.active ? "Disattiva" : "Riattiva"}
                   </button>
+                  )}
+
 
                   <button
                     className="text danger-text"
@@ -514,9 +512,9 @@ export default function Admin({
                       const kind = section === "Servizi" ? "service" : "barber";
                       if (
                         !(await confirmInApp(
-                          "Eliminare " +
-                            r.name +
-                            "? La voce verrà rimossa dagli elenchi; i dati degli appuntamenti saranno conservati.",
+                          section === "Servizi"
+                            ? "Sei sicuro di voler eliminare il servizio «" + r.name + "»? Verrà rimosso dal catalogo; gli appuntamenti già presenti saranno conservati."
+                            : "Eliminare " + r.name + "? La voce verrà rimossa dagli elenchi; i dati degli appuntamenti saranno conservati.",
                         ))
                       )
                         return;
@@ -642,45 +640,7 @@ export default function Admin({
               Crea servizio
             </button>
           </form>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              const v = new FormData(e.currentTarget);
-              run(() =>
-                result(
-                  supabase.from("barber_services").upsert({
-                    barber_id: v.get("barber"),
-                    service_id: v.get("service"),
-                  }),
-                ),
-              );
-            }}
-          >
-            <h3>Associa servizio al barbiere</h3>
-            <label>
-              Barbiere
-              <AppSelect name="barber" required>
-                {barbers.map((b) => (
-                  <option key={b.id} value={b.id}>
-                    {b.name}
-                  </option>
-                ))}
-              </AppSelect>
-            </label>
-            <label>
-              Servizio
-              <AppSelect name="service" required>
-                {services.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name}
-                  </option>
-                ))}
-              </AppSelect>
-            </label>
-            <button className="secondary" disabled={busy}>
-              Associa
-            </button>
-          </form>
+
         </>
       )}
       {section === "Termini" && (

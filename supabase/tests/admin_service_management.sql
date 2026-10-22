@@ -1,0 +1,70 @@
+begin;
+update public.app_settings set require_user_approval=false where id;
+do $test$
+declare ad uuid:=gen_random_uuid();w uuid:=gen_random_uuid();l uuid:=gen_random_uuid();client uuid:=gen_random_uuid();shop uuid:=gen_random_uuid();ba uuid;bw uuid;bl uuid;s uuid;legacy uuid;fresh uuid;booking uuid;uid uuid;d date:=(now()at time zone 'Europe/Rome')::date+3; old_price numeric;
+begin
+ insert into auth.users(id,email,raw_user_meta_data)values
+ (ad,'service-admin@example.invalid','{}'),(w,'service-worker@example.invalid','{}'),(l,'service-lead@example.invalid','{}'),(client,'service-client@example.invalid','{}'),(shop,'service-shop@example.invalid','{}');
+ update public.user_roles set role='admin'where user_id=ad;
+ update public.user_roles set role='shop'where user_id=shop;
+ insert into public.barbers(name,user_id)values('TEST service Admin',ad)returning id into ba;
+ insert into public.barbers(name,user_id)values('TEST service Worker',w)returning id into bw;
+ insert into public.barbers(name,user_id)values('TEST service Lead',l)returning id into bl;
+ update public.user_roles set role='barber_admin'where user_id=l;
+ insert into public.services(name,duration_minutes,price)values('TEST per-user service',30,20)returning id into s;
+ insert into public.services(name,duration_minutes,price,active)values('TEST legacy disabled',30,30,false)returning id into legacy;
+ insert into public.services(name,duration_minutes,price)values('TEST unassigned service',15,10)returning id into fresh;
+ insert into public.barber_services(barber_id,service_id)values(ba,s),(bw,s),(bl,s),(ba,legacy),(bw,legacy),(bl,legacy);
+ insert into public.schedule_exceptions(barber_id,day,closed,opens,closes)values(bw,d,false,'08:00','20:00'),(bl,d,false,'08:00','20:00');
+ insert into public.calendar_entries(barber_id,kind,client_id,service_id,start_at,end_at,service_name,price)
+ values(bw,'appointment',client,s,(d+time '12:00')at time zone 'Europe/Rome',(d+time '12:30')at time zone 'Europe/Rome','TEST saved name',20)returning id into booking;
+ perform public.staff_authorize_session(ad,'service-admin');
+ perform public.staff_authorize_session(w,'service-worker');
+ perform public.staff_authorize_session(l,'service-lead');
+ -- Neither clients, shop accounts nor either barber role gains global admin management.
+ foreach uid in array array[w,l,client,shop]loop
+  perform set_config('request.jwt.claims',jsonb_build_object('sub',uid,'role','authenticated','session_id',case when uid=w then 'service-worker'else 'service-lead'end)::text,true);
+  set local role authenticated;
+  begin perform public.admin_service_barbers(s);raise exception 'Non-admin listed';exception when raise_exception then if sqlerrm<>'ACCESS_DENIED'then raise;end if;end;
+  begin perform public.admin_set_service_barber(s,bw,false);raise exception 'Non-admin changed service';exception when raise_exception then if sqlerrm<>'ACCESS_DENIED'then raise;end if;end;
+  reset role;
+ end loop;
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',ad,'role','authenticated','session_id','service-admin')::text,true);
+ set local role authenticated;
+ if not exists(select 1 from public.admin_service_barbers(s)where barber_id=ba and enabled)then raise exception 'Admin own agenda missing';end if;
+ perform public.admin_set_service_barber(s,bw,false);
+ if exists(select 1 from public.get_available_slots(bw,s,d))then raise exception 'Disabled agenda bookable';end if;
+ if not exists(select 1 from public.get_available_slots(bl,s,d))then raise exception 'Other agenda disabled';end if;
+ reset role;
+ if not exists(select 1 from public.services where id=s and active)then raise exception 'Global service changed';end if;
+ if not exists(select 1 from public.calendar_entries where id=booking and status='confirmed'and price=20 and service_name='TEST saved name')then raise exception 'Existing appointment changed';end if;
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',w,'role','authenticated','session_id','service-worker')::text,true);
+ set local role authenticated;
+ begin perform public.set_barber_service_active(bw,s,true);raise exception 'Worker reactivated admin restriction';exception when raise_exception then if sqlerrm<>'SERVICE_REACTIVATION_BLOCKED'then raise;end if;end;
+ reset role;
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',ad,'role','authenticated','session_id','service-admin')::text,true);
+ set local role authenticated;
+ perform public.admin_set_service_barber(s,bw,true);
+ if not exists(select 1 from public.get_available_slots(bw,s,d))then raise exception 'Reactivation failed';end if;
+ perform public.admin_set_service_barber(fresh,bw,true);
+ if not exists(select 1 from public.admin_service_barbers(fresh)where barber_id=bw and enabled and personally_active)then raise exception 'New association missing';end if;
+ begin perform public.admin_set_service_barber(s,bw,null);raise exception 'Null allowed';exception when raise_exception then if sqlerrm<>'INVALID_SERVICE'then raise;end if;end;
+ begin perform public.admin_set_service_barber(s,gen_random_uuid(),true);raise exception 'Invalid target allowed';exception when raise_exception then if sqlerrm<>'ACCESS_DENIED'then raise;end if;end;
+ if exists(select 1 from public.admin_service_barbers(legacy)where enabled)then raise exception 'Legacy disabled falsely enabled';end if;
+ perform public.admin_set_service_barber(legacy,bw,true);
+ if not exists(select 1 from public.admin_service_barbers(legacy)where barber_id=bw and enabled)then raise exception 'Legacy could not reactivate';end if;
+ if exists(select 1 from public.admin_service_barbers(legacy)where barber_id in(ba,bl)and enabled)then raise exception 'Legacy reopened unselected agendas';end if;
+ reset role;
+ update public.barbers set active=false where id=bl;
+ set local role authenticated;
+ if exists(select 1 from public.admin_service_barbers(s)where barber_id=bl)then raise exception 'Inactive agenda listed';end if;
+ begin perform public.admin_set_service_barber(s,bl,true);raise exception 'Inactive agenda changed';exception when raise_exception then if sqlerrm<>'ACCESS_DENIED'then raise;end if;end;
+ reset role;
+ update public.services set deleted_at=now(),active=false where id=fresh;
+ set local role authenticated;
+ begin perform public.admin_service_barbers(fresh);raise exception 'Deleted service listed';exception when raise_exception then if sqlerrm<>'ACCESS_DENIED'then raise;end if;end;
+ reset role;
+ if has_function_privilege('anon','public.admin_service_barbers(uuid)','execute')or has_function_privilege('anon','public.admin_set_service_barber(uuid,uuid,boolean)','execute')then raise exception 'Anonymous grant';end if;
+end $test$;
+select 'PASS admin-only flags, assignments, reactivation guard, availability, legacy conversion and appointment preservation' as result;
+rollback;
