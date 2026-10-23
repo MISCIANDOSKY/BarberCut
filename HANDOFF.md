@@ -1,6 +1,6 @@
 # BarberUp — Handoff
 
-Ultimo aggiornamento: 22 ottobre 2026 (Europe/Rome).
+Ultimo aggiornamento: 23 ottobre 2026 (Europe/Rome).
 
 ## Regola permanente del titolare
 
@@ -649,3 +649,8 @@ Test personal_reminder_settings.sql superato prima/dopo migrazione con rollback:
 - **ULTIMO PASSAGGIO PENDENTE:** manca una credenziale Management API in Supabase Vault, nome segreto branding_management_token. Nessun token creato, nessun segreto nei sorgenti. Senza credenziale, setup_required e blocco programmazione frontend/server evitano rinomine parziali. Richiedere conferma del titolare prima di creare la credenziale persistente per configurazione Auth: obbligo della policy del browser per nuovo accesso sensibile. Nome reale rimasto BarberUp, nessuna rinomina reale programmata.
 - Test scheduled_branding.sql remoto PASS con rollback: permessi, ritardo, case/Unicode, annullamento/sostituzione, no attivazione anticipata, bypass diretto negato, isolamento credenziali service_role, token monouso, fallimento SMTP non pubblica, riuscita coerente app/manifest/metadati. Nessun token reale usato o dato di prova persistente. Advisor: 19 INFO privati intenzionali e solo WARN preesistente password compromesse; nuovi WARN corretti con wrapper invoker.
 - Build/test/pubblicazione in corso. Aggiornamento del nome di installazioni preesistenti dipende da browser/OS; il titolare distribuirà dopo la scelta definitiva.
+
+## 23 ottobre 2026 — Ripresa e verifica cambio nome
+
+- La pipeline 39829240800 aveva completato TypeScript/build ma si era fermata su un test push che attendeva il vecchio marchio fisso invece del fallback generico «Promemoria appuntamento». Allineato il test, conservando la verifica del promemoria e i controlli delle destinazioni interne. Nessuna logica notifiche modificata in questa ripresa.
+- Nuova pubblicazione in verifica. Resta pendente soltanto l’autorizzazione alla creazione di una credenziale dedicata di gestione Auth per sincronizzare il mittente email; nessuna credenziale creata e nessuna rinomina reale avviata.
