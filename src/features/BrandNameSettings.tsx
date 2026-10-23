@@ -43,7 +43,9 @@ export default function BrandNameSettings() {
         le maiuscole e minuscole inserite. Durante l’attesa resta visibile il
         nome attuale.
       </p>
-      <p className="muted">Il mittente delle email resta quello attualmente configurato su Brevo.</p>
+      <p className="muted">
+        Il mittente delle email resta quello attualmente configurato su Brevo.
+      </p>
       {status?.pending_name && (
         <div className="notice" role="status">
           <p>
@@ -123,10 +125,7 @@ export default function BrandNameSettings() {
             disabled={!status || busy}
           />
         </label>
-        <button
-          className="primary"
-          disabled={!status || busy}
-        >
+        <button className="primary" disabled={!status || busy}>
           {busy ? "Salvataggio…" : "Programma cambio nome tra 15 minuti"}
         </button>
       </form>
