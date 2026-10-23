@@ -689,3 +689,10 @@ Test personal_reminder_settings.sql superato prima/dopo migrazione con rollback:
 - Prima esecuzione completa con diagnostica 39919987436: OIDC reale e rifiuto anonimo/JWT falso verificati, sei controlli catalogo su 33 tabelle PASS, test PASS. Resta rilievo npm di gravità high sul pacchetto Vite di sviluppo/build, con advisory identificati nel report. Nessuna modifica automatica delle dipendenze effettuata dal controllo. Build/test e pubblicazione 39919987453 riusciti.
 
 - Verifica conclusiva 39920204614: test PASS, scanner installato con checksum corretto, zero potenziali segreti dopo esclusione della sola chiave pubblicabile verificata; sei controlli Supabase PASS su 33 tabelle e richieste senza identità/identità falsa negate. Unico rilievo automatico: Vite high (sei advisory correlati), job correttamente rosso per segnalazione, nessun controllo incompleto. Build, tutti i test e pubblicazione PWA 39920204642 riusciti. Report disponibili in GitHub Actions; avvisi email soggetti alle preferenze GitHub dell’utente, non garantiti né modificati. Nessun report automatico in questa chat. Automazione locale PAUSED confermata. Guida operativa in docs/SECURITY-CHECKS.md.
+
+
+## 23 ottobre 2026 — Aggiornamento Vite per gli advisory di sicurezza
+
+- Vite aggiornato da 8.3.0 a 8.3.5, versione patch stabile dello stesso ramo. Gli advisory segnalati includono le versioni fino a 8.3.2 e risultano corretti da 8.3.3; scelta 8.3.5 per includere anche le successive correzioni. Riferimenti ufficiali: https://github.com/vitejs/vite/releases/tag/v8.3.5 e https://github.com/advisories/GHSA-587h-7wmj-h5pm .
+- Aggiornamento remoto: il workflow esistente rigenera e committa package-lock.json prima di npm ci, compilazione TypeScript/Vite e test. Nessun aggiornamento di altre dipendenze dirette o modifica funzionale richiesta.
+- Verifiche di build, test, pubblicazione e nuovo audit in corso; non ancora dichiarata risolta la segnalazione finché npm audit non conferma.
