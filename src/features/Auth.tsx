@@ -1,4 +1,5 @@
 import PasswordRecovery from "./PasswordRecovery";
+import { sendExistingAccountCode, loginCodeError } from "../lib/loginCode.mjs";
 import { useEffect, useId, useState } from "react";
 import {
   savePasswordProof,
@@ -56,19 +57,16 @@ export default function Auth({
   }, [retrySeconds]);
   async function sendLoginCode() {
     if (busy || retrySeconds > 0) return;
+    if (mode !== "otpVerify") setMode("otp");
     setBusy(true);
     setErrorMessage("");
     setCodeError("");
     try {
       clearPasswordProof();
-      await result(
-        supabase.auth.signInWithOtp({
-          email: email.trim(),
-          options: {
-            shouldCreateUser: false,
-            emailRedirectTo: location.origin + import.meta.env.BASE_URL,
-          },
-        }),
+      await sendExistingAccountCode(
+        supabase.auth,
+        email,
+        location.origin + import.meta.env.BASE_URL,
       );
       setRegistrationCode("");
       setRetrySeconds(60);
@@ -76,8 +74,8 @@ export default function Auth({
       notify(
         "Se l’email è associata a un account, riceverai il codice di accesso. Controlla anche le cartelle Spam e Posta indesiderata.",
       );
-    } catch {
-      setErrorMessage(SEND_ERROR);
+    } catch (error) {
+      setErrorMessage(loginCodeError(error));
     } finally {
       setBusy(false);
     }

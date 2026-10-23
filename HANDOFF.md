@@ -663,3 +663,10 @@ Test personal_reminder_settings.sql superato prima/dopo migrazione con rollback:
 - Configurazione Admin: editor attivo senza blocco setup_required; nota esplicita che il mittente delle email rimane quello configurato su Brevo. Preservati case, attesa, annullamento e sostituzione. Manifest, nome installazione e testi email continuano a usare il nome centrale; la provenienza delle email resta invariata.
 - Test scheduled_branding.sql remoto PASS con rollback: nessuna credenziale necessaria/creata, solo Admin, delay 900 secondi, nessuna attivazione anticipata, case misto/Unicode, annullamento/sostituzione, vecchio job escluso, confine accelerato soltanto nella transazione di prova, coerenza app/manifest/metadati e rimozione vecchie API SMTP. Nessuna rinomina reale effettuata o programmata.
 - Advisor invariati: 19 INFO per tabelle private intenzionalmente senza policy dirette e unico WARN preesistente password compromesse. TypeScript, tutti i test frontend e pubblicazione GitHub Pages riusciti nella pipeline `39913358586`. Controllo live: nome BarberUp invariato, nessun cambio programmato e zero credenziali di gestione create. Verifica su telefono fisico non eseguita.
+
+
+## 23 ottobre 2026 — Messaggi corretti per accesso con codice
+
+- Distinto il rifiuto OTP per account non trovato («Signups not allowed for otp» / user_not_found) dagli errori di invio: ora invita a controllare l’email o registrarsi. I codici strutturati Auth vengono preservati, senza cercare utenti tramite nuove API pubbliche e senza creare account durante il login.
+- Richiedendo il codice dalla schermata password, la finestra passa al contesto «Accedi con codice di verifica» anche in caso di errore. Limiti richieste, connessione, account disattivato e email da confermare hanno messaggi dedicati; l’errore di invio resta per gli altri fallimenti.
+- Test automatici con Auth simulata per account assente, distinzione OTP disabilitato, limite richieste, rete, invio e opzione shouldCreateUser=false. Nessun invio email reale o dato personale nei test. Verifica e pubblicazione affidate alla pipeline GitHub Actions del commit.
