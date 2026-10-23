@@ -682,3 +682,5 @@ Test personal_reminder_settings.sql superato prima/dopo migrazione con rollback:
 - Prima esecuzione reale 39919573291: OIDC valido, sei controlli Supabase senza anomalie, endpoint senza token e con token falso rifiutato; test automatici PASS. Gitleaks segnala tre possibili segreti storici e npm una vulnerabilità high: job rosso come previsto per richiedere revisione, senza stampare valori. Aggiunti soli identificatori tecnici delle posizioni e advisory per distinguere falsi positivi. Controllo Codex locale disattivato (PAUSED), sostituito dal job cloud. Nessuna certificazione di sicurezza; GitHub può ritardare il job o sospendere schedule dopo 60 giorni senza attività nel repository.
 
 - Corretto l’escaping del filtro identificativi advisory introdotto nella diagnostica; i log riportano solo codici GHSA validati, senza URL o contenuti arbitrari.
+
+- Diagnostica posizioni validata con prefissi consentiti e caratteri limitati, correggendo anche l’escaping del separatore percorso. Le prime pipeline diagnostiche si erano fermate su sintassi e non rappresentano nuovi rilievi di sicurezza.

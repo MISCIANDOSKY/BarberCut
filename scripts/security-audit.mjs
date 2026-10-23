@@ -82,7 +82,7 @@ async function main() {
       );
       if (findings.length) {
         failed = true;
-        console.log("Posizioni tecniche da verificare (nessun valore):", JSON.stringify(findings.map(f => ({rule: /^[a-z0-9-]{1,80}$/.test(f.RuleID) ? f.RuleID : "other", file: /^(src|scripts|tests|supabase|\\.github)\\/[a-zA-Z0-9_./-]+$/.test(f.File) ? f.File : "other", line: Number.isSafeInteger(f.StartLine) ? f.StartLine : 0, commit: /^[a-f0-9]{40}$/.test(f.Commit) ? f.Commit : "unknown"}))));
+        console.log("Posizioni tecniche da verificare (nessun valore):", JSON.stringify(findings.map(f => ({rule: /^[a-z0-9-]{1,80}$/.test(f.RuleID) ? f.RuleID : "other", file: typeof f.File === "string" && ["src/", "scripts/", "tests/", "supabase/", ".github/"].some(p => f.File.startsWith(p)) && /^[a-zA-Z0-9_.-]+$/.test(f.File.split("/").join("")) && f.File.length < 180 ? f.File : "other", line: Number.isSafeInteger(f.StartLine) ? f.StartLine : 0, commit: /^[a-f0-9]{40}$/.test(f.Commit) ? f.Commit : "unknown"}))));
         add(
           "  Occorre una revisione riservata; eventuali credenziali reali vanno revocate o ruotate. Dettagli e valori esclusi dai log pubblici.",
         );
