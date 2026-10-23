@@ -82,6 +82,7 @@ async function main() {
       );
       if (findings.length) {
         failed = true;
+        console.log("Posizioni tecniche da verificare (nessun valore):", JSON.stringify(findings.map(f => ({rule: /^[a-z0-9-]{1,80}$/.test(f.RuleID) ? f.RuleID : "other", file: /^(src|scripts|tests|supabase|\\.github)\\/[a-zA-Z0-9_./-]+$/.test(f.File) ? f.File : "other", line: Number.isSafeInteger(f.StartLine) ? f.StartLine : 0, commit: /^[a-f0-9]{40}$/.test(f.Commit) ? f.Commit : "unknown"}))));
         add(
           "  Occorre una revisione riservata; eventuali credenziali reali vanno revocate o ruotate. Dettagli e valori esclusi dai log pubblici.",
         );
@@ -101,7 +102,9 @@ async function main() {
   );
   try {
     if (![0, 1].includes(audit.status)) throw new Error();
-    const counts = summarizeAudit(JSON.parse(audit.stdout));
+    const auditResult = JSON.parse(audit.stdout);
+    const counts = summarizeAudit(auditResult);
+    console.log('Pacchetti segnalati:', JSON.stringify(Object.entries(auditResult.vulnerabilities || {}).map(([name, v]) => ({name: /^[@a-zA-Z0-9_./-]+$/.test(name) ? name : 'other', advisories: (v.via || []).filter(x => typeof x === 'object').map(x => /^https:\\/\\/github.com\\/advisories\\/GHSA-[a-z0-9-]+$/.test(x.url) ? x.url : 'review')}))));
     add(
       "- Vulnerabilità dipendenze (incluse quelle di sviluppo): " +
         counts.map(([k, n]) => k + " " + n).join(", ") +
