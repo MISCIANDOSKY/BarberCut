@@ -684,3 +684,6 @@ Test personal_reminder_settings.sql superato prima/dopo migrazione con rollback:
 - Corretto l’escaping del filtro identificativi advisory introdotto nella diagnostica; i log riportano solo codici GHSA validati, senza URL o contenuti arbitrari.
 
 - Diagnostica posizioni validata con prefissi consentiti e caratteri limitati, correggendo anche l’escaping del separatore percorso. Le prime pipeline diagnostiche si erano fermate su sintassi e non rappresentano nuovi rilievi di sicurezza.
+
+- Revisione dei tre rilievi Gitleaks: tutti corrispondono alla stessa chiave Supabase publishable, verificata nelle righe e nei commit originali; non è una credenziale amministrativa. Allowlist limitata all’esatto valore noto in .gitleaks.toml, senza escludere prefissi, file, cronologia o chiavi secret/service_role. Scansione mantenuta su tutta la cronologia raggiungibile.
+- Prima esecuzione completa con diagnostica 39919987436: OIDC reale e rifiuto anonimo/JWT falso verificati, sei controlli catalogo su 33 tabelle PASS, test PASS. Resta rilievo npm di gravità high sul pacchetto Vite di sviluppo/build, con advisory identificati nel report. Nessuna modifica automatica delle dipendenze effettuata dal controllo. Build/test e pubblicazione 39919987453 riusciti.

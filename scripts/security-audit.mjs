@@ -52,6 +52,8 @@ async function main() {
     process.env.RUNNER_TEMP + "/gitleaks",
     [
       "git",
+      "--config",
+      ".gitleaks.toml",
       "--redact",
       "--no-banner",
       "--exit-code",

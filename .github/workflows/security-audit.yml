@@ -8,6 +8,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/security-audit.yml'
+      - '.gitleaks.toml'
       - 'scripts/security-audit.mjs'
       - 'tests/security-audit.test.mjs'
       - 'supabase/functions/weekly-security-audit/**'

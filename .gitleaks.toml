@@ -1,0 +1,10 @@
+title = "BarberUp security scan"
+[extend]
+useDefault = true
+
+# Reviewed 2026-10-23: this exact Supabase PUBLISHABLE key is intentionally public.
+# Do not allowlist a key prefix, a whole file, any secret key, or service-role JWTs.
+[[allowlists]]
+description = "Known Supabase publishable key, not an administrative credential"
+regexTarget = "secret"
+regexes = ['''^sb_publishable_-HmWs8oJ651q7_Qqrd-rWA_KXwOYDgd$''']
