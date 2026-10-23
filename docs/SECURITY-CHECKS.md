@@ -28,3 +28,9 @@ Nei log non vengono stampati token, risultati grezzi dello scanner o dati dei cl
 ## Prima esecuzione verificata — 23 ottobre 2026
 
 [Esecuzione 39920204614](https://github.com/MISCIANDOSKY/BarberUp/actions/runs/39920204614): zero potenziali segreti dopo revisione della chiave pubblicabile, sei controlli Supabase senza rilievi su 33 tabelle; un pacchetto di sviluppo/build segnalato high (Vite). Il job è rosso per questo rilievo reale, non per un malfunzionamento del controllo. Nessuna correzione automatica delle dipendenze eseguita.
+
+## Aggiornamento verificato — 23 ottobre 2026
+
+Vite aggiornato a 8.3.5 e lockfile rigenerato dal workflow remoto. Build, test e pubblicazione riusciti nella pipeline 39989753337. [Nuovo controllo 39989861964](https://github.com/MISCIANDOSKY/BarberUp/actions/runs/39989861964) completato con successo: zero vulnerabilità npm, zero potenziali segreti e nessun rilievo nei sei controlli aggregati Supabase su 33 tabelle. La precedente segnalazione Vite è risolta; restano validi i limiti del controllo descritti sopra.
+
+Il controllo parte anche sulle normali push che cambiano package-lock.json; i commit generati con GITHUB_TOKEN non attivano altri workflow GitHub, quindi in questi casi usare Run workflow oppure attendere la verifica settimanale.

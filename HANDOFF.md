@@ -698,3 +698,5 @@ Test personal_reminder_settings.sql superato prima/dopo migrazione con rollback:
 - Verifiche di build, test, pubblicazione e nuovo audit in corso; non ancora dichiarata risolta la segnalazione finché npm audit non conferma.
 
 - Lockfile remoto verificato: dipendenza radice e pacchetto installabile Vite entrambi 8.3.5. TypeScript/build e tutti i test della pipeline 39989753337 PASS; completamento pubblicazione in corso. Aggiunto package-lock.json ai percorsi che avviano il controllo sicurezza, così viene eseguito anche quando il lockfile cambia tramite una normale push, oltre alla cadenza settimanale. Nuovo audit avviato sul lockfile aggiornato.
+
+- Verifica conclusiva: pipeline 39989753337 con build, tutti i test e pubblicazione GitHub Pages riusciti su Vite 8.3.5. Audit remoto 39989861964 PASS: npm audit low/moderate/high/critical tutti zero, nessun pacchetto segnalato, zero potenziali segreti e sei controlli Supabase PASS su 33 tabelle. Risolti i sei advisory che causavano il rilievo Vite; nessuna estensione di queste conclusioni ai controlli esclusi dal job. Nessuna modifica a database/Auth o funzionalità dell’app per questo aggiornamento.
