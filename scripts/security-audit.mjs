@@ -104,7 +104,7 @@ async function main() {
     if (![0, 1].includes(audit.status)) throw new Error();
     const auditResult = JSON.parse(audit.stdout);
     const counts = summarizeAudit(auditResult);
-    console.log('Pacchetti segnalati:', JSON.stringify(Object.entries(auditResult.vulnerabilities || {}).map(([name, v]) => ({name: /^[@a-zA-Z0-9_./-]+$/.test(name) ? name : 'other', advisories: (v.via || []).filter(x => typeof x === 'object').map(x => /^https:\\/\\/github.com\\/advisories\\/GHSA-[a-z0-9-]+$/.test(x.url) ? x.url : 'review')}))));
+    console.log("Pacchetti segnalati:", JSON.stringify(Object.entries(auditResult.vulnerabilities || {}).map(([name, v]) => ({name: /^[@a-zA-Z0-9_./-]+$/.test(name) ? name : "other", advisories: (v.via || []).filter(x => typeof x === "object").map(x => { const id = String(x.url).split("/").at(-1); return /^GHSA-[a-z0-9-]+$/.test(id) ? id : "review"; })}))));
     add(
       "- Vulnerabilità dipendenze (incluse quelle di sviluppo): " +
         counts.map(([k, n]) => k + " " + n).join(", ") +
