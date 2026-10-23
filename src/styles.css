@@ -2177,3 +2177,29 @@ html.installed-pwa[data-theme="light"] body {
   overflow-wrap: anywhere;
   text-transform: none;
 }
+
+/* Text-only conversations fill the feature screen; only history scrolls. */
+dialog.feature-dialog.messaging-dialog[open] { display:flex;flex-direction:column;overflow:hidden; }
+dialog.feature-dialog.messaging-dialog > header { flex:0 0 auto; }
+.messaging-dialog > .feature-content { flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column; }
+.messaging { display:flex;flex:1;flex-direction:column;min-height:0;gap:12px;width:100%; }
+.message-toolbar { display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;flex:0 0 auto; }
+.message-toolbar > strong { overflow-wrap:anywhere;min-width:0; }
+.message-inbox-scroll,.message-history { flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch; }
+.message-inbox-item { display:flex;gap:12px;justify-content:space-between;align-items:center;width:100%;text-align:left;white-space:normal;min-width:0; }
+.message-inbox-item > span { min-width:0; }
+.message-inbox-item small { display:block;overflow-wrap:anywhere;margin-top:6px;color:var(--muted); }
+.message-unread { flex:0 0 auto;background:var(--accent);color:var(--bg);padding:4px 8px;border-radius:20px; }
+.message-history { display:flex;flex-direction:column;gap:12px;padding:6px; }
+.message-bubble { align-self:flex-start;max-width:min(85%,620px);padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--surface);flex-shrink:0; }
+.message-bubble.is-own { align-self:flex-end;border-color:var(--accent); }
+.message-bubble p { white-space:pre-wrap;overflow-wrap:anywhere;margin:0 0 8px;line-height:1.5; }
+.message-bubble small { display:block;color:var(--muted);font-size:12px; }
+.message-composer { flex:0 0 auto;display:flex;flex-direction:column;gap:10px;margin:0;padding-bottom:env(safe-area-inset-bottom); }
+.message-composer textarea { display:block;width:100%;min-width:0;min-height:72px;max-height:160px;resize:vertical;font:inherit;font-size:16px; }
+.message-composer-actions { display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap; }
+.message-composer-actions small { color:var(--muted); }
+.message-composer-actions button { margin:0; }
+.message-reply-help { margin:0;font-size:13px;flex:0 0 auto; }
+.message-contact { display:block;margin-top:10px; }
+@media(max-width:480px) { .message-composer-actions button { width:100%; } .message-bubble { max-width:92%; } }

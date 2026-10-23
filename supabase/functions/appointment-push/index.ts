@@ -13,7 +13,7 @@ const allowedEndpoint = (endpoint: string) => {
 Deno.serve(async (request: Request) => {
   if (request.method !== "POST") return new Response("Method not allowed", { status: 405 });
   if (Number(request.headers.get("content-length") || 0) > 2048) return new Response("Invalid request", { status: 400 });
-  let input: { action?: string; token?: string; delivery_id?: string };
+  let input: { action?: string; token?: string; delivery_id?: string; kind?: string };
   try { const raw = await request.text(); if (raw.length > 2048) return new Response("Invalid request", {status: 400}); input = JSON.parse(raw); }
   catch { return new Response("Invalid request", {status: 400}); }
   if (!input || typeof input.token !== "string" || input.token.length < 32 || input.token.length > 200) return new Response("Unauthorized", {status: 401});
@@ -27,7 +27,7 @@ Deno.serve(async (request: Request) => {
       return Response.json({ready: true});
     }
     if (input.action !== "send" || typeof input.delivery_id !== "string" || !/^[0-9a-f-]{36}$/.test(input.delivery_id)) return new Response("Invalid request", {status: 400});
-    const { data: job, error } = await database.rpc("claim_appointment_push", {p_delivery: input.delivery_id, p_token: input.token});
+    const { data: job, error } = await database.rpc(input.kind === "message" ? "claim_message_push" : "claim_appointment_push", {p_delivery: input.delivery_id, p_token: input.token});
     if (error) return new Response("Unavailable", {status: 503});
     if (!job) return new Response(null, {status: 204});
     let outcome = "failed";
@@ -44,7 +44,7 @@ Deno.serve(async (request: Request) => {
         if (status === 404 || status === 410) outcome = "expired";
       }
     }
-    const done = await database.rpc("finish_appointment_push", {p_delivery: input.delivery_id, p_token: input.token, p_outcome: outcome});
+    const done = await database.rpc(input.kind === "message" ? "finish_message_push" : "finish_appointment_push", {p_delivery: input.delivery_id, p_token: input.token, p_outcome: outcome});
     return Response.json({processed: !done.error}, {status: done.error ? 503 : 200});
   } catch {
     return new Response("Unavailable", {status: 503});

@@ -1,3 +1,4 @@
+import Messages from "./features/Messages";
 import { useBrandName } from "./lib/branding";
 import AppointmentLog from "./features/AppointmentLog";
 import TermsGate from "./features/TermsGate";
@@ -60,6 +61,8 @@ export default function App() {
     [section, setSection] = useState(() =>
       new URLSearchParams(location.search).get("delete-account") === "1"
         ? "Profilo"
+        : new URLSearchParams(location.search).get("messages") === "1"
+          ? "Messaggi"
         : new URLSearchParams(location.search).get("book") === "1"
           ? "Prenota"
           : new URLSearchParams(location.search).get("appointments") === "1"
@@ -401,15 +404,22 @@ export default function App() {
     const timer = window.setInterval(update, 30000);
     window.addEventListener("focus", update);
     window.addEventListener("online", update);
+    window.addEventListener("barberup:messages-changed", update);
     document.addEventListener("visibilitychange", update);
     return () => {
       request.stop();
       window.clearInterval(timer);
       window.removeEventListener("focus", update);
       window.removeEventListener("online", update);
+      window.removeEventListener("barberup:messages-changed", update);
       document.removeEventListener("visibilitychange", update);
     };
   }, [user?.id]);
+  useEffect(() => {
+    const open = () => setSection("Messaggi");
+    window.addEventListener("barberup:open-messages", open);
+    return () => window.removeEventListener("barberup:open-messages", open);
+  }, []);
   async function removeNotification(id?: string) {
     const owner = user?.id;
     if (!owner || notificationDeleteInFlight.current) return;
@@ -505,7 +515,7 @@ export default function App() {
     "Orari di lavoro",
   ];
   function content() {
-    if (!user && (section === "Prenota" || section === "Le mie prenotazioni"))
+    if (!user && (section === "Prenota" || section === "Le mie prenotazioni" || section === "Messaggi"))
       return (
         <div className="content-stack">
           <p>
@@ -521,6 +531,7 @@ export default function App() {
           </button>
         </div>
       );
+    if (section === "Messaggi") return user ? <Messages key={user.id} /> : null;
     if (section === "Log")
       return ready && logAllowed ? (
         <AppointmentLog key={user!.id} />
@@ -1034,6 +1045,7 @@ export default function App() {
         <Modal
           key={section}
           title={section}
+          className={section === "Messaggi" ? "messaging-dialog" : ""}
           actions={
             section === "Notifiche" && user && (!staff || verified) ? (
               <button

@@ -120,3 +120,20 @@ test("notification opens personal appointments or focuses the existing PWA", asy
   assert.ok(focused);
   assert.equal(second.opened.length, 0);
 });
+
+test("message push opens only the internal messages screen and ignores arbitrary URLs", async () => {
+  const h=harness();let done;
+  h.handlers.push({data:{json:()=>({kind:"message",title:"Nuovo messaggio",body:"Apri Messaggi",url:"https://untrusted.test/"})},waitUntil:p=>{done=p;}});
+  await done;
+  assert.equal(h.notices[0].options.data.url,"https://example.test/BarberUp/?messages=1");
+  assert.equal(h.notices[0].options.data.kind,"message");
+  h.handlers.notificationclick({notification:{data:{kind:"message",url:"https://untrusted.test/"},close:()=>{}},waitUntil:p=>{done=p;}});
+  await done;
+  assert.equal(h.opened[0],"https://example.test/BarberUp/?messages=1");
+});
+test("unknown notification kinds cannot navigate outside the appointment screen",async()=>{
+ const h=harness();let done;
+ h.handlers.notificationclick({notification:{data:{kind:"https://untrusted.test/",url:"https://untrusted.test/"},close:()=>{}},waitUntil:p=>{done=p;}});
+ await done;
+ assert.equal(h.opened[0],"https://example.test/BarberUp/?appointments=1");
+});

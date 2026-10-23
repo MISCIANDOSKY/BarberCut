@@ -79,12 +79,12 @@ export function PushSettingsPanel({ userId }: { userId: string }) {
         await enablePush(userId, settings.public_key);
         setActive(true);
         setSettings({ ...settings, enabled: true });
-        setMessage("Promemoria push attivati su questo dispositivo.");
+        setMessage("Notifiche push attivate su questo dispositivo.");
       } else {
         await disablePush();
         setActive(false);
         setSettings({ ...settings, enabled: false });
-        setMessage("Promemoria push disattivati per il tuo account.");
+        setMessage("Notifiche push disattivate per il tuo account.");
       }
     } catch (e) {
       setError(
@@ -101,7 +101,7 @@ export function PushSettingsPanel({ userId }: { userId: string }) {
     <div className="push-settings">
       <div className="content-stack">
         <p>
-          Ricevi i promemoria dei tuoi appuntamenti anche sul telefono. Le
+          Ricevi promemoria e avvisi dei nuovi messaggi anche sul telefono. Le
           notifiche nel quadrifoglio restano disponibili anche se disattivi le
           push.
         </p>
@@ -114,7 +114,7 @@ export function PushSettingsPanel({ userId }: { userId: string }) {
             }
             onChange={(e) => void toggle(e.target.checked)}
           />
-          Promemoria push su questo dispositivo
+          Notifiche push su questo dispositivo
         </label>
         {settings && !active && settings.enabled && (
           <p className="muted">

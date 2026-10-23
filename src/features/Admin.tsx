@@ -1,3 +1,4 @@
+import { MessageContact } from "./Messages";
 import BrandNameSettings from "./BrandNameSettings";
 import { getBrandName } from "../lib/branding";
 import LogAccess from "./LogAccess";
@@ -398,6 +399,7 @@ export default function Admin({
                 <span>
                   {p?.first_name || "Account"} {p?.last_name}
                   <small>{currentRoleLabel}</small>
+                  {r.role === "client" && <MessageContact clientId={r.user_id} name={[p?.first_name,p?.last_name].filter(Boolean).join(" ") || "Cliente"} />}
                 </span>
                 <AppSelect
                   aria-label={"Ruolo di " + (p?.first_name || r.user_id)}

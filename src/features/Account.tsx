@@ -1,3 +1,4 @@
+import Messages from "./Messages";
 import GeneralSettings from "./GeneralSettings";
 import PasswordRecovery from "./PasswordRecovery";
 import ProfileTerms from "./ProfileTerms";
@@ -138,6 +139,7 @@ export function Profile({
           "Informazioni personali",
           "Impostazioni generali",
           "Termini e condizioni",
+          "Messaggi",
           "Notifiche",
           "Elimina account",
         ].map((label) => (
@@ -185,7 +187,7 @@ export function Profile({
       </div>
 
       {page && (
-        <Modal title={page} wide close={() => setPage("")}>
+        <Modal title={page} wide className={page === "Messaggi" ? "messaging-dialog" : ""} close={() => setPage("")}>
           {notice && (
             <p className="notice" role="status">
               {notice}
@@ -280,6 +282,7 @@ export function Profile({
           {page === "Termini e condizioni" && (
             <ProfileTerms userId={user.id} refresh={reload} />
           )}
+          {page === "Messaggi" && <Messages key={user.id} />}
           {page === "Notifiche" && <PushSettingsPanel userId={user.id} />}
           {page === "Elimina account" && (
             <DeleteAccount
@@ -362,6 +365,7 @@ export function Notifications({
             <strong>{n.title}</strong>
             <p>{n.body}</p>
             <small>{dateLabel(n.created_at)}</small>
+            {String(n.event_key || "").startsWith("message:") && <button type="button" className="text" onClick={() => window.dispatchEvent(new Event("barberup:open-messages"))}>Apri messaggi</button>}
           </div>
           <button
             type="button"

@@ -1,3 +1,4 @@
+import { MessageContact } from "./Messages";
 import { AppPicker } from "../components/AppPicker";
 import { AppSelect } from "../components/AppSelect";
 import { confirmInApp } from "../components/AppDialogs";
@@ -669,6 +670,7 @@ export default function Manage({
               Chiama {detail.guest_phone || detail.profiles.phone}
             </a>
           )}
+          {detail.kind === "appointment" && (detail.client_id ? <MessageContact clientId={detail.client_id} name={[detail.profiles?.first_name || detail.guest_first_name,detail.profiles?.last_name || detail.guest_last_name].filter(Boolean).join(" ") || "Cliente"} label="Invia SMS in app" /> : <p className="muted">Per inviare un messaggio, il cliente deve avere un account registrato.</p>)}
           {detail.kind === "appointment" && (
             <button
               className="secondary"
