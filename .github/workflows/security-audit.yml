@@ -9,6 +9,7 @@ on:
     paths:
       - '.github/workflows/security-audit.yml'
       - '.gitleaks.toml'
+      - 'package-lock.json'
       - 'scripts/security-audit.mjs'
       - 'tests/security-audit.test.mjs'
       - 'supabase/functions/weekly-security-audit/**'
