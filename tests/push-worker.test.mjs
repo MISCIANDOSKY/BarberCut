@@ -73,7 +73,9 @@ test("malformed payload still creates a visible notification", async () => {
   });
   await done;
   assert.equal(h.notices[0].title, "Promemoria appuntamento");
-  assert.ok(h.notices[0].options.body.includes("Ricordati del tuo appuntamento"));
+  assert.ok(
+    h.notices[0].options.body.includes("Ricordati del tuo appuntamento"),
+  );
 });
 test("notification opens personal appointments or focuses the existing PWA", async () => {
   const h = harness();
