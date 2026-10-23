@@ -43,6 +43,7 @@ export default function BrandNameSettings() {
         le maiuscole e minuscole inserite. Durante l’attesa resta visibile il
         nome attuale.
       </p>
+      <p className="muted">Il mittente delle email resta quello attualmente configurato su Brevo.</p>
       {status?.pending_name && (
         <div className="notice" role="status">
           <p>
@@ -77,18 +78,6 @@ export default function BrandNameSettings() {
             Annulla cambio nome
           </button>
         </div>
-      )}
-      {status?.setup_required && (
-        <p className="notice" role="status">
-          Per attivare il cambio nome completo manca il collegamento protetto
-          alle impostazioni del mittente email. Il nome attuale resta invariato.
-        </p>
-      )}
-      {status?.sync_error && (
-        <p className="form-error" role="alert">
-          La sincronizzazione non è riuscita. Il nome attuale è rimasto
-          invariato; il sistema riproverà automaticamente.
-        </p>
       )}
       <form
         onSubmit={async (event) => {
@@ -131,12 +120,12 @@ export default function BrandNameSettings() {
             autoCapitalize="off"
             autoCorrect="off"
             spellCheck={false}
-            disabled={!status || busy || status.setup_required}
+            disabled={!status || busy}
           />
         </label>
         <button
           className="primary"
-          disabled={!status || busy || status.setup_required}
+          disabled={!status || busy}
         >
           {busy ? "Salvataggio…" : "Programma cambio nome tra 15 minuti"}
         </button>
