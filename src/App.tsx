@@ -63,11 +63,11 @@ export default function App() {
         ? "Profilo"
         : new URLSearchParams(location.search).get("messages") === "1"
           ? "Messaggi"
-        : new URLSearchParams(location.search).get("book") === "1"
-          ? "Prenota"
-          : new URLSearchParams(location.search).get("appointments") === "1"
-            ? "Le mie prenotazioni"
-            : "",
+          : new URLSearchParams(location.search).get("book") === "1"
+            ? "Prenota"
+            : new URLSearchParams(location.search).get("appointments") === "1"
+              ? "Le mie prenotazioni"
+              : "",
     ),
     [auth, setAuth] = useState(
       () => new URLSearchParams(location.search).get("keep-active") === "1",
@@ -515,7 +515,12 @@ export default function App() {
     "Orari di lavoro",
   ];
   function content() {
-    if (!user && (section === "Prenota" || section === "Le mie prenotazioni" || section === "Messaggi"))
+    if (
+      !user &&
+      (section === "Prenota" ||
+        section === "Le mie prenotazioni" ||
+        section === "Messaggi")
+    )
       return (
         <div className="content-stack">
           <p>

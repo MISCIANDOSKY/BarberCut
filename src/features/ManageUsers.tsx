@@ -283,7 +283,12 @@ export default function ManageUsers({
                                 : " · Autore non disponibile")}
                         </small>
                       ) : null}
-                      <MessageContact clientId={account.user_id} name={[account.first_name,account.last_name].filter(Boolean).join(" ")} />
+                      <MessageContact
+                        clientId={account.user_id}
+                        name={[account.first_name, account.last_name]
+                          .filter(Boolean)
+                          .join(" ")}
+                      />
                       {!account.email_verified && (
                         <small>
                           Email ancora da verificare: l’approvazione sarà

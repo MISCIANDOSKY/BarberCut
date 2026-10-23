@@ -187,7 +187,12 @@ export function Profile({
       </div>
 
       {page && (
-        <Modal title={page} wide className={page === "Messaggi" ? "messaging-dialog" : ""} close={() => setPage("")}>
+        <Modal
+          title={page}
+          wide
+          className={page === "Messaggi" ? "messaging-dialog" : ""}
+          close={() => setPage("")}
+        >
           {notice && (
             <p className="notice" role="status">
               {notice}
@@ -365,7 +370,17 @@ export function Notifications({
             <strong>{n.title}</strong>
             <p>{n.body}</p>
             <small>{dateLabel(n.created_at)}</small>
-            {String(n.event_key || "").startsWith("message:") && <button type="button" className="text" onClick={() => window.dispatchEvent(new Event("barberup:open-messages"))}>Apri messaggi</button>}
+            {String(n.event_key || "").startsWith("message:") && (
+              <button
+                type="button"
+                className="text"
+                onClick={() =>
+                  window.dispatchEvent(new Event("barberup:open-messages"))
+                }
+              >
+                Apri messaggi
+              </button>
+            )}
           </div>
           <button
             type="button"
