@@ -176,14 +176,21 @@ export default function Messages({
   }, [query, searching, canStart]);
   const removeChats = async (threadId?: string) => {
     if (removing) return;
-    if (!(await confirmInApp(threadId
-      ? "Vuoi eliminare questa chat dalla tua vista? L’altro partecipante continuerà a vederla. I messaggi restano sul server fino alla scadenza del periodo di conservazione."
-      : "Vuoi eliminare tutte le tue chat dalla tua vista? Gli altri partecipanti continueranno a vederle. I messaggi restano sul server fino alla scadenza del periodo di conservazione."))) return;
+    if (
+      !(await confirmInApp(
+        threadId
+          ? "Vuoi eliminare questa chat dalla tua vista? L’altro partecipante continuerà a vederla. I messaggi restano sul server fino alla scadenza del periodo di conservazione."
+          : "Vuoi eliminare tutte le tue chat dalla tua vista? Gli altri partecipanti continueranno a vederle. I messaggi restano sul server fino alla scadenza del periodo di conservazione.",
+      ))
+    )
+      return;
     setRemoving(true);
     setError("");
     revision.current++;
     try {
-      await result(supabase.rpc("hide_message_threads", { p_thread: threadId || null }));
+      await result(
+        supabase.rpc("hide_message_threads", { p_thread: threadId || null }),
+      );
       await load();
       changed();
     } catch (e) {
@@ -231,8 +238,12 @@ export default function Messages({
           Aggiorna
         </button>
         {canStart && (
-          <button type="button" className="text danger" disabled={removing || !rows.length}
-            onClick={() => void removeChats()}>
+          <button
+            type="button"
+            className="text danger"
+            disabled={removing || !rows.length}
+            onClick={() => void removeChats()}
+          >
             Elimina tutto
           </button>
         )}
@@ -243,8 +254,9 @@ export default function Messages({
         </p>
       )}
       <p className="muted message-retention-help">
-        Il cestino rimuove la chat solo dalla tua vista. I messaggi sono eliminati
-        automaticamente dal server dopo {retentionMonths} {retentionMonths === 1 ? "mese" : "mesi"} dall’invio.
+        Il cestino rimuove la chat solo dalla tua vista. I messaggi sono
+        eliminati automaticamente dal server dopo {retentionMonths}{" "}
+        {retentionMonths === 1 ? "mese" : "mesi"} dall’invio.
       </p>
       {!canStart && (
         <p className="muted">
@@ -300,38 +312,51 @@ export default function Messages({
           ) : null}
           {rows.map((r) => (
             <div className="message-chat-row" key={r.id}>
-            <button
-              type="button"
-              className="secondary message-inbox-item"
-              onClick={() =>
-                setSelection({
-                  thread_id: r.id,
-                  client_id: r.client_id,
-                  name: r.name,
-                })
-              }
-            >
-              <span>
-                <strong>{r.name}</strong>
-                <small>{r.last_body}</small>
-                <small>{stamp(r.last_at)}</small>
-              </span>
-              {r.unread > 0 && (
-                <span
-                  className="message-unread"
-                  aria-label={r.unread + " messaggi non letti"}
-                >
-                  {r.unread}
+              <button
+                type="button"
+                className="secondary message-inbox-item"
+                onClick={() =>
+                  setSelection({
+                    thread_id: r.id,
+                    client_id: r.client_id,
+                    name: r.name,
+                  })
+                }
+              >
+                <span>
+                  <strong>{r.name}</strong>
+                  <small>{r.last_body}</small>
+                  <small>{stamp(r.last_at)}</small>
                 </span>
-              )}
-            </button>
-            <button type="button" className="secondary message-trash"
-              aria-label={"Elimina chat con " + r.name} title="Elimina chat"
-              disabled={removing} onClick={() => void removeChats(r.id)}>
-              <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                <path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7" />
-              </svg>
-            </button>
+                {r.unread > 0 && (
+                  <span
+                    className="message-unread"
+                    aria-label={r.unread + " messaggi non letti"}
+                  >
+                    {r.unread}
+                  </span>
+                )}
+              </button>
+              <button
+                type="button"
+                className="secondary message-trash"
+                aria-label={"Elimina chat con " + r.name}
+                title="Elimina chat"
+                disabled={removing}
+                onClick={() => void removeChats(r.id)}
+              >
+                <svg
+                  aria-hidden="true"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                >
+                  <path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7" />
+                </svg>
+              </button>
             </div>
           ))}
           {more && (
@@ -400,7 +425,11 @@ function MessageThread({
         setClock(Date.now());
         setMeta(data);
         setRows((current) => {
-          const all = new Map(current.filter((r) => BigInt(r.id) > BigInt(data.hidden_through || '0')).map((r) => [r.id, r]));
+          const all = new Map(
+            current
+              .filter((r) => BigInt(r.id) > BigInt(data.hidden_through || "0"))
+              .map((r) => [r.id, r]),
+          );
           for (const item of data.items) all.set(item.id, item);
           return [...all.values()].sort((a, b) =>
             BigInt(a.id) < BigInt(b.id)

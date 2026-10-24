@@ -44,7 +44,11 @@ export default function Maintenance({
       setError("Inserisci un numero intero di giorni tra 1 e 36500.");
       return;
     }
-    if (!Number.isInteger(Number(messageMonths)) || Number(messageMonths) < 1 || Number(messageMonths) > 120) {
+    if (
+      !Number.isInteger(Number(messageMonths)) ||
+      Number(messageMonths) < 1 ||
+      Number(messageMonths) > 120
+    ) {
       setError("Inserisci un numero intero di mesi tra 1 e 120.");
       return;
     }
@@ -159,18 +163,28 @@ export default function Maintenance({
         <div className="maintenance-rule">
           <span>Elimina definitivamente i messaggi più vecchi di</span>
           <label className="maintenance-days">
-            <input aria-label="Mesi di conservazione messaggi" type="text" inputMode="numeric"
-              pattern="[0-9]+" maxLength={3} required value={messageMonths}
+            <input
+              aria-label="Mesi di conservazione messaggi"
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]+"
+              maxLength={3}
+              required
+              value={messageMonths}
               disabled={busy || !status}
-              onChange={(event) => setMessageMonths(event.target.value.replace(/[^0-9]/g, ""))} />
+              onChange={(event) =>
+                setMessageMonths(event.target.value.replace(/[^0-9]/g, ""))
+              }
+            />
             <span>mesi</span>
           </label>
         </div>
         <p className="muted">
-          Il periodo decorre dall’invio di ciascun messaggio. La pulizia giornaliera
-          elimina definitivamente dal server anche i messaggi già rimossi dalla
-          vista degli utenti. Ridurre i mesi può eliminare messaggi alla prossima
-          esecuzione. Aggiorna la bozza dei termini se cambi questo periodo.
+          Il periodo decorre dall’invio di ciascun messaggio. La pulizia
+          giornaliera elimina definitivamente dal server anche i messaggi già
+          rimossi dalla vista degli utenti. Ridurre i mesi può eliminare
+          messaggi alla prossima esecuzione. Aggiorna la bozza dei termini se
+          cambi questo periodo.
         </p>
         <button className="primary" disabled={busy || !status}>
           {busy ? "Salvataggio…" : "Salva manutenzione"}
