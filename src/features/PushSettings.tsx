@@ -104,13 +104,19 @@ export function PushSettingsPanel({ userId }: { userId: string }) {
     setError("");
     setMessage("");
     try {
-      await result(supabase.rpc("set_message_push_enabled", { p_enabled: checked }));
+      await result(
+        supabase.rpc("set_message_push_enabled", { p_enabled: checked }),
+      );
       setSettings(await readPushSettings());
-      setMessage(checked
-        ? "Notifiche push dei messaggi attivate. Per riceverle, le push devono essere attive sul dispositivo."
-        : "Notifiche push dei messaggi disattivate. I promemoria degli appuntamenti mantengono le tue impostazioni.");
+      setMessage(
+        checked
+          ? "Notifiche push dei messaggi attivate. Per riceverle, le push devono essere attive sul dispositivo."
+          : "Notifiche push dei messaggi disattivate. I promemoria degli appuntamenti mantengono le tue impostazioni.",
+      );
     } catch {
-      setError("Non riesco ad aggiornare le notifiche dei messaggi. Riprova fra qualche minuto.");
+      setError(
+        "Non riesco ad aggiornare le notifiche dei messaggi. Riprova fra qualche minuto.",
+      );
     } finally {
       setBusy(false);
     }
@@ -165,9 +171,9 @@ export function PushSettingsPanel({ userId }: { userId: string }) {
           Notifiche push dei messaggi
         </label>
         <p className="muted">
-          Puoi disattivare solo gli avvisi dei messaggi sul telefono.
-          I messaggi e gli avvisi nel quadrifoglio restano disponibili.
-          Questa scelta non cambia i promemoria degli appuntamenti.
+          Puoi disattivare solo gli avvisi dei messaggi sul telefono. I messaggi
+          e gli avvisi nel quadrifoglio restano disponibili. Questa scelta non
+          cambia i promemoria degli appuntamenti.
         </p>
         <ReminderSettings userId={userId} />
         <PushHelp />

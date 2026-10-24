@@ -1,5 +1,9 @@
 import { supabase, result } from "./api";
-export type PushSettings = { enabled: boolean; messages_enabled: boolean; public_key: string | null };
+export type PushSettings = {
+  enabled: boolean;
+  messages_enabled: boolean;
+  public_key: string | null;
+};
 const OWNER = "barberup-push-device-owner";
 export function pushCapability() {
   const ios =
