@@ -719,4 +719,4 @@ Test personal_reminder_settings.sql superato prima/dopo migrazione con rollback:
 ## 24 ottobre 2026 — Pulsante messaggio nei dettagli appuntamento
 
 - Testo aggiornato da «Invia SMS in app» a «Invia messaggio in app». Nei dettagli appuntamento il pulsante usa lo stesso stile primary dorato e rettangolare di Chiama, a tutta larghezza e subito sotto, con margine aggiuntivo rimosso.
-- Variante di presentazione opzionale di MessageContact; i collegamenti nelle liste Utenti mantengono il loro stile. Nessuna modifica alle regole di invio, ai permessi o al database. Build/test e pubblicazione da verificare nella pipeline del commit.
+- Variante di presentazione opzionale di MessageContact; i collegamenti nelle liste Utenti mantengono il loro stile. Nessuna modifica alle regole di invio, ai permessi o al database. TypeScript/build, tutti i test e pubblicazione GitHub Pages riusciti nella pipeline 40072349069. Verifica dei sorgenti: stessa classe primary di Chiama, larghezza 100%, margine superiore rimosso.

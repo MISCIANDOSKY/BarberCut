@@ -12,9 +12,9 @@ Aprire **Profilo → Messaggi**, sopra Notifiche.
 
 - Da Messaggi: **Nuovo messaggio** e ricerca del cliente per nome, cognome o telefono (almeno due caratteri).
 - Da Utenti: **Invia messaggio** sotto lo stato del cliente; nella gestione ruoli Admin sotto il ruolo Cliente.
-- Dai dettagli di un appuntamento associato a un cliente registrato: **Invia SMS in app**, sotto Chiama. Per un ospite senza account non si inviano messaggi.
+- Dai dettagli di un appuntamento associato a un cliente registrato: **Invia messaggio in app**, sotto Chiama. Per un ospite senza account non si inviano messaggi.
 
-Il nome SMS nel pulsante indica un messaggio interno: non viene usata la rete SMS telefonica e non vengono addebitati SMS. Solo testo, nessun allegato; massimo 2.000 caratteri e 20 messaggi al minuto per mittente.
+Il pulsante invia un messaggio interno: non viene usata la rete SMS telefonica e non vengono addebitati SMS. Solo testo, nessun allegato; massimo 2.000 caratteri e 20 messaggi al minuto per mittente.
 
 ## Notifiche e privacy
 
