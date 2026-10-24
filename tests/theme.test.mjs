@@ -186,6 +186,9 @@ test("Il bootstrap prima del rendering usa Auto e rispetta i temi manuali", asyn
       window: { matchMedia: () => ({ matches: systemDark }) },
     });
     assert.equal(doc.documentElement.dataset.theme, expected);
-    assert.equal(doc.documentElement.dataset.themePreference, ["light", "dark", "auto"].includes(saved) ? saved : "auto");
+    assert.equal(
+      doc.documentElement.dataset.themePreference,
+      ["light", "dark", "auto"].includes(saved) ? saved : "auto",
+    );
   }
 });

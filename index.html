@@ -12,7 +12,8 @@
         let preference = "auto";
         try {
           const stored = localStorage.getItem("barberup-theme");
-          if (stored === "light" || stored === "dark" || stored === "auto") preference = stored;
+          if (stored === "light" || stored === "dark" || stored === "auto")
+            preference = stored;
         } catch {}
         let theme = preference;
         if (preference === "auto") {
