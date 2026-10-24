@@ -714,3 +714,9 @@ Test personal_reminder_settings.sql superato prima/dopo migrazione con rollback:
 
 - Verifica reale nella PWA con due account temporanei dedicati, push disattivate per entrambi: Profilo mostra Messaggi sopra Notifiche; Admin avvia ricerca destinatario e invia, cliente riceve e risponde, cliente non ha Nuovo messaggio. Link ?messages=1 apre la casella; simulando la data precedente soltanto sulla conversazione di prova, campo e invio diventano disabilitati con istruzioni. Chat verificata a 1280×720, 390×844 e 320×568: nessun overflow orizzontale, composer entro schermo, scorrimento separato della cronologia; viewport poi ripristinato. Nessun contenuto reale dei clienti usato per i test.
 - Account temporanei, sessioni, profili, conversazione e messaggi eliminati al termine: conteggi residui tutti zero. Non conservate credenziali o identificativi dei fixture nel repository. Nessuna notifica push/email reale inviata dalla prova. Dispatcher messaggi attivo ogni minuto; documentazione di utilizzo in docs/MESSAGES.md.
+
+
+## 24 ottobre 2026 — Pulsante messaggio nei dettagli appuntamento
+
+- Testo aggiornato da «Invia SMS in app» a «Invia messaggio in app». Nei dettagli appuntamento il pulsante usa lo stesso stile primary dorato e rettangolare di Chiama, a tutta larghezza e subito sotto, con margine aggiuntivo rimosso.
+- Variante di presentazione opzionale di MessageContact; i collegamenti nelle liste Utenti mantengono il loro stile. Nessuna modifica alle regole di invio, ai permessi o al database. Build/test e pubblicazione da verificare nella pipeline del commit.

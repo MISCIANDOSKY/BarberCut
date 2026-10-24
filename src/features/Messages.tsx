@@ -32,17 +32,19 @@ export function MessageContact({
   clientId,
   name,
   label = "Invia messaggio",
+  variant = "text",
 }: {
   clientId: string;
   name: string;
   label?: string;
+  variant?: "text" | "primary";
 }) {
   const [open, setOpen] = useState(false);
   return (
     <>
       <button
         type="button"
-        className="text message-contact"
+        className={variant + " message-contact"}
         onClick={() => setOpen(true)}
       >
         {label}

@@ -2326,3 +2326,8 @@ dialog.feature-dialog.messaging-dialog > header {
     max-width: 92%;
   }
 }
+
+.message-contact.primary {
+  width: 100%;
+  margin-top: 0;
+}

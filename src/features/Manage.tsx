@@ -682,7 +682,8 @@ export default function Manage({
                     .filter(Boolean)
                     .join(" ") || "Cliente"
                 }
-                label="Invia SMS in app"
+                label="Invia messaggio in app"
+                variant="primary"
               />
             ) : (
               <p className="muted">
