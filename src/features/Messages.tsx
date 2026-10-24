@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { confirmInApp } from "../components/AppDialogs";
 import { Empty, Modal } from "../components/UI";
 import { supabase, result, friendly } from "../lib/api";
 import type { Row } from "../lib/api";
@@ -82,6 +83,8 @@ export default function Messages({
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [searchBusy, setSearchBusy] = useState(false);
   const [more, setMore] = useState(false);
+  const [removing, setRemoving] = useState(false);
+  const [retentionMonths, setRetentionMonths] = useState(6);
   const revision = useRef(0);
   const load = useCallback(
     async (append = false, offset = 0) => {
@@ -101,6 +104,7 @@ export default function Messages({
               ]
             : data.items,
         );
+        setRetentionMonths(data.retention_months || 6);
         setCanStart(data.can_start === true);
         setMore(data.items.length === 100);
         setLoaded(true);
@@ -170,6 +174,24 @@ export default function Messages({
       window.clearTimeout(timer);
     };
   }, [query, searching, canStart]);
+  const removeChats = async (threadId?: string) => {
+    if (removing) return;
+    if (!(await confirmInApp(threadId
+      ? "Vuoi eliminare questa chat dalla tua vista? L’altro partecipante continuerà a vederla. I messaggi restano sul server fino alla scadenza del periodo di conservazione."
+      : "Vuoi eliminare tutte le tue chat dalla tua vista? Gli altri partecipanti continueranno a vederle. I messaggi restano sul server fino alla scadenza del periodo di conservazione."))) return;
+    setRemoving(true);
+    setError("");
+    revision.current++;
+    try {
+      await result(supabase.rpc("hide_message_threads", { p_thread: threadId || null }));
+      await load();
+      changed();
+    } catch (e) {
+      setError(messageError(e));
+    } finally {
+      setRemoving(false);
+    }
+  };
   if (selection)
     return (
       <MessageThread
@@ -208,12 +230,22 @@ export default function Messages({
         <button type="button" className="text" onClick={() => void load()}>
           Aggiorna
         </button>
+        {canStart && (
+          <button type="button" className="text danger" disabled={removing || !rows.length}
+            onClick={() => void removeChats()}>
+            Elimina tutto
+          </button>
+        )}
       </div>
       {error && (
         <p className="form-error" role="alert">
           {error}
         </p>
       )}
+      <p className="muted message-retention-help">
+        Il cestino rimuove la chat solo dalla tua vista. I messaggi sono eliminati
+        automaticamente dal server dopo {retentionMonths} {retentionMonths === 1 ? "mese" : "mesi"} dall’invio.
+      </p>
       {!canStart && (
         <p className="muted">
           Puoi rispondere ai messaggi della barberia solo nello stesso giorno in
@@ -267,10 +299,10 @@ export default function Messages({
             <Empty>Non ci sono ancora messaggi.</Empty>
           ) : null}
           {rows.map((r) => (
+            <div className="message-chat-row" key={r.id}>
             <button
               type="button"
               className="secondary message-inbox-item"
-              key={r.id}
               onClick={() =>
                 setSelection({
                   thread_id: r.id,
@@ -293,6 +325,14 @@ export default function Messages({
                 </span>
               )}
             </button>
+            <button type="button" className="secondary message-trash"
+              aria-label={"Elimina chat con " + r.name} title="Elimina chat"
+              disabled={removing} onClick={() => void removeChats(r.id)}>
+              <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7" />
+              </svg>
+            </button>
+            </div>
           ))}
           {more && (
             <button
@@ -360,7 +400,7 @@ function MessageThread({
         setClock(Date.now());
         setMeta(data);
         setRows((current) => {
-          const all = new Map(current.map((r) => [r.id, r]));
+          const all = new Map(current.filter((r) => BigInt(r.id) > BigInt(data.hidden_through || '0')).map((r) => [r.id, r]));
           for (const item of data.items) all.set(item.id, item);
           return [...all.values()].sort((a, b) =>
             BigInt(a.id) < BigInt(b.id)

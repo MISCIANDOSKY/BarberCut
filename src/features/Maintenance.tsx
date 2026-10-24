@@ -10,6 +10,7 @@ export default function Maintenance({
   const [status, setStatus] = useState<Row | null>(null);
   const [inactiveDays, setInactiveDays] = useState("120");
   const [appointmentDays, setAppointmentDays] = useState("550");
+  const [messageMonths, setMessageMonths] = useState("6");
   const [disableInactive, setDisableInactive] = useState(true);
   const [deleteOld, setDeleteOld] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -21,6 +22,7 @@ export default function Maintenance({
       setStatus(data);
       setInactiveDays(String(data.settings.inactive_days));
       setAppointmentDays(String(data.settings.appointment_days));
+      setMessageMonths(String(data.settings.message_months));
       setDisableInactive(data.settings.disable_inactive);
       setDeleteOld(data.settings.delete_old_appointments);
     } catch (e) {
@@ -42,16 +44,21 @@ export default function Maintenance({
       setError("Inserisci un numero intero di giorni tra 1 e 36500.");
       return;
     }
+    if (!Number.isInteger(Number(messageMonths)) || Number(messageMonths) < 1 || Number(messageMonths) > 120) {
+      setError("Inserisci un numero intero di mesi tra 1 e 120.");
+      return;
+    }
     setBusy(true);
     setError("");
     setFeedback("");
     try {
       await result(
-        supabase.rpc("save_maintenance_settings", {
+        supabase.rpc("save_maintenance_message_settings", {
           p_inactive_days: days[0],
           p_appointment_days: days[1],
           p_disable_inactive: disableInactive,
           p_delete_old: deleteOld,
+          p_message_months: Number(messageMonths),
         }),
       );
       await load();
@@ -149,6 +156,22 @@ export default function Maintenance({
           appuntamenti più vecchi vengono eliminati definitivamente; quelli
           recenti e futuri restano disponibili.
         </p>
+        <div className="maintenance-rule">
+          <span>Elimina definitivamente i messaggi più vecchi di</span>
+          <label className="maintenance-days">
+            <input aria-label="Mesi di conservazione messaggi" type="text" inputMode="numeric"
+              pattern="[0-9]+" maxLength={3} required value={messageMonths}
+              disabled={busy || !status}
+              onChange={(event) => setMessageMonths(event.target.value.replace(/[^0-9]/g, ""))} />
+            <span>mesi</span>
+          </label>
+        </div>
+        <p className="muted">
+          Il periodo decorre dall’invio di ciascun messaggio. La pulizia giornaliera
+          elimina definitivamente dal server anche i messaggi già rimossi dalla
+          vista degli utenti. Ridurre i mesi può eliminare messaggi alla prossima
+          esecuzione. Aggiorna la bozza dei termini se cambi questo periodo.
+        </p>
         <button className="primary" disabled={busy || !status}>
           {busy ? "Salvataggio…" : "Salva manutenzione"}
         </button>
@@ -168,6 +191,7 @@ export default function Maintenance({
               })}
               . Account disattivati: {status.last_run.disabled_accounts}.
               Appuntamenti eliminati: {status.last_run.deleted_appointments}.
+              Messaggi eliminati: {status.last_run.deleted_messages || 0}.
             </p>
           ) : (
             <p>

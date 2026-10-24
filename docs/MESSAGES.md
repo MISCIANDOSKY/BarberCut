@@ -30,3 +30,11 @@ Messaggi e conversazioni sono in tabelle private con RLS, senza accesso diretto 
 - Test SQL con rollback: supabase/tests/direct_messages.sql, compresi avvio e risposta Admin ↔ entrambi i ruoli barbiere, riuso della conversazione, ricerca, isolamento e vincoli cliente invariati.
 - Test frontend/worker e build/pubblicazione: pipeline 39993081163.
 - Prova UI con account temporanei poi rimossi: invio Admin, risposta cliente, chiusura risposte, profilo, collegamento push e layout fino a 320 pixel. Nessun invio a clienti reali. Ricezione push su telefono fisico non verificata.
+
+## Rimozione e conservazione
+
+Ogni chat ha un cestino: rimuove tutti i messaggi già presenti solo dalla vista dell’utente che lo preme. Gli altri partecipanti mantengono la propria copia visibile. Il server conserva i messaggi fino alla scadenza. Un nuovo messaggio fa ricomparire la chat senza ripristinare i precedenti messaggi rimossi. La scelta vale su tutti i dispositivi dello stesso account.
+
+Solo Admin, Barbiere e Barbiere Admin hanno anche **Elimina tutto**, in alto nella casella Messaggi. Il cliente può eliminare soltanto singole chat. Ogni comando chiede conferma nel dialog integrato nella PWA e non avvia alcuna cancellazione del contenuto sul server.
+
+La manutenzione giornaliera elimina definitivamente i messaggi più vecchi di **6 mesi dall’invio** e le notifiche/consegne push associate. Admin può cambiare il periodo da **Manutenzione → Mesi di conservazione messaggi** (1–120 mesi); la soglia attuale è indicata nella casella Messaggi. Un periodo più breve si applica alla prossima esecuzione anche ai messaggi già esistenti. L’eliminazione del profilo può anticipare la cancellazione tramite le FK già configurate. La bozza dei termini 1.0 descrive questa distinzione; durate e rotazione dei backup restano da definire nella bozza.

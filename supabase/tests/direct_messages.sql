@@ -210,6 +210,50 @@ begin
  begin perform public.message_history((sent->>'thread_id')::uuid);raise exception 'Client read staff conversation';exception when raise_exception then if sqlerrm<>'ACCESS_DENIED'then raise;end if;end;
  reset role;
 
+
+ -- Local removal is private and never deletes message content.
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',customer,'role','authenticated','session_id',sc)::text,true);
+ set local role authenticated;
+ begin perform public.hide_message_threads();raise exception 'Client bulk removal allowed';exception when raise_exception then if sqlerrm<>'ACCESS_DENIED'then raise;end if;end;
+ perform public.hide_message_threads(t);
+ if jsonb_array_length(public.message_history(t)->'items')<>0 then raise exception 'Hidden history still visible';end if;
+ if exists(select 1 from jsonb_array_elements(public.message_inbox()->'items')x where x->>'id'=t::text)then raise exception 'Hidden chat still listed';end if;
+ begin perform public.save_maintenance_message_settings(120,550,true,true,3);raise exception 'Client changed retention';exception when raise_exception then if sqlerrm<>'ACCESS_DENIED'then raise;end if;end;
+ reset role;
+ if not exists(select 1 from private.direct_messages where id=firstmsg)then raise exception 'Local removal deleted server content';end if;
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',other_client,'role','authenticated','session_id',so)::text,true);
+ set local role authenticated;
+ begin perform public.hide_message_threads(t);raise exception 'Outsider removed chat';exception when raise_exception then if sqlerrm<>'ACCESS_DENIED'then raise;end if;end;
+ reset role;
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',worker,'role','authenticated','session_id',sw)::text,true);
+ set local role authenticated;
+ if jsonb_array_length(public.message_history(t)->'items')=0 then raise exception 'Peer history removed';end if;
+ sent:=public.send_direct_message('TEST new message after removal',gen_random_uuid(),t);
+ reset role;
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',customer,'role','authenticated','session_id',sc)::text,true);
+ set local role authenticated;
+ hist:=public.message_history(t);
+ if jsonb_array_length(hist->'items')<>1 or hist->'items'->0->>'id'<>sent->>'id'then raise exception 'Old history reappeared';end if;
+ reset role;
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',worker,'role','authenticated','session_id',sw)::text,true);
+ set local role authenticated;
+ perform public.hide_message_threads();
+ if jsonb_array_length(public.message_inbox()->'items')<>0 then raise exception 'Staff bulk removal failed';end if;
+ reset role;
+ -- Retention uses months since sending; admin setting is validated and daily cleanup removes only old content.
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',ad,'role','authenticated','session_id',sa)::text,true);
+ set local role authenticated;
+ begin perform public.save_maintenance_message_settings(120,550,false,false,0);raise exception 'Invalid months accepted';exception when raise_exception then if sqlerrm<>'INVALID_MESSAGE_RETENTION'then raise;end if;end;
+ perform public.save_maintenance_message_settings(120,550,false,false,1);
+ if (public.maintenance_status()->'settings'->>'message_months')::integer<>1 then raise exception 'Retention not saved';end if;
+ reset role;
+ update private.direct_messages set created_at=now()-interval '2 months' where id=firstmsg;
+ hist:=private.run_daily_maintenance();
+ if (hist->>'deleted_messages')::integer<1 or exists(select 1 from private.direct_messages where id=firstmsg)then raise exception 'Daily cleanup failed';end if;
+ if exists(select 1 from public.notifications where event_key='message:'||firstmsg::text)then raise exception 'Old message notification retained';end if;
+ if not exists(select 1 from private.direct_messages where id=(sent->>'id')::bigint)then raise exception 'Recent message deleted';end if;
+ if has_function_privilege('authenticated','private.purge_old_messages()','EXECUTE') or has_function_privilege('anon','public.hide_message_threads(uuid)','EXECUTE') then raise exception 'Cleanup privileges exposed';end if;
+
  -- Shop role and revoked/missing sessions cannot use messaging.
  perform set_config('request.jwt.claims',jsonb_build_object('sub',shop,'role','authenticated','session_id',ss)::text,true);
  set local role authenticated;
