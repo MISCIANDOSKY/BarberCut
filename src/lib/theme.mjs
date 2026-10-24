@@ -1,13 +1,13 @@
 export const THEME_STORAGE_KEY = "barberup-theme";
 export const THEME_CHANGE_EVENT = "barberup-theme-change";
 function normalizeTheme(value) {
-  return value === "light" || value === "auto" ? value : "dark";
+  return value === "light" || value === "dark" ? value : "auto";
 }
 export function readTheme(storage) {
   try {
     return normalizeTheme(storage?.getItem(THEME_STORAGE_KEY));
   } catch {
-    return "dark";
+    return "auto";
   }
 }
 export function applyTheme(theme, doc, systemDark = true) {

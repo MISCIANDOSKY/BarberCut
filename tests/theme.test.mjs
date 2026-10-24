@@ -8,8 +8,8 @@ import {
   selectTheme,
   currentTheme,
 } from "../src/lib/theme.mjs";
-test("Il tema predefinito resta scuro, anche con preferenze non valide o storage bloccato", () => {
-  for (const value of [null, "dark", "system", "unexpected"])
+test("Il tema predefinito è Auto, anche con preferenze non valide o storage bloccato", () => {
+  for (const value of [null, "system", "unexpected"])
     assert.equal(
       readTheme({
         getItem: (key) => {
@@ -17,18 +17,19 @@ test("Il tema predefinito resta scuro, anche con preferenze non valide o storage
           return value;
         },
       }),
-      "dark",
+      "auto",
     );
-  assert.equal(readTheme(), "dark");
+  assert.equal(readTheme(), "auto");
   assert.equal(
     readTheme({
       getItem() {
         throw new Error("blocked");
       },
     }),
-    "dark",
+    "auto",
   );
   assert.equal(readTheme({ getItem: () => "light" }), "light");
+  assert.equal(readTheme({ getItem: () => "dark" }), "dark");
 });
 test("Il cambio aggiorna insieme palette, controlli e colore della barra PWA", () => {
   const meta = {
@@ -52,7 +53,7 @@ test("Il cambio aggiorna insieme palette, controlli e colore della barra PWA", (
   assert.equal(doc.documentElement.dataset.theme, "dark");
   assert.equal(doc.documentElement.style.colorScheme, "dark");
   assert.equal(meta.content, "#151815");
-  assert.equal(applyTheme("unexpected", doc), "dark");
+  assert.equal(applyTheme("unexpected", doc), "auto");
   assert.doesNotThrow(() =>
     applyTheme("light", {
       documentElement: { dataset: {}, style: {} },
@@ -158,7 +159,7 @@ test("Auto segue cambi sistema e ripresa; i temi manuali restano fissi", () => {
     else delete globalThis.document;
   }
 });
-test("Il bootstrap prima del rendering rispetta Auto e mantiene Scuro come default", async () => {
+test("Il bootstrap prima del rendering usa Auto e rispetta i temi manuali", async () => {
   const { readFile } = await import("node:fs/promises");
   const { runInNewContext } = await import("node:vm");
   const html = await readFile(
@@ -167,7 +168,9 @@ test("Il bootstrap prima del rendering rispetta Auto e mantiene Scuro come defau
   );
   const script = html.match(/<script>([\s\S]*?)<\/script>/)[1];
   for (const [saved, systemDark, expected] of [
-    [null, false, "dark"],
+    [null, false, "light"],
+    [null, true, "dark"],
+    ["unexpected", false, "light"],
     ["auto", false, "light"],
     ["auto", true, "dark"],
     ["light", true, "light"],
@@ -183,6 +186,6 @@ test("Il bootstrap prima del rendering rispetta Auto e mantiene Scuro come defau
       window: { matchMedia: () => ({ matches: systemDark }) },
     });
     assert.equal(doc.documentElement.dataset.theme, expected);
-    assert.equal(doc.documentElement.dataset.themePreference, saved ?? "dark");
+    assert.equal(doc.documentElement.dataset.themePreference, ["light", "dark", "auto"].includes(saved) ? saved : "auto");
   }
 });

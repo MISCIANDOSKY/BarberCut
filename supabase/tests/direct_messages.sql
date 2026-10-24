@@ -37,8 +37,8 @@ begin
  perform set_config('request.jwt.claims',jsonb_build_object('sub',worker,'role','authenticated','session_id',sw)::text,true);
  set local role authenticated;
  if not (public.message_inbox()->>'can_start')::boolean then raise exception 'Staff cannot initiate';end if;
- sent:=public.send_direct_message('TEST first message',nonce,null,customer);
- again:=public.send_direct_message('TEST first message',nonce,null,customer);
+ sent:=public.send_direct_message(E'TEST anteprima 😀\nseconda riga '||repeat('testo ',50),nonce,null,customer);
+ again:=public.send_direct_message(E'TEST anteprima 😀\nseconda riga '||repeat('testo ',50),nonce,null,customer);
  if sent<>again then raise exception 'Idempotency failed';end if;
  t:=(sent->>'thread_id')::uuid;firstmsg:=(sent->>'id')::bigint;
  begin perform public.send_direct_message('Different',nonce,t);raise exception 'Nonce reused';exception when raise_exception then if sqlerrm<>'INVALID_MESSAGE'then raise;end if;end;
@@ -47,6 +47,7 @@ begin
  hist:=public.message_history(t);
  if jsonb_array_length(hist->'items')<>1 then raise exception 'Duplicate message';end if;
  reset role;
+ if not exists(select 1 from public.notifications n join private.direct_messages m on n.event_key='message:'||m.id::text where m.id=firstmsg and n.body=left(regexp_replace(m.body,'[[:space:]]+',' ','g'),180) and char_length(n.body)=180 and strpos(n.body,E'\n')=0)then raise exception 'Notification preview invalid';end if;
  select id into delivery from private.message_push_deliveries where message_id=firstmsg and subscription_id=sub;
  if delivery is null or not private.message_push_valid(delivery)then raise exception 'Push not queued';end if;
  select last_staff_at into ts from private.message_threads where id=t;
@@ -88,6 +89,7 @@ begin
  update private.message_push_deliveries set status='queued',token_hash=extensions.digest(secret,'sha256'),token_expires_at=now()+interval '5 minutes'where id=delivery;
  if public.claim_message_push(delivery,'incorrect') is not null then raise exception 'Bad token accepted';end if;
  hist:=public.claim_message_push(delivery,secret);
+ if hist->'payload'->>'body'<>'TEST reopen' then raise exception 'Push text preview missing';end if;
  if hist->'payload'->>'kind'<>'message' or (select status from private.message_push_deliveries where id=delivery)<>'sending'then raise exception 'Message claim failed';end if;
  perform public.finish_message_push(delivery,secret,'sent');
  if (select status from private.message_push_deliveries where id=delivery)<>'sent'then raise exception 'Finish failed';end if;
