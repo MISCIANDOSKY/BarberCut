@@ -1,6 +1,6 @@
 # BarberUp — Handoff
 
-Ultimo aggiornamento: 23 ottobre 2026 (Europe/Rome).
+Ultimo aggiornamento: 24 ottobre 2026 (Europe/Rome).
 
 ## Regola permanente del titolare
 
@@ -720,3 +720,12 @@ Test personal_reminder_settings.sql superato prima/dopo migrazione con rollback:
 
 - Testo aggiornato da «Invia SMS in app» a «Invia messaggio in app». Nei dettagli appuntamento il pulsante usa lo stesso stile primary dorato e rettangolare di Chiama, a tutta larghezza e subito sotto, con margine aggiuntivo rimosso.
 - Variante di presentazione opzionale di MessageContact; i collegamenti nelle liste Utenti mantengono il loro stile. Nessuna modifica alle regole di invio, ai permessi o al database. TypeScript/build, tutti i test e pubblicazione GitHub Pages riusciti nella pipeline 40072349069. Verifica dei sorgenti: stessa classe primary di Chiama, larghezza 100%, margine superiore rimosso.
+
+
+## 24 ottobre 2026 — Messaggi Admin ↔ barbieri
+
+- Corretto il rifiuto dei destinatari con ruolo Admin nei messaggi inviati dai barbieri. Admin e Barbiere/Barbiere Admin possono avviare e proseguire conversazioni in entrambe le direzioni, senza la finestra giornaliera riservata ai clienti. Nessuna estensione al ruolo Barberia o alla comunicazione fra soli barbieri.
+- Ricerca destinatari estesa alle coppie Admin/barbiere autorizzate; Admin trova il pulsante anche sotto i ruoli Barbiere e Barbiere Admin nella gestione Utenti. Dai dettagli appuntamento funziona anche per un cliente che ha ruolo Admin. Identificativo del destinatario nella casella coerente per entrambi i partecipanti; Admin conservato come primo partecipante per riusare la stessa conversazione indipendentemente da chi scrive per primo.
+- Migrazione Supabase 20261024070321_allow_admin_barber_direct_messages applicata. Helper privato con search_path vuoto ed EXECUTE revocato ai client; controlli di sessione/staff/termini, privacy e preferenze push conservati. Nessuna nuova tabella o apertura di grant diretti. Clienti ancora impossibilitati ad avviare conversazioni e risposte limitate al giorno italiano dell’ultimo messaggio staff.
+- Test SQL remoto con rollback PASS: entrambe le direzioni ed entrambi i ruoli barbiere, risposte anche nei giorni successivi, conversazione unica, metadati destinatario, ricerca, notifiche al destinatario corretto e isolamento da terzi; superati anche tutti i test precedenti su clienti, push, token, sessioni e cancellazione. Nessun dato di prova persistente o messaggio a utenti reali. Advisor senza nuovi rilievi rispetto allo stato precedente (INFO privati intenzionali e WARN preesistente password compromesse disattivata).
+- Build/test frontend e pubblicazione da verificare nella pipeline GitHub. Ricezione push su dispositivo fisico non provata.

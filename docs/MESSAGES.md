@@ -5,13 +5,14 @@ Aprire **Profilo → Messaggi**, sopra Notifiche.
 ## Chi può scrivere
 
 - Admin, Barbiere Admin e Barbiere con agenda attiva e accesso staff verificato possono iniziare una conversazione con un cliente registrato della barberia.
+- Admin e barbieri (normali o Admin) possono scriversi in entrambe le direzioni, iniziando la conversazione da ciascuna parte. Questi scambi non scadono a mezzanotte e riutilizzano una sola conversazione per coppia.
 - Il cliente non può iniziare. Può rispondere soltanto nel giorno italiano dell’ultimo messaggio ricevuto da quel referente, fino alla mezzanotte Europe/Rome. Un nuovo messaggio dello staff riapre le risposte. La regola è controllata sul server e comprende l’ora legale.
 - Ogni conversazione è privata tra il cliente e il singolo admin/barbiere che l’ha avviata. Gli altri barbieri non possono leggerla. Il ruolo Barberia non accede ai messaggi.
 
 ## Da dove inviare
 
-- Da Messaggi: **Nuovo messaggio** e ricerca del cliente per nome, cognome o telefono (almeno due caratteri).
-- Da Utenti: **Invia messaggio** sotto lo stato del cliente; nella gestione ruoli Admin sotto il ruolo Cliente.
+- Da Messaggi: **Nuovo messaggio** e ricerca del destinatario per nome, cognome o telefono (almeno due caratteri).
+- Da Utenti: **Invia messaggio** sotto lo stato del cliente; nella gestione ruoli Admin anche sotto i ruoli Cliente, Barbiere e Barbiere Admin.
 - Dai dettagli di un appuntamento associato a un cliente registrato: **Invia messaggio in app**, sotto Chiama. Per un ospite senza account non si inviano messaggi.
 
 Il pulsante invia un messaggio interno: non viene usata la rete SMS telefonica e non vengono addebitati SMS. Solo testo, nessun allegato; massimo 2.000 caratteri e 20 messaggi al minuto per mittente.
@@ -26,6 +27,6 @@ Messaggi e conversazioni sono in tabelle private con RLS, senza accesso diretto 
 
 ## Verifiche
 
-- Test SQL con rollback: supabase/tests/direct_messages.sql.
+- Test SQL con rollback: supabase/tests/direct_messages.sql, compresi avvio e risposta Admin ↔ entrambi i ruoli barbiere, riuso della conversazione, ricerca, isolamento e vincoli cliente invariati.
 - Test frontend/worker e build/pubblicazione: pipeline 39993081163.
 - Prova UI con account temporanei poi rimossi: invio Admin, risposta cliente, chiusura risposte, profilo, collegamento push e layout fino a 320 pixel. Nessun invio a clienti reali. Ricezione push su telefono fisico non verificata.

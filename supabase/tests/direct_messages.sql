@@ -109,6 +109,62 @@ begin
  set local role authenticated;
  sent:=public.send_direct_message('TEST admin',gen_random_uuid(),null,customer);
  reset role;
+
+ -- Admin and both barber roles can initiate and respond in either direction.
+ -- The Admin is the canonical first participant, so reverse initiation reuses the same thread.
+ foreach uid in array array[worker,lead] loop
+   sid:=case when uid=worker then sw else sl end;
+   perform set_config('request.jwt.claims',jsonb_build_object('sub',uid,'role','authenticated','session_id',sid)::text,true);
+   set local role authenticated;
+   if not exists(select 1 from jsonb_array_elements(public.message_recipients('TEST'))x where x->>'id'=ad::text)then raise exception 'Admin not searchable by barber';end if;
+   sent:=public.send_direct_message('TEST barber to admin',gen_random_uuid(),null,ad);
+   hist:=public.message_history((sent->>'thread_id')::uuid);
+   if not(hist->>'can_send')::boolean or hist->'reply_until'<>'null'::jsonb then raise exception 'Staff composer restricted';end if;
+   if hist->>'client_id'<>ad::text then raise exception 'Barber peer metadata wrong';end if;
+   if not exists(select 1 from jsonb_array_elements(public.message_inbox()->'items')x where x->>'id'=sent->>'thread_id' and x->>'client_id'=ad::text)then raise exception 'Barber inbox peer wrong';end if;
+   reset role;
+   if not exists(select 1 from public.notifications where user_id=ad and event_key='message:'||(sent->>'id'))then raise exception 'Admin notification missing';end if;
+   update private.message_threads set last_staff_at=now()-interval '2 days' where id=(sent->>'thread_id')::uuid;
+   perform set_config('request.jwt.claims',jsonb_build_object('sub',ad,'role','authenticated','session_id',sa)::text,true);
+   set local role authenticated;
+   if not exists(select 1 from jsonb_array_elements(public.message_recipients('TEST'))x where x->>'id'=uid::text)then raise exception 'Barber not searchable by admin';end if;
+   again:=public.send_direct_message('TEST admin to barber',gen_random_uuid(),null,uid);
+   if sent->>'thread_id'<>again->>'thread_id'then raise exception 'Duplicate staff conversation';end if;
+   perform public.send_direct_message('TEST admin reply',gen_random_uuid(),(sent->>'thread_id')::uuid);
+   reset role;
+   if not exists(select 1 from public.notifications where user_id=uid and event_key='message:'||(again->>'id'))then raise exception 'Barber notification missing';end if;
+   update private.message_threads set last_staff_at=now()-interval '2 days' where id=(sent->>'thread_id')::uuid;
+   perform set_config('request.jwt.claims',jsonb_build_object('sub',uid,'role','authenticated','session_id',sid)::text,true);
+   set local role authenticated;
+   if not(public.message_history((sent->>'thread_id')::uuid)->>'can_send')::boolean then raise exception 'Staff reply expired';end if;
+   perform public.send_direct_message('TEST barber late reply',gen_random_uuid(),(sent->>'thread_id')::uuid);
+   reset role;
+   -- A different barber is not a participant in this Admin conversation.
+   perform set_config('request.jwt.claims',jsonb_build_object('sub',case when uid=worker then lead else worker end,'role','authenticated','session_id',case when uid=worker then sl else sw end)::text,true);
+   set local role authenticated;
+   begin perform public.message_history((sent->>'thread_id')::uuid);raise exception 'Staff conversation leaked';exception when raise_exception then if sqlerrm<>'ACCESS_DENIED'then raise;end if;end;
+   reset role;
+ end loop;
+ -- Admin-first creation after removing only test internal threads; both barber roles can reply.
+ delete from private.message_threads where staff_id=ad and client_id in(worker,lead);
+ foreach uid in array array[worker,lead] loop
+   perform set_config('request.jwt.claims',jsonb_build_object('sub',ad,'role','authenticated','session_id',sa)::text,true);
+   set local role authenticated;
+   sent:=public.send_direct_message('TEST admin starts',gen_random_uuid(),null,uid);
+   reset role;
+   sid:=case when uid=worker then sw else sl end;
+   perform set_config('request.jwt.claims',jsonb_build_object('sub',uid,'role','authenticated','session_id',sid)::text,true);
+   set local role authenticated;
+   again:=public.send_direct_message('TEST barber responds',gen_random_uuid(),null,ad);
+   if sent->>'thread_id'<>again->>'thread_id'then raise exception 'Admin-first duplicated';end if;
+   reset role;
+ end loop;
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',customer,'role','authenticated','session_id',sc)::text,true);
+ set local role authenticated;
+ begin perform public.send_direct_message('Client cannot initiate to admin',gen_random_uuid(),null,ad);raise exception 'Client initiated to admin';exception when raise_exception then if sqlerrm<>'ACCESS_DENIED'then raise;end if;end;
+ begin perform public.message_history((sent->>'thread_id')::uuid);raise exception 'Client read staff conversation';exception when raise_exception then if sqlerrm<>'ACCESS_DENIED'then raise;end if;end;
+ reset role;
+
  -- Shop role and revoked/missing sessions cannot use messaging.
  perform set_config('request.jwt.claims',jsonb_build_object('sub',shop,'role','authenticated','session_id',ss)::text,true);
  set local role authenticated;

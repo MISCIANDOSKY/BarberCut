@@ -399,7 +399,7 @@ export default function Admin({
                 <span>
                   {p?.first_name || "Account"} {p?.last_name}
                   <small>{currentRoleLabel}</small>
-                  {r.role === "client" && (
+                  {["client", "barber", "barber_admin"].includes(r.role) && (
                     <MessageContact
                       clientId={r.user_id}
                       name={

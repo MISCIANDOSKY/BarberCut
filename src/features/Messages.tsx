@@ -224,7 +224,7 @@ export default function Messages({
       {searching ? (
         <div className="message-inbox-scroll content-stack">
           <label>
-            Cerca cliente per nome, cognome o telefono
+            Cerca destinatario per nome, cognome o telefono
             <input
               type="search"
               value={query}
@@ -238,7 +238,7 @@ export default function Messages({
           ) : searchBusy ? (
             <p role="status">Ricerca…</p>
           ) : !contacts.length ? (
-            <Empty>Nessun cliente trovato.</Empty>
+            <Empty>Nessun destinatario trovato.</Empty>
           ) : null}
           {contacts.map((c) => (
             <button
