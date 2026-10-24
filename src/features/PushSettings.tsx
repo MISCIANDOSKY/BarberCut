@@ -1,4 +1,5 @@
 import ReminderSettings from "./ReminderSettings";
+import { supabase, result } from "../lib/api";
 import { useEffect, useState } from "react";
 import { Modal } from "../components/UI";
 import {
@@ -97,6 +98,23 @@ export function PushSettingsPanel({ userId }: { userId: string }) {
       setBusy(false);
     }
   };
+  const toggleMessages = async (checked: boolean) => {
+    if (busy || !settings) return;
+    setBusy(true);
+    setError("");
+    setMessage("");
+    try {
+      await result(supabase.rpc("set_message_push_enabled", { p_enabled: checked }));
+      setSettings(await readPushSettings());
+      setMessage(checked
+        ? "Notifiche push dei messaggi attivate. Per riceverle, le push devono essere attive sul dispositivo."
+        : "Notifiche push dei messaggi disattivate. I promemoria degli appuntamenti mantengono le tue impostazioni.");
+    } catch {
+      setError("Non riesco ad aggiornare le notifiche dei messaggi. Riprova fra qualche minuto.");
+    } finally {
+      setBusy(false);
+    }
+  };
   return (
     <div className="push-settings">
       <div className="content-stack">
@@ -137,6 +155,20 @@ export function PushSettingsPanel({ userId }: { userId: string }) {
             Disattiva le push per il mio account
           </button>
         )}
+        <label className="check">
+          <input
+            type="checkbox"
+            checked={settings?.messages_enabled ?? true}
+            disabled={busy || !settings}
+            onChange={(e) => void toggleMessages(e.target.checked)}
+          />
+          Notifiche push dei messaggi
+        </label>
+        <p className="muted">
+          Puoi disattivare solo gli avvisi dei messaggi sul telefono.
+          I messaggi e gli avvisi nel quadrifoglio restano disponibili.
+          Questa scelta non cambia i promemoria degli appuntamenti.
+        </p>
         <ReminderSettings userId={userId} />
         <PushHelp />
         {busy && <p role="status">Aggiornamento notifiche…</p>}

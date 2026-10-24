@@ -91,6 +91,51 @@ begin
  if hist->'payload'->>'kind'<>'message' or (select status from private.message_push_deliveries where id=delivery)<>'sending'then raise exception 'Message claim failed';end if;
  perform public.finish_message_push(delivery,secret,'sent');
  if (select status from private.message_push_deliveries where id=delivery)<>'sent'then raise exception 'Finish failed';end if;
+
+ -- Message-only opt-out must leave global push/subscription/reminders available.
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',customer,'role','authenticated','session_id',sc)::text,true);
+ set local role authenticated;
+ if not(public.push_settings()->>'messages_enabled')::boolean then raise exception 'Message default not enabled';end if;
+ perform public.set_message_push_enabled(false);
+ hist:=public.push_settings();
+ if (hist->>'messages_enabled')::boolean or not(hist->>'enabled')::boolean then raise exception 'Message opt-out altered global preference';end if;
+ begin perform public.set_message_push_enabled(null);raise exception 'Null preference accepted';exception when raise_exception then if sqlerrm<>'INVALID_PUSH'then raise;end if;end;
+ reset role;
+ if not exists(select 1 from private.push_subscriptions where id=sub)then raise exception 'Message opt-out removed subscription';end if;
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',worker,'role','authenticated','session_id',sw)::text,true);
+ set local role authenticated;
+ sent:=public.send_direct_message('TEST only message push off',gen_random_uuid(),t);
+ reset role;
+ if exists(select 1 from private.message_push_deliveries where message_id=(sent->>'id')::bigint)then raise exception 'Message opt-out queued push';end if;
+ if not exists(select 1 from public.notifications where user_id=customer and event_key='message:'||(sent->>'id'))then raise exception 'Message opt-out removed in-app notification';end if;
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',customer,'role','authenticated','session_id',sc)::text,true);
+ set local role authenticated;
+ perform public.set_message_push_enabled(true);
+ reset role;
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',worker,'role','authenticated','session_id',sw)::text,true);
+ set local role authenticated;
+ sent:=public.send_direct_message('TEST message push restored',gen_random_uuid(),t);
+ reset role;
+ select id into delivery from private.message_push_deliveries where message_id=(sent->>'id')::bigint and subscription_id=sub;
+ if delivery is null or not private.message_push_valid(delivery)then raise exception 'Message preference not restored';end if;
+ -- Queued but unsent messages are suppressed immediately when disabled.
+ update private.message_push_deliveries set status='queued',token_hash=extensions.digest(secret,'sha256'),token_expires_at=now()+interval '5 minutes' where id=delivery;
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',customer,'role','authenticated','session_id',sc)::text,true);
+ set local role authenticated;
+ perform public.set_message_push_enabled(false);
+ reset role;
+ if private.message_push_valid(delivery) or (select status from private.message_push_deliveries where id=delivery)<>'cancelled' then raise exception 'Queued push survived opt-out';end if;
+ if public.claim_message_push(delivery,secret) is not null then raise exception 'Cancelled push claimed';end if;
+ -- No preference row: changing message preference must preserve staff default (global off).
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',lead,'role','authenticated','session_id',sl)::text,true);
+ set local role authenticated;
+ perform public.set_message_push_enabled(false);
+ if(public.push_settings()->>'enabled')::boolean then raise exception 'Message toggle enabled staff push';end if;
+ perform public.set_message_push_enabled(true);
+ if(public.push_settings()->>'enabled')::boolean then raise exception 'Message re-enable altered global off';end if;
+ reset role;
+ if has_function_privilege('anon','public.set_message_push_enabled(boolean)','EXECUTE') then raise exception 'Anonymous preference access';end if;
+
  -- Global push opt-out leaves messages/in-app notifications but no new push.
  update private.push_preferences set enabled=false where user_id=customer;
  perform set_config('request.jwt.claims',jsonb_build_object('sub',worker,'role','authenticated','session_id',sw)::text,true);
@@ -173,6 +218,7 @@ begin
  delete from auth.sessions where id=sc;
  perform set_config('request.jwt.claims',jsonb_build_object('sub',customer,'role','authenticated','session_id',sc)::text,true);
  set local role authenticated;
+ begin perform public.set_message_push_enabled(true);raise exception 'Revoked session changed preference';exception when raise_exception then if sqlerrm<>'ACCESS_DENIED'then raise;end if;end;
  begin perform public.message_inbox();raise exception 'Revoked session allowed';exception when raise_exception then if sqlerrm<>'ACCESS_DENIED'then raise;end if;end;
  reset role;
  delete from public.profiles where id=customer;

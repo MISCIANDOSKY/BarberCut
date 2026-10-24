@@ -19,7 +19,7 @@ Il pulsante invia un messaggio interno: non viene usata la rete SMS telefonica e
 
 ## Notifiche e privacy
 
-Ogni nuovo messaggio o risposta crea un avviso in app e, se abilitate e autorizzate sul dispositivo, una push. Da **Profilo → Notifiche** l’interruttore push comprende promemoria e messaggi. Spegnerlo lascia disponibili i messaggi e gli avvisi interni. I default dei barbieri rimangono quelli già configurati, con push inizialmente spente.
+Ogni nuovo messaggio o risposta crea un avviso in app e, se abilitate e autorizzate sul dispositivo, una push. Da **Profilo → Notifiche** l’interruttore push comprende promemoria e messaggi. Spegnerlo lascia disponibili i messaggi e gli avvisi interni. La spunta separata **Notifiche push dei messaggi** permette di disattivare solo le push delle chat, senza modificare i promemoria appuntamento o le sottoscrizioni del dispositivo. La scelta vale per l’account su tutti i dispositivi; resta memorizzata anche spegnendo e riaccendendo l’interruttore generale. Per ricevere le push dei messaggi devono essere attivi entrambi gli interruttori e il permesso del dispositivo. Disattivare la spunta annulla le consegne messaggi ancora in attesa. I default dei barbieri rimangono quelli già configurati, con push inizialmente spente.
 
 Il dispatcher controlla la coda ogni minuto. Il testo della conversazione non compare nella push: un avviso generico apre la casella Messaggi. Messaggi già letti o avvisi eliminati vengono esclusi dalla consegna; tentativi/scadenza sono limitati. La ricezione effettiva dipende dal permesso del dispositivo e dal servizio push. Su iPhone serve la PWA aggiunta alla schermata Home con iOS 16.4 o successivo.
 
